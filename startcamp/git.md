@@ -116,3 +116,9 @@ $ git clone {가져오고자 하는 repo url}
 
 
 
+### 5. 변경사항 다운로드
+
+```sh
+$ git pull origin master
+```
+
