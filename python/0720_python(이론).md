@@ -525,36 +525,313 @@ print(b)
 
 ###### (4) 연산자/함수
 
+| operation     | 설명                    |
+| ------------- | ----------------------- |
+| x in s        | containment test        |
+| x not in s    | containment test        |
+| s1+s2         | concatenation           |
+| s*n           | n번만큼 반복하여 더하기 |
+| s[i]          | indexing                |
+| s[i:j]        | slicing                 |
+| s[i:j:k]      | k간격으로 slicing       |
+| len(s)        | 길이                    |
+| min(s),max(s) | 최솟값, 최댓값          |
+| s.count(x)    | x의 개수                |
+
 
 
 ##### 2) 순서가 없는 데이터
 
-###### (1) set
+###### (1) set({})
+
+- 수학에서의 집합과 동일
+
+- `{}`를 통해 만들며, 순서가 없고 중복된 값이 없다.
+
+- 빈 집합을 만들려면 `set()`을 사용(`{}`는 불가능)
+
+  
 
 ###### (2) dictionary
 
+- `key`와 `value`가 쌍으로 이뤄져있으며, 궁극의 자료구조
 
+- `{}`를 통해 만들며, `dict()`로 만들 수 있음
 
-##### 3) 형변환
+- `key`는 변경 불가능한 데이터만 가능)(str, int, float, bool, tuple, range)
+
+- `value`는 `list`, `dictionary` 등 모든 것이 가능
+
+  
+
+##### 3) 형변환(O변환가능/X변환불가능)
+
+|    구분    | string |   list   |  tuple   | range |   set    | dictionary |
+| :--------: | :----: | :------: | :------: | :---: | :------: | :--------: |
+|   string   |   -    |    O     |    O     |   X   |    O     |     X      |
+|    list    |   O    |    -     |    O     |   X   |    O     |     X      |
+|   tuple    |   O    |    O     |    -     |   X   |    O     |     X      |
+|   range    |   O    |    O     |    O     |   -   |    O     |     X      |
+|    set     |   O    |    O     |    O     |   X   |    -     |     X      |
+| dictionary |   O    | O(KEY만) | O(KEY만) |   X   | O(KEY만) |     -      |
 
 ##### 4) 데이터 분류(**중요)
 
 ###### (1) 변경 불가능한 데이터
 
+- 단일 데이터 : 숫자, 글자, 참/거짓
+- range, tuple, frozenset
+
 ###### (2) 변경 가능한 데이터
 
+- list, dict, set, 사용자가 만든 데이터타입
 
 
 
+### 2. 제어문
 
-### 2. 제어
+#### 1.1 조건문
+
+> `if`문은 반드시 참/거짓을 판단할 수 있는 조건과 함께 사용
+
+##### 1) if 조건문
+
+```python
+if <참/거짓 조건>:
+    <코드>#앞에 스페이스 4번 띄움
+else :
+    <코드>
+```
+
+```python
+if (num%2)==1: #우선순위가 애매하면 ()를 써줌
+#if (num%2): 이값이 1 혹은 0이되기 때문에 1이되면 True라서 홀수, 0은 F라서 짝수
+  print('홀수입니다.')
+else :
+  print('짝수입니다.')
+```
+
+##### 2) elif 복수 조건
+
+```python
+if score>=90:
+  print('A')
+elif score>=80:
+  print('B')
+elif score>=70:
+  print('C')
+elif score>=60:
+  print('D')
+else :
+  print('F')
+```
+
+##### 3) 중첩 조건문
+
+```python
+if score>=90:
+  print('A')
+  if score>=95:
+    print('참 잘했어요!')
+elif score>=80:
+  print('B')
+elif score>=70:
+  print('C')
+elif score>=60:
+  print('D')
+else :
+  print('F')
+```
+
+##### 4) 조건 표현식
+
+- 조건에 따라 값을 정할 때 활용
+- =삼항 연산자
+
+```python
+true_value if <조건식> else false_value
+```
+
+```python
+num = int(input('숫자를 입력하세요 : '))
+value = num if num >= 0 else -num
+print(value)#절댓값
+```
 
 
 
+#### 1.2 반복문
+
+##### 1) while 반복문
+
+- 조건식이 참인 경우 반복적으로 코드 실행
+- 조건식 뒤에 콜론(`:`)이 반드시 필요, 코드는 `4spaces`를 들여쓰기 함
+- 반드시 종료조건 설정 필요
+
+```python
+while <조건식>:
+    <코드>
+```
+
+```python
+while True:
+    print('조건식이 참일 때까지')
+    print('계속 반복')
+```
+
+##### 2) for문
+
+- 시퀀스(String,Tuple,List,Range)나 다른 순회가능한  객체((iterable)의 요소들을 순회함
+- 정해진 시퀀스 내에서 반복 시 사용, 가지고 있는 모든 것을 꺼냄
+
+```python
+for <임시변수> in <순회가능한데이터(iterable)>:
+    <코드>
+```
+
+ ```python
+#enumerate(iterable,start=0)
+lunch = ['짜장면', '초밥', '피자', '햄버거']
+for idx, menu in enumerate(lunch):
+  print(idx,menu) #알고리즘테스트에서 활용도가 높다.
+#출력
+0 짜장면
+1 초밥
+2 피자
+3 햄버거
+ ```
 
 
-반복제어
 
--  break**
+##### 3) 반복제어
 
-- continue
+###### (1) break
+
+- `for`나 `while`문에서 빠져나감
+
+```python
+n=0
+while True:
+  if n>=3:
+    print('브레이크걸리는 시점',n)
+    break
+  print(n)
+  n+=1
+print('반복문 탈출!')
+```
+
+```python
+for i in range(10):
+  if i>1:
+    print('break할거야')
+    break
+  print(i)
+```
+
+###### (2) continue
+
+- `continue` 이후의 코드를 수행하지 않고, 다음 요소부터 계속하여 반복 수행
+
+```python
+for i in range(6):
+#i=2,continue를 만나면 continue이후의(밑의) 코드 2개는 실행하지 않고 바로 n=3으로 넘어감
+  if i %2==0:
+    continue
+    print(f'{i}는 짝수다.')
+  print(f'{i}는 홀수다.')
+```
+
+```python
+for age in ages:
+  if age<20:
+    continue
+  else:
+    print(f'{age} 살은 성인입니다.')
+
+for age in ages:
+  if age>=20:
+    print(f'{age} 살은 성인입니다.')
+##둘다 맞다. continue쓰고 안쓰고 차이 둘 다 표현 할 줄 알아야 함
+```
+
+###### (3) for-else
+
+- 끝까지 반복문을 시행한 후 실행
+- 반복에서 리스트의 소진이나(`for`문) 조건이 거짓이 돼서(`while`문) 종료할 때 실행
+- 반복문이 `break`문으로 종료될 때는 실행되지 않음(`break`를 통해 중간에 종료되지 않은 경우만 실행)
+
+```python
+for i in range(3):
+  print(i)
+  if i==100:
+    break
+else:
+  print('break 실행 안됨') ## for와 같은 라인에 else를 써줌
+#
+0
+1
+2
+break 실행 안됨
+```
+
+```python
+for i in range(3):
+  print(i)
+  if i==1:
+    break
+else:
+  print('break 실행 안됨') ## for와 같은 라인에 else를 써줌
+#
+0
+1
+```
+
+```python
+numbers=[1,4,6,8,10]
+for number in numbers:
+  print(number)
+  if number==5:#numbers에 5가 있다면 True만 출력
+    print('True')
+    break
+else :#5가 없다면 False만 출력
+  print('False')
+
+
+#하나라도 있으면 뭐하고, 아니면 뭐하고 이런 문제에서 사용 break를 만나고 안만나고의 차이
+```
+
+###### (4) pass
+
+- 아무것도 하지 않음
+- 문법적으로 문장이 필요하지만, 아직 코딩이 완성되지 않았을 때 자리 채우는 용도로 사용 가능
+
+```python
+# pass
+for i in range(5):
+  if i==3:
+    pass #왜 쓰냐? if에 들어올 코드를 아직 잘 모를때 비워두면 에러를 발생시키기 때문에 사용
+    print('요건 패스')
+  print(i)
+#
+0
+1
+2
+요건 패스
+3
+4
+```
+
+```python
+# continue
+for i in range(5):
+  if i==3:
+    continue #밑의 코드는 실행하지 않고 지나감
+    print('요건 패스')
+  print(i)
+#
+0
+1
+2
+4
+```
+
