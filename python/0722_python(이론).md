@@ -183,7 +183,7 @@ def my_max(*args):#함수에 인자를 여러개 넣어도 알아서 인식(가�
 #### (5) 가변 키워드 인자
 
 - 정해지지 않은 키워드 인자들은 `dict`형태로 처리 됨
-- `**`러 표현, 보통 `kwargs` 이름 사용
+- `**`로 표현, 보통 `kwargs` 이름 사용
 
 ```python
 def func(**kwargs):
@@ -339,7 +339,7 @@ print('global_num:', global_num)
 
 - 반복문을 통한 팩토리얼
   - n이 1보다 큰 경우 반복문을 돌며, n은 1씩 감소
-  - 마지막에 ndl 1이면 더 이상 반복문 돌지 않음
+  - 마지막에 n이 1이면 더 이상 반복문 돌지 않음
 
 ```python
 def fact(n):
@@ -385,16 +385,34 @@ def factorial(n):
 - 반복문
 
 ```python
-
+def fib_loop(n): 
+    a = 0
+    b = 1
+    if n < 0: 
+        print("Incorrect input") 
+    elif n == 0: 
+        return a 
+    elif n == 1: # 첫번째 수는 1
+        return b 
+    else: 
+        for i in range(1,n): #n=2일때
+            c = a + b #c=0+1=1
+            a = b #a=1
+            b = c #b=1
+        return b #1(두번째 수는 1)
 ```
 
 - 재귀함수 사용
 
 ```python
 def fib(n):
-    if n<=1:
-        return n
-    else:
+    if n<0:
+        print("Incorrect input") 
+    elif n==0: 
+        return 0
+    elif n==1:#첫번째 피보나치 수는 1
+        return 1
+    else:#n=2일때 fib(1)+fib(0)=1+0=1 두번째 수는 1
         return fib(n-1)+fib(n-2)
 ```
 
