@@ -698,6 +698,7 @@ print(a) #[1, 2, [1, 2]]
 
 # elif 는 다음과 같이 사용해야 합니다. (if else 열거)
 [식 if 조건식 else 식 if 조건식 else 식 if ... else ... for 변수 in iterable]
+
 ```
 
 - 짝수리스트
@@ -710,53 +711,104 @@ for number in range(1,11):
         even_list.append(number)
 ```
 
-- List comprehension 활용
-
-```python
-
-```
-
-
-
-
-
-
-
-
-
 
 
 ### 3. 데이터 구조에 적용가능한 Built-in Function
 
+- 순회가능한(iterable) 데이터 구조에 적용가능
+- list, dict, set, str, bytes, tuple, range
+
 #### 1) `map(function, iterable)`
+
+- 순회가능한 데이터 구조(iterable)의 모든 요소에 function을 적용한 후 결과 돌려줌
+- return은 `map_object`형태
+- 입력값을 처리할 때 자주 활용
 
 #### 2) `filter(function, iterable)`
 
+- iterable에서 fuction의 반환된 결과가 `True`인 것들만 구성하여 반환
+- `filter object`를 반환
+
 #### 3) `zip(*iterables)`
+
+- 복수의 iterable 객체를 모음
+- 결과는 튜플의 모음으로 구성된 `zip object`를 반환
 
 ### 4. 세트(Set)
 
+- mutable(변경가능)
+- unordered(순서 없고)
+- iterable(순회 가능한)
+
 #### 4.1 추가 및 삭제
 
-##### 1) `.update(*others)`
+- `.add(elem)` :  elem을 세트에 추가를 함, 중복을 제거하고 return하는 값이 없다
 
-##### 2) `.remove(elem)`
+- `.update(*others)` : 여러가지 값을 추가, 인자로는 반드시 iterable 데이터 구조를 전달
 
-##### 3) `.discard(elem)`
+- `.remove(elem)` : elem을 세트에서 삭제하고, 없으면 KeyError가 발생
 
-##### 4) `.pop()`
+- `.discard(elem)` : elem을 세트에서 삭제하고 없어도 에러가 발생하지 않음
+
+- `.pop()` : 임의의 원소를 제거해 반환
 
 #### 4.2 딕셔너리(Dictionary)
 
+- mutable
+- unordered
+- iterable
+- `Key : Value`페어의 자료구조
+
 ##### 1) 조회
 
-###### `.get(key[, default])`
+- `.get(key[, default])` 
+  - key를 통해 value를 가져옴, 절대로 KeyError가 발생하지 않고, default는 기본적으로 None
 
 ##### 2) 추가 및 삭제
 
-###### `.update()`
+- `.update()`
+  - 값을 제공하는 key, value로 덮어씀
 
 ##### 3) 딕셔너리 순회(반복문 활용)
 
+- 딕셔너리에 `for`문을 실행
+
+```python
+# 0. dictionary 순회 (key 활용)
+for key in dict:
+    print(key)
+    print(dict[key])
+
+
+# 1. `.keys()` 활용
+for key in dict.keys():
+    print(key)
+    print(dict[key])
+
+
+# 2. `.values()` 활용    
+for val in dict.values():
+    print(val)
+
+
+# 3. `.items()` 활용
+for key, val in dict.items():
+    print(key, val)
+```
+
+- `get(key[,default])`
+  - key가 딕셔너리에 있는 경우 key에 대응하는 값을 돌려주고, 그렇지 않음 default돌려줌
+
 ##### 4) Dictionary comprehension
+
+- `iterable`에서 `dict`를 생성할 수 있음
+
+```python
+{키: 값 for 요소 in iterable}
+
+dict({키: 값 for 요소 in iterable})
+
+# elif 는 다음과 같이 사용해야 합니다. (if else 열거)
+{키: 값 if 조건식 else 식 if 조건식 else 식 if ... else ... for 변수 in iterable}
+```
 
