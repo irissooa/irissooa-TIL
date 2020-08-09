@@ -469,11 +469,21 @@ words = ['안녕', 'hello']
 
 -  기타 문자열 관련 검증 메소드 : 참/거짓 변환 -> 그때그때 구글링으로 찾기...ㅎㅎ
 
-```python
-.isalpha(), .isdecimal(), .isdigit(), .isnumeric(), .isspace(), .isupper(), .istitle(), .islower()
-```
+- `.isalpha()`: 문자열이 문자인지 아닌지를 True,False로 리턴
 
+- `.isdecimal()`:주어진 문자열이 int형으로 변환이 가능한지 알아내는 함수이기 때문에 특수문자 중 숫자모양을 숫자로 치지않는다.
 
+- `.isdigit()`: 단일 글자가 '숫자' 모양으로 생겼으면 무조건 True를 반환하는 함수. 즉, 숫자처럼 생긴 '모든 글자'를 숫자로 친다.
+
+- `.isnumeric()`:숫자값 표현에 해당하는 문자열까지 인정한다. 제곱근 및 분수, 거듭제곱 특수문자도 isnumeric() 함수는 True를 반환하는 것을 알 수 있다.
+
+- `.isspace()`:문자열에 공백이 포함되어 있음 True 아니면 False
+
+- `.isupper()`:모두 대문자라면 True 아니면 False
+
+- `.istitle()`:모든 단어의 첫 문자열이 대문자이면 True 아니면 False
+
+- `.islower()`:모두 소문자라면 True 아니면 False
 
 ### 2. 리스트(List)
 
