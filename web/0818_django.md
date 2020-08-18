@@ -285,3 +285,105 @@ TEMPLATES = [
 
 
 
+
+
+##  Practice
+
+## practice/urls.py
+
+```python
+from django.contrib import admin
+from django.urls import path
+from pages import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('lotto/', views.lotto),
+]
+```
+
+## pages/views.py
+
+```python
+import random
+from django.shortcuts import render
+
+# Create your views here.
+def lotto(request):
+    #로또 당첨 번호
+    numbers = range(1,46)
+    lotto = random.sample(numbers,6)
+    #보너스 번호
+    bonus = random.sample(numbers,1)
+
+    #로또 1000회분량
+    lotto_1000 = [random.sample(numbers,6) for _ in range(1000)]
+
+    #각 등수 별 cnt세기
+    #1등 lotto랑 같음, 2등 lotto 5개 +보너스1개 3등 lotto 5개(보너스포함안함) 4등 4개 5등 3개 이후 꽝
+    
+    first, second, third, fourth, fifth, death = 0,0,0,0,0,0
+    for i in lotto_1000:
+        cnt = 0
+        for j in i: #로또_1000안의 리스트들을 본다
+            for k in lotto: #뽑은 lotto의 번호와 비교함
+                if j == k:
+                    cnt += 1
+        #순위별로 cnt 분배
+        if cnt == 6:
+            first += 1
+        elif cnt == 5 and (bonus in i):
+            secnd += 1
+        elif cnt == 5 and (bonus not in i):
+            third += 1
+        elif cnt == 4:
+            fourth += 1
+        elif cnt ==3:
+            fifth += 1
+        else:
+            death += 1
+        
+
+    context = {
+        'lotto' : sorted(lotto),
+        'bonus' : bonus,
+        'first' : first,
+        'second' : second,
+        'third' : third,
+        'fourth' : fourth,
+        'fifth' : fifth,
+        'death' : death,
+    }
+    return render(request,'lotto.html',context)
+```
+
+## templates/lotto.html
+
+- `ul`아래에 `li`로 하나씩 묶어주면 리스트를 만들 수 있음
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lotto</title>
+</head>
+<body>
+  <h1>로또 당첨 횟수를 알아보자.</h1>
+  <hr>
+  <h2>이번 회차 당첨 번호 : {{ lotto }} + {{ bonus }}</h2>
+  <ul>
+  <li>1등 : {{ first }}번</li>
+  <li>2등 : {{ second }}번</li>
+  <li>3등 : {{ third }}번</li>
+  <li>4등 : {{ fourth }}번</li>
+  <li>5등 : {{ fifth }}번</li>
+  <li>꽝 : {{ death }}번</li>
+  </ul>
+</body>
+</html>
+```
+
+
+
