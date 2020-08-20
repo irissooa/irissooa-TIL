@@ -1,4 +1,4 @@
-# Django
+# Django  made by,,,채린,,수아,,,,,
 
 ##  새로알게 된 것
 
@@ -181,9 +181,17 @@ INSTALLED_APPS = [
    ```
 
    3. migrate : DB에 적용
-
-
-
+   
+   **[슈가빈 참고]**
+   
+   -모델.py에 적힌 파이썬 코드를 실제 db에 적용시키는걸 makemigrations, migrations임
+   
+     \#이 파일을 통해 migrate를 하게되면 db.sqlite3 db가 형성된다
+   
+     \#이렇게 파일이 저장이 되어있으면 서버를 껐다 켜도 영향이 없음
+   
+   
+   
 5. `urls.py` 분리
 
    - migrate를 끝내면 url을 분리한다
@@ -405,9 +413,9 @@ INSTALLED_APPS = [
   - `{% for article in articles %}`
   
   - articles에 있는 데이터 수만큼 for문을 통해 반복한다는 뜻임!! 
-    
+  
 - `<p>글 번호: {{article.pk}}</p>`
-    
+  
   - pk는 id라고 써도 똑같은데 보통 pk라고 쓰고, primary key의 약자임
   
   - `<p>글 제목: {{article.title}}</p>`
@@ -418,12 +426,12 @@ INSTALLED_APPS = [
   
     - 상세페이지를 누르면 articles의 detail로 가는데, 여기서는 특정 페이지로 가야하기 때문에 동적 url을 사용한다. 그걸 사용하려면,  반드시 위처럼 한칸 띄우고, `article.pk`를 적어준다. 
   -  위를 다 수행한 뒤 보낼곳 url이름을 적어줌 article.pk를 넘겨줘 articles의 pk디테일로 보내짐
-    
+  
     
 
 8. `new`(정보를 보내고)/ `create`(정보를 받는 역할)
 
-   -  urls.py에 아래처럼 적어줌
+   -  **urls.py**에 아래처럼 적어줌
 
      ```python
      urlpatterns = [
@@ -435,9 +443,11 @@ INSTALLED_APPS = [
 
      
 
-   - 그리고 views.py로 넘어간다.
+   - 그리고 **views.py**로 넘어간다.
 
      ```python
+     from django.shortcuts import render, redirect #render와 함께 redirect를 import!!
+     
      def new(request):
          return render(request, 'articles/new.html')
      
@@ -445,9 +455,10 @@ INSTALLED_APPS = [
      def create(request):
          title = request.POST.get('title') #new에서 보낸 정보
          content = request.POST.get('content') #new에서 보낸 정보를 POST에서 찾음
+         
          #받은 정보를 db에 저장(DB API 적는 방법)
          #1.
-         article = Article() ㅔ
+         article = Article() 
          article.title = title 
          article.content = content
          article.save()
@@ -462,68 +473,251 @@ INSTALLED_APPS = [
      ```
      
 
+   - new함수는 new.html로 정보를 보내기만 하기 때문에, context가 필요없다!
+
+   - `title = request.POST.get('title')`
+
+     - new.html에서 post방식으로 저장한 데이터를 title에 할당함. POST에 저장이 되어 있는 것임.
+     - ~~근데 `get('title')`이 new .html의 title의 name값인가????~~
+
+     
+
+   - `return redirect('articles:detail', article.pk)`
+
+     - 글이 다 써졌으면, 해당 글 디테일 페이지로 redirecting해줌(모듈불러옴) 
+     - 위를 다 수행한 뒤 보낼곳 url 이름을 적어주고, article.pk를 넘겨줘 articles의 pk디테일로 보내짐
+
    
+
+   - 그리고 `new.html`과 `create.html`를 작성해보자
+
+     (근데 create.html은 필요없다. 왜냐면, create의 리턴값은 detail의 url로 가는 것으로 설정하였기 때문이다)
+
+     `new.html`
+
+     ```html
+     {% extends 'base.html' %}
+     
+     {% block content %}
+       <h1 class="text-center">New</h1>
+       <form action="{% url 'articles:create' %}" method="POST"> 
+         {% csrf_token %}
+         <label for="title">Title: </label>
+         <input type="text" name="title" id="title"><br>
+         <label for="content">Content: </label>
+         <textarea name="content" id="content" cols="30" rows="10"></textarea><br>
+         <input type="submit" value ="글쓰기">
+       </form>
+       <hr>
+       <a href="{% url 'articles:index' %}">[뒤로가기]</a>
+     {% endblock content %}
+     ```
+
+     `<form action="{% url 'articles:create' %}" method="POST"` :POST방식으로 저장된 정보를 action에 있는 url인 create로 넘겨준다! 정보를 넘겨주면 create view함수로 가게 되고, (**정확히 모르겠다**)
+
+     `{% csrf_token %}`: 누군가가 내 create에 마구 요청을 보내면 비용이 많이 들기 때문에 장고에서 아무나 create에 요청을 할 수 없게 장치를 해둔것이고 그게 바로 이것이다. `사이트간 요청 위조`이다. POST를 쓸때는 이 토큰이 무조건 필요함!! 
+
+     `<a href="{% url 'articles:index' %}">[뒤로가기]</a>`: 뒤로가기 버튼을 누르면 `article/index` 로 감(**근데 view로 가는건지 html로 가는건진 모르겠다....,ㅠ**)
 
     #### GET vs POST
 
-   - GET은 검색/조회, POST는 db에 변화를 일으킴(POST는 요청할때마다 DB에 변화를 일으킴)
+   - GET은 검색/조회, POST는 db에 변화를 일으킴(POST는 요청할때마다 DB에 변화를 일으킴.아무나 DB변경할 수 없도록 보안장치 - CSRF token)
+     
      - 여기서 중요한건, DB에 영향을 주는 여부임. GET을 쓸 때는 `a태그`를 쓰고, POST를 쓸때는 보통 `form`태그를 보통 쓴다.
+     
+   - ```PYTHON
+         #1.
+         article = Article()  #모델 클래스로부터 article이라는 인스턴스를 만듦
+         article.title = title #article 인스턴스 클래스 변수에 접근해서 해당 인스턴스 변수를 변경
+         article.content = content #마찬가지
+         article.save() #무조건 저장을 해야함!! 
+         #2
+         Article.objects.create(title=title, content=content)
+         #db api로 적는건데, create() 메서드를 사용하면 쿼리셋 객체를 생성하고, save하는 로직이 한번의 step으로 가능
+         #3
+         aricle = Article(title=title,content=content) #class로 인스턴스 생성시 키워드 인자를 함께 작성 
+         article.save() #저장해야함
+         
+     ```
+
+     
+
+   9. `detail`
+
+      
+
+   - urls.py로!
+
+     ```python
+     urlpatterns = [
+     	#(전략)
+         path('<int:article_pk>/', views.detail, name='detail'),
+         #(후략)
+     ```
+
+     - `path('<int:article_pk>/', views.detail, name='detail'),` : article pk와 같이 create가 생성되면서 detail url로 보내게 되면서 pk값도 같이 보내고, 그 해당 pk의 detail 템플릿을 나타나게 할꺼야!
+
+   - views.py로!
+
+     ```python
+     def detail(request, article_pk):
+         article = Article.objects.get(pk=article_pk)
+         context = {
+             'article' : article,
+         }
+         return render(request,'articles/detail.html',context)
+     ```
+
+     - 동적 라우팅이기 때문에 인자가 하나 더 필요함(`article_pk`)
+     -   article_pk에 해당하는 article을 찾아서 보여줌. db에서 pk를 이용해 해당되는 데이터를 찾아서 보여줄거야
+
+     
+
+   - html을 만들자
+
+     ```html
+     {% extends 'base.html' %}
+     {% load humanize %} #naturaltime을 적기 위해서 이거 추가/그리고 settings에서 installed apps에서`django.contrib.humanize`를 추가!! 
+     
+     {% block content %}
+     <h1 class="text-center">디테일 페이지</h1>
+     <a href="{% url 'articles:index' %}">목록으로 가기</a>
+     
+       <p>글 번호: {{ article.pk }}</p>
+       <p>글 제목: {{ article.title }}</p>
+       <p>글 내용: {{ article.content }}</p>
+       <p>작성 시간: {{ article.created_at|naturaltime }}</p>
+       <p>수정 시간: {{ article.updated_at|naturaltime }}</p>
+     
+       <form action="{% url 'articles:delete' article.pk %}" method="POST">
+       {% csrf_token %}
+       <input type="submit" class="btn btn-danger" value="삭제하기">
+       <a href="{% url 'articles:update' article.pk %}" method="POST">수정하기</a>
+       </form>
+     {% endblock content %}
+     ```
+
+     `<form action="{% url 'articles:delete' article.pk %}" method="POST">`: 삭제는 db를 변경해야하므로 post방식
+
+     `<a href="{% url 'articles:update' article.pk %}" method="POST">수정하기</a>` : 수정은 a태그가 맞다. 수정할 수 있는 화면을 보여주는 거지 db에서 조회해서 내용을 보여주기만 하면 됨(**근데 우리는 a태그는 get방식, 폼태그는 post방식으로 쓰는걸로 이해했고,,, 그럼 수업때는 a태그가 맞다고 한 이유가 수정한 페이지를 보여주기 때문이었다, 몰라;;;;;;;**
 
    
 
+10. `delete`
 
+    여기서부터 그냥 똑같으니까 복붙
 
-## POST
+    `urls.py`
 
-> 앞으로는 내용을 쓸 때 GET이 아니라 POST로 써야됨
+    ```python
+    
+    urlpatterns = [
+    
+        path('delete/<int:article_pk>/', views.delete, name="delete"),
+    ```
 
-/create/ -> db 데이터를 쓰는 일
+    `views.py`
 
-클라우드서비스, aws, firebase, azur 등등 서비스를 이용해서 db를 사용할건데 데이터를 쓸 때마다 비용(돈)이 나감 쓴만큼 비용이 발생함
+    ```python
+    def delete(request, article_pk):
+        article = Article.objects.get(pk=article_pk)
+        article.delete()
+        return redirect('articles:index')
+    ```
 
-누군가가 내 creat에 마구마구 요청을 보내요 -> 내 돈 왕창 나감....
+    
 
-장고에서 아무나 내 creat에 요청을 보낼 수 없게 장치를 해둠
+    `delete.html`
 
-그것이 바로 `csrf_token` 이다
-
-**사이트 간 요청 위조**(또는 **크로스 사이트 요청 위조**, [영어](https://ko.wikipedia.org/wiki/영어): Cross-site request forgery, **CSRF**, **XSRF**)는 [웹사이트](https://ko.wikipedia.org/wiki/웹사이트) [취약점 공격](https://ko.wikipedia.org/wiki/취약점_공격)의 하나로, 사용자가 자신의 의지와는 무관하게 공격자가 의도한 행위(수정, 삭제, 등록 등)를 특정 웹사이트에 요청하게 하는 공격을 말한다.ㄴ
-
-name=csrfmiddlewaretoken
-
-value=내가적은값
-
-두개가 같이 전달 됨
-
-/create/에서 정당한 토큰이다/아니다를 판별함
-
-정당한 토큰 없이 요청을 했다? 403에러가 남
-
-![image-20200820113735412](0820_django.assets/image-20200820113735412.png)
-
-정당한 토큰을 받으려면?
-
-/new/페이지로 들어와서 글을 써야만 이 토큰을 받을 수 있다
-
-GET/POST
-
-GET = 요청을 아무리 여러번 해도 DB에 변화가 없는 요청- 검색, 조회(있는 것을 가져올 뿐 내 데이터에 변환ㄴ 없음)
-
-POST=요청할때마다 DB에 변화가 일어나는 요청-글쓰기, 수정, 삭제, 아무나 db를 변경할 수없도록 보안장치-csrf token
+    이거 필요없음 왜냐면 바로 index.url로 가는거니까~
 
 
 
-세부 내용을 구성할 때 `html`에 
+11. `update`
 
-![image-20200820133623254](0820_django.assets/image-20200820133623254.png)
+    `urls.py`
+
+    ```python
+    urlpatterns = [
+        path('update/<int:article_pk>/', views.update, name="update"),
+        path('modify/<int:article_pk>/', views.modify, name="modify"),
+    ]
+    
+    ```
+
+    `views.py`
+
+    ```python
+    def update(request, article_pk):
+        #수정할 수 있는 화면을 보여주는 것이 목적
+        #article_pk로 정보 가져와서 넘겨주면 됨(내용이 이미 기록돼있어야 됨)
+        article = Article.objects.get(pk=article_pk)
+        context = {
+            'article' : article,
+        }
+        return render(request,'articles/update.html',context)
+    ```
+
+    `article = Article.objects.get(pk=article_pk)`  : pk가 article pk 값을 가져옴/예를 들면 pk가 1인 title, content 등등이 들어오는 것임
+
+    `update.html`  
+
+    ```html
+    {% extends 'base.html' %}
+    
+    {% block content %}
+      <h1 class="text-center">Update</h1>
+      <form action="{% url 'articles:modify' article.pk %}" method="POST"> 
+        {% csrf_token %}
+        <label for="title">Title: </label>
+        <input type="text" name="title" id="title" value="{{article.title}}"><br>
+        <label for="content">Content: </label>
+        <textarea name="content" id="content" cols="30" rows="10">{{article.content}}</textarea><br>
+        <input type="submit" value ="수정하기">
+      </form>
+      <hr>
+      <a href="{% url 'articles:index' %}">[뒤로가기]</a>
+    {% endblock content %}
+    ```
+
+    - 수정한걸 받아서 modify 로 보냄, article.pk를 가지고! 그걸 수정할거니까
+
+    
+
+    
+
+12. `modify`
+
+    `urls.py`
+
+    ```python
+    urlpatterns = [
+    
+        path('modify/<int:article_pk>/', views.modify, name="modify"),
+    ]
+    
+    ```
+
+    `views.py`
+
+    ```python
+    def modify(request, article_pk):
+        #1. 수정대상 찾기
+        article = Article.objects.get(pk=article_pk)
+        #2. 수정할 데이터 가져오기
+        title = request.POST.get('title') #update에서 보내준 데이터
+        content = request.POST.get('content') #update에서 보내준 데이터
+        #3. 수정 대상을 수정할 데이터로 수정하기
+        article.title = title
+        article.content = content
+        article.save()
+        #4. detail페이지 redirection
+        return redirect('articles:detail',article_pk)
+    ```
+
+    
+
+    끝,,,,`
 
 
-
-detail -삭제버튼!서버로 요청 서버에서 해당db의 아이템 삭제
-
--index 페이지로 redirect
-
-detail - 수정하기- 수정할 수 있는 화면- 수정끝나면 요청(수정하기버튼)- 그요청대로 수정-detail보여줌
-
-수정을 했더니 번호가 달라지면서 새글이 써졌다. why?` <form action="{% url 'articles:create' %}" method="POST"> `이기 때문, create로 되기 때문 다른 이름인 modify로 바꿔줌
 
