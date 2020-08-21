@@ -1,6 +1,6 @@
 # Django
 
-## 가상환경(Visual Environment)
+## 가상환경(Virtual Environment)
 
 - 파이썬 인터프리터, 라이브러리 및 스크립트가 "시스템파이썬"(운영 체제 일부로 설치되어 있는 것)에 설치된 모든 라이브러리와 격리 되어 있는 파이썬 환경
 - 각 가상 환경은 고유한 파이썬 환경을 가지며 독립적으로 설치된 패키지 집합을 가짐
@@ -99,6 +99,7 @@ $ pip install ipython django-extensions
 - 패키지 요구사항 파일 생성
 
   - 다른이름으로 해도 만들어지지만 반드시 이 이름으로 만들어라!!!
+  - 이 컴퓨터에 저장된 모든 라이브러리르 보여줘요
 
   ```sh
   #패키지 요구사항 저장
@@ -147,4 +148,44 @@ $ pip install ipython django-extensions
   - 위 명령어를 입력하면 json파일로 더미데이터가 만들어짐
 
 
+
+## 순서
+
+0. ptj03 폴더 만들기
+1. git init(pjt03에서)
+2. .gitignore 만들기, django,venv등등 추가
+
+3. 가상환경 만들기
+
+```sh
+$ python -m venv venv
+```
+
+4. 가상환경 활성화하기
+
+```sh
+$ source venv\Scripts\activate
+```
+
+5. 필요한 모듈/라이브설치 
+
+```sh
+$ pip install django
+$ pip install requests
+$ pip install ipython django-extensions
+```
+
+6. 프로젝트 작성
+
+```sh
+# 가상환경에서 진행을 할 때만 .을 뒤에 붙여줌
+$ django-admin startproject pjt03 .
+```
+
+7. 최종제출
+
+```sh
+#패키지 요구사항 저장
+$ pip freeze > requirements.txt
+```
 
