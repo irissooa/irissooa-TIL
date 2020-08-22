@@ -1,4 +1,4 @@
-# WEB 과목평가 정리
+#  WEB 과목평가 정리
 
 ## HTML
 
@@ -149,10 +149,11 @@
 
   - `name`에 fullname이라는 `key`로 내가 적은 이름(input값)이 value로 전달됨
   - ex. `http://naver.com/?fullname=내가적은이름&class-no=2&temp=37.5미만` 이런식으로 됨
-  - 태그사이에 있는 이름은 화면에 표시될 text이고 value에 적은 것은 정보가 전달될 때 사용됨
+  - 태그사이에 있는 이름은 화면에 표시될 text
+  - `value`에 적은 것은 정보가 전달될 때 사용됨
   - `id`를 `label`과 같게 주면 글자를 클릭했을 때 체크가 됨(label의 글을 눌러도 input 값이 눌러짐-input형태가 버튼이다)
-    - `name`을 똑같이 주면 여러개 중 하나가 선택됨(input type이 체크하는 형태인데 여러개 모두 선택되지 않고 한개만 선택되게 하기 위해 사용)
-
+  - `name`을 똑같이 주면 여러개 중 하나가 선택됨(input type이 체크하는 형태인데 여러개 모두 선택되지 않고 한개만 선택되게 하기 위해 사용)
+  
   ```sh
   <body>
   	<form~>
@@ -162,9 +163,10 @@
   </div>        
   </body>
   ```
-
+```
   
 
+  
   
 
 
@@ -187,7 +189,7 @@
   <p style= "color: blue">
       Lorem ipsum dolor.
   </p>
-  ```
+```
 
   - 해당 태그(`<p>`)가 선택자가 되고, CSS코드에는 속성과 값이 만들어짐, 꾸미는데 한계가 있고, 재사용이 불가능함
 
@@ -418,7 +420,7 @@ margin:10px 20px 30px;
 }
 ```
 
-- 상/우/하/좌
+- 상/우/하/좌(시계방향)
 
 ```
 .margin-4{
@@ -428,10 +430,11 @@ margin:10px 20px 30px 40px;
 
 #### box-sizing
 
-- 기본적으로 모든 요소의 box-sizing은 content-box
-  - padding을 제외한 순수 contents영역만들 box로 설정
+- 기본적으로 모든 요소의 box-sizing은 content-box의 크기!
+  - padding을 제외한 순수 contents영역만을 box로 설정
 - 일반적으로 영역을 볼 때는 border까지의 너비를 100px보는 것을 원함
   - 그 경우 box-sizing을 border-box로 설정
+  - 이 말은 border까지의 box 크기를 정한다는 말.
 - 보통 CSS최상단에서 보더박스를 전체선택자(`*`)로 다 적용해주고 시작
 
 ## Display
@@ -803,3 +806,10 @@ margin:10px 20px 30px 40px;
 - class="row" -> display :flex가 선언이 돼있음
 - google news는 정돈이 잘돼있음, 시멘틱태그, 그리드시스템 잘씀
 - 12개의 column으로 나뉘어져 있음
+
+**offset**
+
+- `offset-*` 은 지정한 만큼의 column 공간을 무시하고 다음 공간부터 컨텐츠를 적용한다.
+
+
+
