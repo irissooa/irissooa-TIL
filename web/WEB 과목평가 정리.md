@@ -796,3 +796,11 @@ margin:10px 20px 30px 40px;
 
 
 
+## 추가(Test)
+
+#### .d-none
+
+- `dispaly: none;`의 의미를 가지며 html에서 실행했을 때 해당 블럭이 보이지 않게 한다.
+- `.d-md-none` 이와 같은 문법으로 페이지 크기에 따라서 블락의 형태를 조절할 수 있다.
+- `.d-block` 으로 다시 보이게 할 수 도 있다.
+- [관련 Bootstrap 페이지 참조링크](https://getbootstrap.com/docs/4.0/utilities/display/)
