@@ -164,23 +164,6 @@
   </body>
   ```
 ```
-  
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
--------------------
-
 ## CSS
 
 - Inline Style Sheet : HTML태그의 style속성에 CSS코드를 넣는 방법
