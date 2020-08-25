@@ -140,3 +140,23 @@ for tc in range(1, int(input())+1):
     print() # 테스트 케이스 마다 띄워줘야 하니 추가
 ```
 
+- 선생님 풀이
+- 입력값을 받고 개수를 세서 그만큼 수를 출력시키면 됨
+
+```python
+#선생님 풀이
+num_list = ['ZRO','ONE','THR','FOR','FIV','SIX','SVN','EGT','NIN']
+num_dict = {'ZRO':0, 'ONE':1,'TWO':2,'THR':3,'FOR':4,'FIV':5,'SIX':6,'SVN':7,'EGT':8,'NIN':9}
+T = int(input())
+for tc in range(1,T+1):
+    a,b = input().split() #split(' ')이게 디폴트
+    arr = list(input().split())
+    cnt = [0] * 10 #0~9까지 개수를 세야됨
+    for key in arr:
+        cnt[num_dict[key]] += 1 #key값으로 value값으로 변환해 cnt리스트의 idx값들에각각 더해줌
+    print('#{}'.format(tc))
+    for i in range(10):
+        print(num_list[i] * cnt[i],end='')
+    print()
+```
+
