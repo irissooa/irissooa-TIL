@@ -537,25 +537,57 @@ for tc in range(10):
 
 
 
-## 미로찾기
-
-```python
-
-```
 
 
 
 
-
-## 백준 2667_단지번호붙이기 dfs...풀어보기....!
-
-
-
-## SWEA_종이붙이기
+## SWEA_종이붙이기(점화식)
 
 - 친절한 하영이 설명👍👍
 
 ![image-20200827151430526](0827_algorithm(문제).assets/image-20200827151430526.png)
+
+```python
+#10X20, 20X20인 직사각형 종이
+#교실 바닥에 20XN 크기의 직사각형을 테이프로 표시
+#준비한 종이를 빈틈없이 붙이는 방법을 찾아보려함
+#10의 배수인 N이 주어졌을 때, 종이를 붙이는 모든 경우를 찾으려면
+#표시한 영역을 몇 개나 만들어야 되는가
+#직사각형 종이가 모자라는 경우는 없다
+#첫줄 테스트케이스 개수
+#다음 줄 테스트케이스 별로 N주어짐
+
+#N을 입력받는다
+#20XN에 10X20과 20X20을 어떻게 집어넣을까....생각해봐ㅏㅏ....
+#이거도 방문..배열인가..?
+#같은 크기의 False 2차배열을 만들고
+#하나씩 채워지면 True..로 바꾸고..
+#먼저 큰거 1개 넣고 나머지에 작은거 넣는 방법,
+
+#이건 하영이가 dp로 푸는거랬엉...다시 생각해보자..!
+
+#점화식으로 푼다!
+#규칙찾기(하영그림참고)
+#N이 10일때 d[10]의 경우의 수 1가지.
+#N이 20일때 d[20] 경우의 3가지
+#N이 30일때 d[30] 경우의 d[20]의 경우의 수 + d[10]의 경우의 수 + d[10]의 경우의 수
+#d[n]점화식 d[n] = d[n-1] + d[n-2]*2
+import sys
+sys.stdin = open('input.txt','r')
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())//10 #값들이 다 10의 배수기때문에 10의 몫으로 int값 /하면 float
+    #그 전값들에 계속 쌓아나가야된다,,,,,,,
+    #점화식 값들을 담을 배열을 만듦
+    arr = [0 for _ in range(N+1)] #0idx는 안쓰기 때문에 N+1을 해서 1개 더 idx를 줘야 N까지 표현 가능
+    arr[1], arr[2] = 1,3 #1과 2의 값, 0은 안씀
+    for i in range(3,N+1): #얘도 마찬가지 이유, 그리고 3부터 시작!1과2는 값을 지정
+        arr[i] = arr[i-1] + arr[i-2] * 2
+        # print(arr[i])
+    print('#{} {}'.format(tc,arr[N]))
+
+```
 
 
 
@@ -606,6 +638,79 @@ T = int(input())
 for tc in range(1,T+1):
     code = input()
     print('#{} {}'.format(tc,check(code)))
+```
+
+
+
+## SWEA_4871_그래프 경로
+
+- DFS(i) 이거 선생님께 여쭤보기!!!
+
+```python
+#V개 이내의 노드를 E개의 간선으로 연결한 방향성 그래프
+#특정한 두개의 노드에 경로가 존재하는지 확인하는 프로그램
+#경로가 있으면 1 없으면 0 출력
+#노드번호는 1번부터 존재, V개의 노드 중 간선으로 연결되지 않은 경우도 있음
+#첫줄 테스트케이스
+#테스트케이스의 첫줄에 V와 E가 주어짐
+#둘째줄부터 E개의 줄에 걸쳐, 출발 도착 노드로 간선 정보가 주어짐
+#E개의 줄 이후에는 경로의 존재를 확인할 출발 노드 S와 도착노드 G가 주어짐
+
+#DFS, 이건 방향이 있음!
+#input받기
+#정점수(꼭지점), 간선수(연결된 선들) 주어짐
+#인접행렬 초기값을 만듦
+#한칸 더 크게 만드는 이유는 인덱스를 맞추어 주기 위해(0번 idx버림, V까지 idx로 쓰기 위해)
+#그래프 방향이 있기 때문에 arr[st][ed] = 1만 해줘도 됨
+#방문배열을 선언해주고
+#방문(함수) , 방문을 했을 떄 1로 바꿔줌
+# 현재 내 정점 v와 연결되어 있는지 확인
+#연결이 되어있고 : 1, 방문하지 않았다면(0)
+#DFS(i)로 반복
+#그러다가 i == G(종점)으로 가면 이어진 거니까 1출력
+
+import sys
+sys.stdin = open('input.txt','r')
+
+ans = 0 #global 변수 선언
+def DFS(v):
+    #이번 DFS는 return값이 없음, 그래서 도착지에 도착하면 표시를해줌(global 변수에)
+    global ans
+    visited[v] = True #방문을 했으니 True
+    #종료조건!!, 못찾은건 어차피 ans = 0으로 끝날거니까 따로 조건지정안해도됨
+    if v == G:
+        ans = 1 #표시를 해준거야 이 함수는 리턴값이 없지만 global변수로 답을 찾았다고 표시를 해줌!(종료는 아님, 그 상위의 DFS 돌아가고있음)
+    # 정점만큼 돌면서
+    #Linked[v][i] 이게 1(이어져있고) 방문을 안했고(False)
+    for i in range(1, V+1): #정점1번부터 볼거야아
+        if Linked[v][i] == 1 and visited[i] == False:
+            DFS(i) #이거 진심 이해0 -> 뭐냐고,,,,이건 그냥 쓰다보면...이해된대....ㅎ for문 돌듯...걍..재귀야.............
+
+
+
+
+T = int(input())
+for tc in range(1,T+1):
+    ans = 0 #tc돌때마다 0으로 초기화 해줘야됨!!!
+    V, E = map(int,input().split())
+    #인접행렬 초기값
+    Linked = [[0]*(V+1) for _ in range(V+1)]
+    # print(arr)
+
+    #방문배열 선언
+    visited = [False for _ in range(V+1)] #배열의 idx를 표시해줘야되는데, 그러면 V까지 꼭 나와야함.
+    # 근데 (1,V+1)을 하면 어차피 길이가 (V)와 같음 그래서 (V+1)로 1개 더 추가함
+    # print(type(visited))
+    # print(visited)
+
+    for i in range(E): #간선수만큼 볼거야..
+        st, ed = map(int,input().split()) #start, end
+        #유향이기 때문에 st->end = 1만 해주면 됨
+        Linked[st][ed] = 1
+
+    S,G = map(int,input().split()) #E개의 줄 이후 출발노드,도착노드 주어짐
+    DFS(S) #함수를 선언해줌(출발점), 값이없으니까 변수에 할당을 못함. 그래서 표시한 값을 지정해준거야!
+    print('#{} {}'.format(tc,ans))
 ```
 
 
@@ -824,9 +929,161 @@ for t in range(1,11):
     print('#{} {}'.format(t,result[0][0]))
 ```
 
+```python
+#의수
+def find_ladder(x, y, cnt, arr):
+    # 시작지점 만나면 탈출
+    while x > 0: 
+        # 좌우 확인하고 둘다 0이면 위로 올라간다
+        if arr[x][y+1] == 0 and arr[x][y-1] == 0:
+            x -= 1
+            cnt += 1
+         
+        # 오른쪽에 사다리가 있으면
+        elif arr[x][y+1] == 1:
+            # 벽에 부딫힐 때까지 계속 오른쪽으로 돌진
+            while arr[x][y+1]:
+                y += 1
+                cnt += 1
+            # 벽에 부닥치면 위로 한칸 올라가자
+            x -= 1
+            cnt += 1
+             
+        # 왼쪽에 사다리가 있는 경우
+        elif arr[x][y-1] == 1:
+            # 벽에 부딫힐 떄까지 계속 왼쪽으로 돌진
+            while arr[x][y-1]:
+                y -= 1
+                cnt += 1
+            # 벽에 부닥치면 위로 한칸 올라가자
+            x -= 1
+            cnt += 1
+    # 다끝나면 시작점과 cnt를 튜플형태로 반환
+    return y-1, cnt
+ 
+for tc in range(1, 11):
+    test_case = int(input())
+     
+    # 띄를 둘러보자
+    ladder = [0] * 101 # 아래쪽은 띄를 안 두를거라 101개 만든다
+    ladder[0] = [0] * 102
+    for i in range(1, 101):
+        ladder[i] = [0] + list(map(int, input().split())) + [0]
+ 
+    # 끝나는 지점 탐색
+    end = []
+    for i in range(1, 101):
+        if ladder[100][i]:
+            end.append(i)
+     
+    # 모든 경우의 수를 result에 튜플 형태로 저장
+    result = []
+    for e in end:
+        count = 0
+        # return 값을 2개주면 튜플형태로 자동으로 반환됨
+        temp = find_ladder(100, e, count, ladder) 
+        result.append(temp)
+     
+    # 우선 cnt로 정렬하고, 동일한 것이 있을 때는 시작번호가 큰것 순서로 저장
+    result.sort(key=lambda x: (x[1], -x[0])) 
+    print('#{} {}'.format(tc, result[0][0]))
+```
 
 
 
 
-## 미로찾기 풀어보쟈..
 
+## SWEA_1226_미로찾기
+
+```python
+#미로를 짜보쟈(DFS)
+#1은 벽이고, 0이 길, 2는 출발점, 3은 도착점
+#일단 배열을 입력받는다
+#0을따라 계속 감, 가다가 1을 만나면 0인 곳으로 방향 전환(오,왼,아래,위 순서로 볼거야)/일단가는 방향을 우선시해줄거야!
+#방문배열을 해서 그전에 갔던 곳은 가지 않게 함,,,근데 이러면 길이 아니라서 돌아갈때 오류가 생기지 않을까? 일단해본다
+#다음 위치가 idx에 벗어나지 않는지 확인, 방문하지 않은 곳인지 확인
+#종료조건은 3을 만나면 종료!, 아니면 더이상 갈곳이 없을때!
+#시작점은 (1,1)이고 도착점(끝점)은(13,13)임 
+#도착했다는 것을 저장할 global변수 필요함(ans)
+
+
+import sys
+sys.stdin = open('input.txt','r')
+
+di = [0,0,1,-1] #오, 왼, 아, 위
+dj = [1,-1,0,0]
+
+def check(i,j):
+    global ans
+    visited[i][j] = True
+    # print(i,j)
+    #종료조건
+    if maize[i][j] == 3: #3을 만났다는 건 도착했다는 뜻!
+        ans = 1 #도착했다는 것 표시
+        # print('여기오나')
+        return
+    else:
+        #idx 벗어나면 continue, 방문했던 곳이면 continue, maize[ni][nj]가 0이 아니면 continue,
+        for d in range(4): #4방향을 볼거야
+            ni = i + di[d]
+            nj = j + dj[d]
+
+            #이거는 아래와 같은 뜻 아닌가..? 왜 안되냐고ㅠㅠㅠㅠ
+            #check(ni,nj)만 하는 이유...! 선생님께 여쭤보기
+            #maize[ni][nj] == 3을 해주는 건, 만약 3에 도달했을때 위 ans =1을 적용하게 해주기 위해!
+            # if ni < 0 or ni >= 16 or nj < 0 or nj >= 16:
+            #     continue
+            # if visited[ni][nj] == True:
+            #     continue
+            # if maize[ni][nj] != 0 and maize[ni][nj] == 3:
+            #     continue
+            # check(ni,nj)
+
+            if 0 <= ni < 16 and 0 <= nj < 16 and (maize[ni][nj] == 0 or maize[ni][nj] == 3) and visited[ni][
+                nj] == False:
+                check(ni, nj)
+
+
+
+for tc in range(1,11):
+    ans = 0 #초기화(tc돌때마다)
+    T = int(input())
+    maize = [list(map(int,input())) for _ in range(16)]
+    # print(maize)
+    # for i in range(16):
+    visited = [[False for j in range(16)] for i in range(16)] #방문배열 초기화
+    check(1,1)
+    if ans == 1:
+        print('#{} {}'.format(tc,ans))
+        # break
+    else: #못찾음
+        print('#{} 0'.format(tc))
+```
+
+- stack을 이용해서는 어떻게 풀지?
+
+```python
+def dfs(graph, start, end):
+    """DFS 를 이용하여 미로 찾기 알고리즘을 구현한다. :param graph: 미로 그래프 :param start: 출발 지점(노드) :param end: 도작 지점(노드) :return: 최소 이동 거리 """ 
+    stack = [(start, 0)] # idx 0: 노드, idx 1: 이동 거리 
+    visit = {start, } # 방문한 노드 저장 공간 
+    while stack: 
+        node, distance = stack.pop() 
+        new_distance = distance + 1 
+        for near_node in graph[node]: 
+            # 방문한 적 없는 노드인 경우 
+            if near_node not in visit: 
+                print("{} Node 방문".format(near_node)) 
+                # 도착 지점에 도착한 경우 총 이동거리를 반환 
+                if near_node == end: 
+                    return new_distance 
+                visit.add(near_node) # 방문 
+                stack.append((near_node, new_distance)) # 이동 거리를 1 증가 시킨다. 
+    return -1 # 도착 지점이 막힌 경우(없는 경우)
+
+출처: https://memostack.tistory.com/36 [MemoStack]
+```
+
+
+
+## 백준 2667_단지번호붙이기 dfs...풀어보기....!
