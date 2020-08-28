@@ -1028,20 +1028,25 @@ def check(i,j):
             ni = i + di[d]
             nj = j + dj[d]
 
-            #이거는 아래와 같은 뜻 아닌가..? 왜 안되냐고ㅠㅠㅠㅠ
-            #check(ni,nj)만 하는 이유...! 선생님께 여쭤보기
+           
             #maize[ni][nj] == 3을 해주는 건, 만약 3에 도달했을때 위 ans =1을 적용하게 해주기 위해!
-            # if ni < 0 or ni >= 16 or nj < 0 or nj >= 16:
-            #     continue
-            # if visited[ni][nj] == True:
-            #     continue
-            # if maize[ni][nj] != 0 and maize[ni][nj] == 3:
-            #     continue
-            # check(ni,nj)
-
-            if 0 <= ni < 16 and 0 <= nj < 16 and (maize[ni][nj] == 0 or maize[ni][nj] == 3) and visited[ni][
-                nj] == False:
-                check(ni, nj)
+            #범위 밖이면 continue(다음 for문으로 넘어감)
+            if ni < 0 or ni >= 16 or nj < 0 or nj >= 16:
+                continue
+             #방문을 했다면 continue
+            if visited[ni][nj] == True:
+                continue
+            #0이 아닌데!(0이어야앞으로감), 근데 3이다? 그럼 ans =1로 표시해주고 끝내야됨
+            if maize[ni][nj] != 0:
+                if maize[ni][nj] == 3:
+                  ans = 1
+                  return
+                continue
+            check(ni,nj)
+		#위 조건과 반대로, 해당되면 if문안으로 들어와 다음으로 넘어감
+            # if 0 <= ni < 16 and 0 <= nj < 16 and (maize[ni][nj] == 0 or maize[ni][nj] == 3) and visited[ni][
+            #     nj] == False:
+            #     check(ni, nj)
 
 
 
