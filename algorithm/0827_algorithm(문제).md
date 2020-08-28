@@ -589,6 +589,42 @@ for tc in range(1,T+1):
 
 ```
 
+- 선생님 풀이
+
+```python
+
+#선생님 풀이 메모이제이션 사용 재귀+메모이제이션
+def f(n): #n : 문제의 크기(식별값)
+    #기저 사례
+    if n == 1:
+        return 1
+    if n == 2:
+        return 3
+    #일반적 사례
+    if memo[n]:
+        return memo[n]
+    memo[n] = f(n-1) + f(n-2) * 2
+    return memo[n]
+
+for tc in range(1, int(input())+1):
+    N = int(input()) // 10
+    memo = [0] * (N+1) #초기값 0 -> 이 문제의 답을 아직 구하지 않음
+    print(f(N))
+    
+
+#2.반복문+메모이제이션
+for tc in range(1, int(input())+1):
+    N = int(input()) // 10
+    memo = [0] * (N+1) #초기값 0 -> 이 문제의 답을 아직 구하지 않음
+    memo[1], memo[2] = 1,3 #기저값
+
+    for i in range(3, N+1): #문제의 크기를 ㄴ타내는값
+        memo[i] = memo[i-1] + memo[i-2] * 2
+
+    print(memo[N])
+
+```
+
 
 
 ## SWEA_4866_괄호검사
@@ -639,6 +675,76 @@ for tc in range(1,T+1):
     code = input()
     print('#{} {}'.format(tc,check(code)))
 ```
+
+- 선생님 풀이
+
+```python
+#선생님풀이
+for tc in range(1, int(input())+1):
+    arr = input()
+    S = [] #스택
+    ans = 1
+    #한문자씩 읽어서 처리
+    for ch in arr:
+        #여는 괄호 push
+        if ch == '(' or ch == '{':
+            S.append(ch)
+        #닫는 괄호
+        if ch == ')' or ch == '}':
+            #빈 스택일 경우
+        if len(S) == 0:
+            break
+        #1.방법
+        t = S.pop() #여기서 비교해도됨
+        #ch와 S[-1]비교해서 다르다 (짝이 같은지 안같은지 비교)
+        if (ch == ')' and t != '(') or (ch == '}' and t != '{'):
+            break
+        #2.방법
+        # if (ch == ')' and S[-1] != '(') or (ch == '}' and S[-1] != '{'):
+        #     ans = 0
+        #     break
+        # t = S.pop() #여기 왔다는건 정상적인 경우
+            #같다면 스택에서 제거
+        #괄호문자가 아닌 경우
+
+    #빈스택인지 조사 ->남아있다면 잘못된것
+    if len(S) == 0:
+        ans = 0
+    print(ans)
+```
+
+- 선생님 풀이 (딕셔너리 이용)
+
+```python
+#딕셔너리 만드는 방법
+paren = {'(':')','{':'}',')':'(','}':'{'} #딕셔너리 만들어 사용
+for tc in range(1, int(input())+1):
+    arr = input()
+    S = [] #스택
+    ans = 1
+    #한문자씩 읽어서 처리
+    if ch not in paren:continue
+    for ch in arr:
+        #여는 괄호 push
+        if ch == '(' or ch == '{':
+            S.append(ch)
+        #닫는 괄호
+        if ch == ')' or ch == '}':
+            #빈 스택일 경우
+        if len(S) == 0:
+            break
+        #1.방법
+        t = S.pop() #여기서 비교해도됨
+        if paren[ch] != t:
+            ans = 0
+            break
+    #빈스택인지 조사 ->남아있다면 잘못된것
+    if len(S) == 0:
+        ans = 0
+    print(ans)
+```
+
+
 
 
 
@@ -713,6 +819,39 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,ans))
 ```
 
+- 선생님 코드
+
+```python
+
+#선생님 풀이
+def DFS(v):
+    visit[v] = 1
+    if v == e: #도착점과 같아
+        return 1
+    for w in range(1,V+1):
+        if G[v][w] == 1 and visit[w] == 0:
+            #현재방문한 정점 v라고 생각했을 때 w1,w2,w3,,,등등 갔다가 올건데
+            #그중에 만약 1이 나온다면 굳이 반복문 다 돌지 않고 바로 끝내주면됨!!!!
+            if DFS(w) == 1:
+                return 1
+    return 0
+
+
+for tc in range(1,int(input())+1):
+    V,E = mpa(int,input().split())
+    #인접행렬, 정점번호 1~V
+    G = [[0] * (V+1) for _ in range(V+1)]
+
+    for _ in range(E) #간선 정보 읽기
+        u,v = map(int,input().split())
+        G[u][v] = 1
+
+    s, e = map(int,input().split())
+    visit = [0] * (V+1)
+    # DFS(s)
+    print(DFS(s))
+```
+
 
 
 
@@ -784,11 +923,37 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,check(STR)))
 ```
 
+- 선생님 풀이
+- 스택이용!
+
+```python
+
+#선생님 풀이
+for tc in range(1,int(input)+1):
+    arr = input()
+    S = []
+
+    for ch in arr:
+        #빈스택인경우
+        if not S:
+            S.append(ch)
+        #ch와 S[-1] 비교해서 다르면 push
+        elif ch != S[-1]:
+            S.append(ch)
+        # if와 elif하는 일이 같네?
+        # if not S or ch != S[-1]: #or은 앞에 것이 True라면 뒤에 안봄, 앞이 False면 뒤엘 봄, 근데 굳이 이런거하다가 실수할 수 있음!
+        #     S.append(ch)
+        #같으면 ch와 S[-1] 버림
+        else:
+            S.pop()
+    print(len(S))
+```
+
 
 
 ## ladder
 
-
+- def 에서 ni,nj 범위 정하는 것을 반드시 앞에 둬야 idx에러가 안뜸! idx넘어가면 False라 뒤 조건을 보지 않고 바로 else로 가기때문
 
 ```python
 #음!ladder풀듯 풀어보자!
@@ -835,7 +1000,7 @@ def check(i,j,dist):
             #idx가 벗어나지 않고, 그 값이 0이 아니면 방문하지 않았던 곳으로 갈거야
             # print(ni,nj,visited[ni][nj])
             # print('로 갈라함')
-
+#범위 정하는 것을 반드시 앞에 둬야 idx에러가 안뜸! idx넘어가면 False라 뒤 조건을 보지 않고 바로 else로 가기때문
             # if ni >= 0 and ni < 100 and nj >= 0 and nj < 100 and ladder[ni][nj] != 0 and visited[ni][nj] == False:
             #     # 양옆중 1이 있는지 확인, 있다면 그 곳으로 방향 전환
             #     return check(ni,nj) #반복
@@ -990,6 +1155,160 @@ for tc in range(1, 11):
 ```
 
 
+
+- 선생님 풀이
+- 방향 정보- 한칸씩 이동
+- 현재 위치에서 이동할 다음 위치를 계산
+  - 진행 중 방향 정보(위, 좌, 우)필요
+  - 교차점을 만나면 좌, 우, 위로 이동하는 방향 결정
+
+1. 위
+   - 오른쪽에 길이 있으면 이동, 방향 설정
+   - 왼쪽에 길을 있으면 이동, 방향 설정
+   - 위로 이동
+2. 왼쪽
+   - 왼쪽에 길이 있으면 이동
+   - 위로 이동, 방향 설정
+3. 오른쪽
+   - 오른쪽에 길이 있으면 이동, 방향 설정
+   - 위로 이동 방향 설정
+
+```sh
+사다리 정보 = arr[][]
+현재 위치(x,y) = (행, 열)
+방향정보 = dir (0:상, 1:좌, 2:우)
+Check(x,y)
+- x,y 의 경계조사
+- arr[x][y]가 1인가?
+
+[조건식]
+dir == 0 and check(x,y-1) 좌
+dir == 1 and check(x,y-1) 좌
+
+dir == 0 and check(x,y+1) 우
+dir == 2 and check(x,y+1) 우
+
+dir == 0 and check(x-1,y) 상
+dir == 1 and check(x-1,y) 상
+dir == 2 and check(x-1,y-1) 상
+
+[조건식]
+dir == 0 or 1 and check(x,y-1)  좌
+dir == 0 or 2 and check(x,y+1) 우
+그외
+```
+
+- 왼쪽이나 오른쪽 길이 없으면
+  - 위로 이동
+
+- 오른쪽 길이 나오면(계속 가던길을 가게함)
+  - 오른쪽 길이 없을 때까지 계속 이동한 후 위로 한 칸이동
+- 왼쪽길이 나오면(계속 가던길을 가게함)
+  - 왼쪽으로 없을 떄까지 계속 이동한 후 위로 한 칸 이동
+
+- 이렇게 상황 판단하기 싫어요!!!!
+
+```python
+def check(x,y):
+    #범위를 벗어나는지
+    if x < 0 or x >= 100 or y < 0 or y >= 100:
+        return  False
+    #길인지아닌지 보고
+    if arr[x][y] ==0:
+        return False
+    #맞다면 true
+    return True
+
+ for tc in range(1,11):
+     case_num = input()
+     arr = [list(map(int,input().split())) for _ in range(100)]
+
+     #도착점을 찾는다
+     x = y = 0
+     for i in range(100):
+        if arr[99][i] == 2:
+            x, y = 99, i
+            break
+    dir = 0 #방향정보 저장 0:위, 1:좌, 2:우
+
+    while x: #0이되면 False가 됨, 99부터 올라감
+        #가던 방향으로 계속 가고, check가 True일때
+        #왼쪽으로 가는 경우
+        if dir != 2 and check(x,y-1):
+            y -= 1
+            dir = 1
+        #오른쪽으로 가는 경우
+        elif dir != 1 and check(x,y+1):
+            y += 1
+            dir = 2
+        #그외, 위로 가는 경우
+        else:
+            x -= 1
+            dir = 0
+    print(y)
+```
+
+- 
+
+```python
+    #2번 방법 방향정보 필요없고 벽 부딛칠때까지 계속 한쪽으로 직진
+    while x:
+        if check(x,y-1): #왼쪽으로 가는 경우
+            while check(x,y-1):
+                y -= 1
+            x -= 1
+        elif check(x,y+1): #오른쪽으로 가는 경우
+            while check(x,y+1):
+                y += 1
+            x -= 1
+        x -= 1
+    print(y)
+
+    #3번 사다리를 지움, 그럼 옆에 오른쪽 판단안하고 갔던곳은 벽으로 막히고 한쪽 방향으로 감(이거를 아래 재귀함수로 만듦)
+    while x:
+        arr[x][y] = 0
+        if check(x,y-1): #왼쪽으로 가는 경우
+            y -= 1
+        elif check(x,y+1): #오른쪽으로 가는 경우
+            y += 1
+        else:
+            x -= 1
+    print(y)
+
+    #4번 재귀
+    def ladder(x,y):
+        if x == 0:
+            global ans
+            ans = y #시작지점을 저장
+        else:
+            arr[x][y] = 0
+            if check(x, y - 1):  # 왼쪽으로 가는 경우
+                ladder(x,y-1)
+            elif check(x, y + 1):  # 오른쪽으로 가는 경우
+                ladder(x,y+1)
+            else:
+                ladder(x-1,y)
+            arr[x][y] = 1 #지우면서 갔던것들을 원상복구함 
+    ans = 0
+    ladder(x,y)
+    print(ans)
+
+
+#이거는 반환하는 값이 필요하니까 return 해줌!-> 다시이해필요
+def ladder(x,y):
+        if x == 0:
+            return y #ladder2를 풀때는 return 0하고 아래 return들에 전부 +1해주면 됨
+        else:
+            arr[x][y] = 0 #길 따라가면서 0으로 지웠다가 아래에서 다시 원상복구 '=2'
+            if check(x, y - 1):  # 왼쪽으로 가는 경우
+                return ladder(x,y-1)
+            elif check(x, y + 1):  # 오른쪽으로 가는 경우
+                return ladder(x,y+1)
+            else:
+                return ladder(x-1,y)
+    print(ladder(x,y))
+    print(ans)
+```
 
 
 
