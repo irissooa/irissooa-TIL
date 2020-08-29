@@ -220,3 +220,39 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,sum(SUM)))
 ```
 
+
+
+## 파리퇴치
+
+- 이거 풀때 너무 아무생각이 없었다.....
+- 다음부턴 정신차리고...스탭을 세세하게 적고 시작하기...!!!!!
+
+```python
+import sys
+sys.stdin = open('input.txt','r')
+
+'''
+NXN배열을 돌건데
+크기가 M인 것을 다 더해서 최대인 것을 구함
+for문을 돌건데 idx가 N-M+1만큼 돌거야
+'''
+
+T = int(input())
+for tc in range(1,T+1):
+    N, M = map(int,input().split())
+    arr = [list(map(int,input().split())) for _ in range(N)]
+    #NXN을 돌면서 MXM의 값들을 다 더할거야
+    MAX = 0
+    #NXN을 돌면서 MXM을 돌고 그 원소를 더할거야
+    for i in range(N-M+1):
+        for j in range(N-M+1):
+            SUM = 0
+            for m in range(M):
+                for n in range(M):
+                    SUM += arr[i+m][j+n]
+            if SUM > MAX:
+                MAX = SUM
+
+    print('#{} {}'.format(tc,MAX))
+```
+
