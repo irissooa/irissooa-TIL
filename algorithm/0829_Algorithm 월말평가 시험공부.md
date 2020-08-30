@@ -744,3 +744,35 @@ for tc in range(1,T+1):
     print(''.join(stack))
 ```
 
+
+
+## 회문
+
+```python
+'''
+회문을 찾을건데 길이가 가장 긴 값을 뽑아줄거야!
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def solve():
+    L = 100
+    while L:
+        for i in range(100):
+            for j in range(100-L+1):
+                word = words[i][j:j+L]
+                col_word = col_words[i][j:j+L]
+                if word == word[::-1] or col_word == col_word[::-1]:
+                    #print(word)
+                    return L
+        L -= 1
+
+for tc in range(1,11):
+    T = int(input())
+    words = [list(input()) for _ in range(100)]
+    col_words = list(zip(*words))
+    # print(words,col_words)
+
+    print(f'#{T} {solve()}')
+```
+
