@@ -707,8 +707,52 @@ for tc in range(1,11):
     result = 0 #찾았는지 결과값 초기화
     for i in range(16):
         for j in range(16):
-            if arr[i][j] != 0 and visited[i][j] == False:
-                DFS(1,1)
+            DFS(1,1)
+    print('#{} {}'.format(tc,result))
+```
+
+## 미로2
+
+- RecursionError!!!!!!!!! 어떻게 고칠까....??
+
+```python
+'''
+미로2는 배열이 100이라 
+RecursionError: maximum recursion depth exceeded in comparison
+'''
+import sys
+sys.stdin = open('input.txt','r')
+di = [0,0,1,-1] #우좌하상
+dj = [1,-1,0,0]
+def DFS(i,j):
+    global result
+    visited[i][j] = True
+    # print(i,j)
+    if arr[i][j] == 3:
+        result = 1
+        return True
+    else:
+        for d in range(4):
+            ni = i + di[d]
+            nj = j + dj[d]
+            if ni < 0 or ni >= 100 or nj < 0 or nj >= 100:
+                continue
+            if arr[ni][nj] == 1:
+                continue
+            if visited[ni][nj] ==True:
+                continue
+            DFS(ni,nj)
+            # break
+
+for tc in range(1,11):
+    T = int(input())
+    arr = [list(map(int,input())) for _ in range(100)]
+    # print(arr)
+    result = 0
+    visited = [[False for j in range(100)] for i in range(100)]
+    for i in range(100):
+        for j in range(100):
+            DFS(1,1)
     print('#{} {}'.format(tc,result))
 ```
 
@@ -774,5 +818,37 @@ for tc in range(1,11):
     # print(words,col_words)
 
     print(f'#{T} {solve()}')
+```
+
+
+
+## 부분집합 합 같은 것 구하기
+
+```python
+import sys
+sys.stdin =open('input.txt','r')
+
+T = int(input())
+for tc in range(1,T+1):
+    # N개원소 중 부분집합 합이 W
+    N,W = map(int,input().split())
+    N_list = list(map(int,input().split()))
+    cnt = 0 #부분집합의 개수를 세어줄거야
+    #1<<N개의 부분집합의 개수
+    for i in range(1<<N):
+        sub_sum = 0 #부분집합 합 초기화
+        sub = [] #부분집합 담을 리스트
+        #원소의 수만큼 비트를 비교함
+        for j in range(N):
+            #i의 j번째 비트가 1이면 j번째 원소 출력
+            if i & (1<<j):
+                sub.append(N_list[j])
+                sub_sum += N_list[j]
+        #부분집합 합이 W면 cnt += 1해주기
+        if sub_sum == W:
+            cnt += 1
+            # print(sub)
+
+    print('#{} {}'.format(tc,cnt))
 ```
 
