@@ -169,6 +169,36 @@
 11. 닫는 괄호가 나왔음, 여는 괄호가 나올 때까지 pop, 출력
 12. 수식이 끝남, 스택에 있는 연산자들을 모두 pop하고 출력
 
+
+
+#### 후위 표기식 계산
+
+> 계산할 때 피연산자들의 위치를 잘 맞춰줘야 함
+
+1. 피연산자면 스택에 push함
+2. 연산자를 만나면 pop을 두 번하고 각각 값을 저장한 후, 연산자에 맞는 계산을 함
+3. 계산을 한 뒤, 결과 값은 다시 스택에 넣음, 과정을 수식이 끝날 때 까지 반복함
+4. 수식이 끝났다면 스택에 마지막 남은 값이 결과 값이 됨
+
+![image-20200901232937826](0831_algorithm(이론)_스택2(중위후위표기계산기, 백트래킹).assets/image-20200901232937826.png)
+
+1. 2는 피연산자이므로 스택에 push
+2. 4는 피연산자이므로 스택에 push
+3. 5는 피연산자이므로 스택에 push
+4. `+`는 연산자 스택에 `pop()`을 2번 수행해 각각 값을 변수에 담고 더함
+   1. 이후 스택에 결과 값을 push함
+   2. **위 계산식에서 5+4라고 돼있는데 실제로는 4+5로 수행해야됨**
+5. `*`는 연산자 스택에서 pop()을 2번 수행해 각각 값을 변수에 담고 곱함
+   1. 이후 스택에 결과값을 push함
+   2. 4번과 마찬가지로 `2*9`로 수행해야함
+6. 수식이 끝났으므로 스택에 마지막 남은 값을 pop함, 그 값이 최종 결과 값임
+
+
+
+
+
+
+
 [출처](https://jamanbbo.tistory.com/53)
 
 ## 백준 후위표기식 문제도 풀어보기!!
@@ -602,4 +632,148 @@ def perm(idx): #몇번째 원소인지를 인자로 받음
     #return
 perm(0)
 ```
+
+- 순열_비트
+
+```python
+#비트
+arr=[1,2,3]
+N = 3
+sel = [0] * N
+def perm(idx,check): #몇번째 원소인지를 인자로 받음
+    if idx == N:
+        print(sel)
+        return
+    for i in range(N):
+        if (check & (1<<i))!=0:
+            continue
+        sel[idx] = arr[i]
+        perm(idx+1,check |(1<<i))
+
+perm(0,0)
+```
+
+
+
+- 순열_swap
+
+```python
+arr = [1,2,3]
+N = 3
+
+def perm(idx):
+
+    if idx == N:
+        print(arr)
+        return
+
+    for i in range(idx, N):
+        arr[idx], arr[i] = arr[i], arr[idx]
+        perm(idx+1)
+        arr[idx], arr[i] = arr[i], arr[idx]
+
+perm(0)
+```
+
+
+
+## SWEA_4881_배열 최소 합
+
+```python
+'''
+NxN배열에 숫자가 들어있음
+한줄에 하나씩 N개의 숫자를 골라 합이 최소가 되게하려함
+한줄에 하나, 세로로 같은 줄에서 두 개 이상의 숫자를 고를 수 없음.
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def perm(i,sum):
+    global MIN
+    # sum이 MIN보다 크거나 같으면 종료
+    if sum >= MIN:
+        return
+    #idx가 N과 같아지면
+    if i == N:
+        #저장된 MIN과 sum을 비교해서 MIN보다 작으면 갱신함
+        if MIN > sum:
+            MIN = sum
+        return
+    
+    for k in range(N):
+        #방문표시 했다면 지나가라
+        if visited[k]:
+            continue
+        #방문을 했다고 표시
+        visited[k] = True
+        #다음 idx로 함수 호출, 그 값을 더해준것을 같이 보냄
+        perm(i+1,sum+board[i][k])
+        #다시 방문 표시 원상 복구
+        visited[k] = False
+
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    board = [list(map(int,input().split())) for i in range(N)]
+    visited = [False for i in range(N)]
+    MIN = 9999999
+    perm(0,0)
+    print('#{} {}'.format(tc,MIN))
+```
+
+
+
+## 
+
+## SWEA_4874_forth
+
+```python
+'''
+Forth코드 연산 결과를 출력하라, 불가능한 경우 error를 출력
+숫자는 스택에 넣고
+연산자를 만나면 스택의 숫자 두 개를 꺼내 더하고 결과를 다시 스택에 넣음
+'.'은 코드 마지막이란 뜻, 스택에서 숫자를 꺼내 출력
+'''
+import sys
+sys.stdin = open('input.txt','r')
+T = int(input())
+for tc in range(1,T+1):
+    forth = list(input().split())
+    stack = []
+    #숫자면 스택에 넣음, 연산자면 스택의 숫자를 두개꺼내 계산하고 결과를 다시 스택에 넣음
+    for f in forth:
+        #isdigit은 문자인애가 숫자인지 판별함
+        if f.isdigit():
+            stack.append(int(f))
+        else:
+            if len(stack) >= 2:
+                A = stack.pop() #제일 마지막 숫자뺌
+                B = stack.pop() #그다음 숫자 뺌
+                if f == '+':
+                    total = B+A
+                    stack.append(total)
+                elif f == '*':
+                    total = B*A
+                    stack.append(total)
+                elif f == '/':
+                    total = B//A
+                    stack.append(total)
+                elif f == '-':
+                    total = B-A
+                    stack.append(total)
+                else:
+                    result = 'error'
+            elif f == '.':
+                if len(stack) == 1:
+                    result = stack[0]
+                else:
+                    result = 'error'
+            else:
+                result = 'error'
+                break
+    print('#{} {}'.format(tc,result))
+```
+
+
 
