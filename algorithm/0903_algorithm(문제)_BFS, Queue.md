@@ -67,7 +67,35 @@ for tc in range(1,T+1):
 
 
 
-## SWEA_5102_노드의 길이
+## SWEA_5102_노드의 거리
+
+- 그래프 탐색 -> 출발점에서 도달가능한 정점들 찾을 수 있음(경로)
+- BFS는 그래프 탐색을 하게되면 특성상 출발점에서 가장 가까운 정점(인접정점, 거리가 1인 정점) 
+  - q에 저장
+  - 거리가 1인 것 저장, 2인것 저장....도착점까지 가는 거리 저장
+  - DFS 보다 **최단으로 갈 수 있는 거리(최적화)**를 더 쉽게 구할 수 있음!(DFS로는 보장할 수 없음)
+- 예시
+
+![image-20200904110052672](0903_algorithm(문제)_BFS, Queue.assets/image-20200904110052672.png)
+
+- v -> w
+- visit[w] = 1
+- D[w] = D[v] +1
+- P[w] = v
+
+|           정점            | 1(출발) |  2   |  3   |  4   |  5   |  6   |  7   |
+| :-----------------------: | :-----: | :--: | :--: | :--: | :--: | :--: | :--: |
+|   D(출발점에서최단거리)   |    0    |  1   |  1   |  2   |  2   |  3   |  2   |
+| P(BFS트리,이전 방문 정점) |    1    |  1   |  1   |  2   |  2   |  4   |  3   |
+
+- Q = 1 2 3 4 5 7 6 (경로)
+- P는 부모(어디서 왔는지)를 알 수 있음, 도착점의 이전 정점번호를 읽으면서 실제 최단 거리까지의 정점들의 경로를 알 수 있음(보통 거리를 구하라고 함, 굳이 출력하라고 하지 않음)
+- 1번에서 7번까지 가는 경로가 3가지인데 그중 가장 짧은 것이 2번만에 가는 것이다
+- 이런식으로 추가해서 생성할 수 있음, 하지만 방문이랑 D랑 같이 쓰면 간편하기 때문에 같이 쓰는 경우도 많음
+
+![image-20200904111540803](0903_algorithm(문제)_BFS, Queue.assets/image-20200904111540803.png)
+
+- 문제풀기
 
 ```python
 '''
@@ -124,5 +152,212 @@ for tc in range(1,T+1):
     # BFS(S)
 
     print('#{} {}'.format(tc,BFS(S)))
+```
+
+- 선생님 코드
+
+```python
+#선생님풀이
+for tc in range(1,int(input())+1):
+    V,E = map(int,input().split())
+    #인접행렬
+    G = [[0] * (V+1) for _ in range(V+1)]
+
+    for _ in range(E):
+        u,v = map(int,input().split())
+        #방향이 없기 때문
+        G[u][v] = G[v][u] = 1
+        
+    s,e = map(int,input().split()) #출발 도착
+    
+    visit = [0] * (V+1) #정점의 개수만큼 만듦
+    Q = [s] #출발점을 미리 넣어둠
+    visit[s] = 1 #출발점의 방문표시 0으로 해야되지만 방문표시랑 같이 사용하기 위해 1이라고 함, 큐에 삽입
+    
+    while Q: #빈큐가 아닐동안 반복
+        v = Q.pop(0) #큐에서 뺌
+        #v의 방문하지 않은 인접정점을 찾는다
+        #연결된 모든 정점들 확인함
+        for w in range(1,V+1):
+            if G[v][w] and not visit[w]: #G[v][w] == 1 and visit[w]==0:이란 말
+                visit[w] = visit[v] + 1 #거리계산
+                Q.append(w)
+    print(visit[e]-1)#visit을 방문표시와 거리를 같이 표현했기 떄문에 원래 거리로 했을 시 0부터 시작이니 1을 빼줌
+```
+
+- 종료조건을 주는 것도 좋음!
+  - while문 바로 아래에 둬도 되고, 
+  - for문 안에 두고 도착지점에 도달했을 때 break하기전에 Q를 비워주고 break하면 while문도 나올 수 있음
+
+```python
+    while Q: #빈큐가 아닐동안 반복
+        v = Q.pop(0) #큐에서 뺌
+        #방법 1. 여기다가 종료조건을 줘도됨
+        # if v == e:
+        #     break
+        #v의 방문하지 않은 인접정점을 찾는다
+        #연결된 모든 정점들 확인함
+        for w in range(1,V+1):
+            if G[v][w] and not visit[w]: #G[v][w] == 1 and visit[w]==0:이란 말
+                visit[w] = visit[v] + 1 #거리계산
+                #방법2 종료조건 
+                #if w == e:# 도착점에 도착했네?
+                #     Q.clear() #큐를 비우고(break해도 while에서 못나가서) 빠짐
+                #     break
+                Q.append(w)
+```
+
+- 인접리스트로 사용하는 것이 좀 더 효율적!! 익숙해지자
+
+```python
+for tc in range(1,int(input())+1):
+    V,E = map(int,input().split())
+    #인접리스트
+    G = [[] * (V+1) for _ in range(V+1)]
+
+    for _ in range(E):
+        u,v = map(int,input().split())
+        G[u].append(v)
+        G[v].append(u)
+
+    s,e = map(int,input().split()) #출발 도착
+    
+    visit = [0] * (V+1) #정점의 개수만큼 만듦
+    Q = [s] #출발점을 미리 넣어둠
+    visit[s] = 1 #출발점의 방문표시 0으로 해야되지만 방문표시랑 같이 사용하기 위해 1이라고 함, 큐에 삽입
+    
+    while Q: #빈큐가 아닐동안 반복
+        v = Q.pop(0) #큐에서 뺌
+        #여기다가 종료조건을 줘도됨
+         if v == e:
+             break
+        #인접리스트
+        for w in G[v]:
+            if visit[w] == 0:#방문하지 않았다면
+                visit[w] = visit[v]+1 #거리계산
+                Q.append(w)
+    print(visit[e]-1)#visit을 방문표시와 거리를 같이 표현했기 떄문에 원래 거리로 했을 시 0부터 시작이니 1을 빼줌
+```
+
+
+
+## SWEA_5097_회전
+
+```python
+'''
+N개의 숫자로 이루어진수열, 맨앞의 숫자를 맨 뒤로 보내는 작업 M번
+수열의 맨 앞에 있는 숫자를 출력
+'''
+import sys
+sys. stdin = open('input.txt','r')
+T = int(input())
+for tc in range(1,T+1):
+    N,M = map(int,input().split()) #M은 최대 1000
+    arr= list(map(int,input().split()))
+#M번 작업을 진행, 맨앞의 숫자를 pop하고, 그 숫자를 제일 뒤에 붙임
+    for i in range(M):
+        arr.append(arr.pop(0))
+    print('#{} {}'.format(tc,arr[0]))
+```
+
+- 선생님 풀이1, 나처럼도 풀고, 다양한 방법 보여주심
+
+```python
+T = int(input())
+for tc in range(1,T+1):
+    N,M = map(int,input().split()) #M은 최대 1000
+    arr= list(map(int,input().split()))
+#아래 식을 안쓰고 M % N의 idx값을 넣어도 답을 구할 수 있음
+    print('#{} {}'.format(tc,arr[M % N]))
+```
+
+- 선형 큐
+
+```python
+ #선형큐일경우(파이썬제외) 뒤에 M번 만큼 추가할 리스트를 추가해줘야됨
+    arr= list(map(int,input().split())) + ([0] * M)
+    f,r = -1,N-1
+    for _ in range(M):
+        f += 1 #arr[f]
+        r += 1
+        arr[r] = arr[f]
+    print(arr[f+1])
+```
+
+- 원형큐
+
+```python
+#원형큐일경우
+    arr= [0] +list(map(int,input().split()))
+    f,r = 0,N
+    SIZE = N+1
+    for _ in range(M):
+        f = (f+1) % SIZE
+        r = (r+1) % SIZE
+        arr[r] = arr[f]
+    print(arr[(f+1) % SIZE])
+```
+
+
+
+## SWEA_5099_피자굽기
+
+![image-20200904101126044](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101126044.png)
+
+![image-20200904101635000](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101635000.png)
+
+![image-20200904101751106](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101751106.png)
+
+- 한바퀴 돌고 1번을 예로 들면 치즈 양이 7이니까 7//2=3 으로 꺼냈다가 다시 넣음
+- 제일 앞 꺼내고 제일 뒤로 보냄
+- 다시돌면 2번 나옴 반복(피자 치즈 양이 0 이되면 뺌)
+- 여분으로 남아있는 피자를 다시 넣으면 된다.
+
+```python
+for tc in range(1,int(input())+1):
+    N,M = map(int,input().split()) #N:화덕의 크기 M:피자수
+    #피자번호와 idx번호를 맞추기 위해 앞에 0을 추가함
+    pizza = [0] + list(map(int,input().split())) #치즈양
+    #화덕(q처럼 사용할 예정), 피자번호를 저장함
+    oven = [i for i in range(1,N+1)] #피자번호
+    pos = N+1 #추가될 남은 피자 초기값(M개중에 오븐에 N개들어가고 남은 것 시작 점)
+
+    while len(oven) > 1: #한개가 되면 pop해서 없앨거야
+        num = oven.pop(0)
+        pizza[num] = pizza[num] // 2 #치즈양 한바퀴,반으로 줄어듦
+        if pizza[num]: #0이 아님
+            oven.append(num)
+        else: #0이면 새로운 피자 집어넣음
+            if pos <= M: #M까지만 넣고 넘으면 추가안함
+                oven.append(pos)
+                pos += 1 #다음번호를 가리키게 함
+    print('#{} {}'.format(tc,oven[0]))
+
+```
+
+- 방법2
+
+```python
+#방법2
+for tc in range(1,int(input())+1):
+    N,M = map(int,input().split()) #N:화덕의 크기 M:피자수
+    #피자번호와 idx번호를 맞추기 위해 앞에 0을 추가함
+    pizza = [0] + list(map(int,input().split())) #치즈양
+    #번호랑 치즈양을 묶어서넣어줌
+    oven = [[i,pizza[i]] for i in range(1,N+1)] #피자번호
+    #남은 피자
+    remain = [[i,pizza[i]] for i in range(N+1,M)]
+    pos = N+1 #추가될 남은 피자 초기값(M개중에 오븐에 N개들어가고 남은 것 시작 점)
+
+    while len(oven) > 1: #한개가 되면 pop해서 없앨거야
+        num, cheeze = oven.pop(0)
+        cheeze = cheeze // 2 #치즈양 한바퀴,반으로 줄어듦
+        if cheeze: #0이 아님
+            oven.append(num,cheeze)
+        else: #0이면 새로운 피자 집어넣음
+            if remain: #M까지만 넣고 넘으면 추가안함
+                oven.append(remain.pop(0))
+    print('#{} {}'.format(tc,oven[0]))
+
 ```
 
