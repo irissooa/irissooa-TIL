@@ -1,5 +1,51 @@
 # Algorithm
 
+## 조합
+
+- 조합_반복문
+
+```python
+arr = [1,2,3,4]
+N = 4
+R = 2
+sel=[0]*R
+#arr idx와 sel의 sidx
+def combination(idx,sidx):
+    if sidx == R:
+        print(sel)
+        return
+    for i in range(idx,N):
+        sel[sidx] = arr[i]
+        combination(i+1,sidx+1)
+combination(0,0)
+```
+
+- 조합_재귀
+
+```python
+arr = [1,2,3,4]
+N = 4
+R = 2
+sel=[0]*R
+#arr idx와 sel의 idx
+def combination(idx,sidx):
+    #순서도 중요! sidx 종료조건을 먼저 줘야됨!
+    if sidx == R:
+        print(sel)
+        return
+    if idx == N:
+        return
+   	sel[sidx] = arr[idx]
+    #뽑고가고
+    combination(idx+1,sidx+1)
+    #안뽑고가고
+    combination(idx+1,sidx)
+    
+combination(0,0)
+```
+
+
+
 ## 러시아 깃발
 
 ```python
@@ -196,50 +242,6 @@ for tc in range(1,T+1):
 
 
 
-## 조합
-
-- 조합_반복문
-
-```python
-arr = [1,2,3,4]
-N = 4
-R = 2
-sel=[0]*R
-#arr idx와 sel의 idx
-def combination(idx,sidx):
-    if sidx == R:
-        print(sel)
-        return
-    for i in range(idx,N):
-        sel[sidx] = arr[i]
-        combination(i+1,sidx+1)
-combination(0,0)
-```
-
-- 조합_재귀
-
-```python
-arr = [1,2,3,4]
-N = 4
-R = 2
-sel=[0]*R
-#arr idx와 sel의 idx
-def combination(idx,sidx):
-    #순서도 중요! sidx 종료조건을 먼저 줘야됨!
-    if sidx == R:
-        print(sel)
-        return
-    if idx == N:
-        return
-   	sel[sidx] = arr[idx]
-    #뽑고가고
-    combination(idx+1,sidx+1)
-    #안뽑고가고
-    combination(idx+1,sidx)
-    
-combination(0,0)
-```
-
 
 
 ## SWEA_7465_창용마을무리의 개수
@@ -431,3 +433,282 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,MIN-B))
 ```
 
+
+
+## SWEA_1267_작업순서
+
+- 아래 코드 10개 testcode 중 5개만 맞음...왜그럴까....ㅠ
+
+```python
+'''
+V개의  작업
+해야할 V개의 작업
+어떤 작업은 특정 작업이 끝나야 시작할 수 있음(선행관계)
+선행관계를 나타낸 그래프
+각 작업은 하나씩 정점으로 표시됨
+선행 관계는 방향성을 가진 간선으로 표현
+사이클은 존재하지 않음(한 정점에서 시작해서 같은 정점으로 돌아오는 경로)
+한번에 하나의 작업씩 처리
+가능한 작업순서 중 하나만 제시하면 됨!
+선행관계만 잘 지켜서 출력하면 됨!
+
+선행관계를 잘 지켜야되니..bfs아닐까...?ㅎ
+
++지형오빠 도움
+정점을 1부터 도는데 1로 향하는 다른 인접 정점을 찾고 만약에 그 정점에 방문하지 않았다면 q에 담아주고 while문을 돌게함
+while문을 나왔을 땐 1의 모든 부모 정점들이 거꾸로 담겨있음, 그것을 ans라는 임시로 정점을 담을 list에 담아준 뒤 거꾸로 뒤집어줌
+
++채린's
+while문을 돌면서 해당 정점을 향한 간선이 있는지 확인하고 만약 방문하지 않았다면 continue를 해줌, 
+그렇게 방문하지 않은 부모 정점이 있으면 전부 뛰어넘고 방문한 정점들만 출력해주고 전부 True가 될때까지 계속 반복함
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def BFS(v):
+    q = [v]
+    ans = [v] #임시로 v를 담을 리스트
+    visited[v] = True
+    # print(v,'v',end = ' ')
+    while q:
+        #종료조건 만약 0을 제외한 정점들을 전부 돌았다면 멈춰라!
+        if visited[1:V+1] == [True for _ in range(V)]:
+            # print(visited)
+            # print('여기들어옴')
+            break
+        pv = q.pop(0)
+        #w를 돌면서 pv와 연결된 것이 있는지 찾는다
+        for w in range(1,V+1):
+            #w가 pv와 연결된 것이 있는데 만약 w에 방문을 하지 않았다면 w를 q에 넣어줌
+            if G[w][pv] == 1:
+                #그 이전의 정점이 방문하지 않았다면
+                if visited[w] == False:
+                    visited[w] = True
+                    q.append(w)
+        #q에 담긴 가지 않았던 정점들을 ans에 추가해줌
+        #만약 정점 모두 방문을 했다면 그만!
+        ans += q
+    # print(pv)
+    # print(ans)
+    # print(visited)
+    # print()
+    #ans는 뒷 순서부터 담겼기 때문에 뒤집어줌
+    ans = ans[::-1]
+    #ans에 마지막으로 연결된 v를 담아줌
+    return ans
+
+for tc in range(1,2):
+    #정점의 총 V와 간선의 총 수 E가 주어짐
+    V,E = map(int,input().split())
+    #인접행렬
+    G = [[0]*(V+1) for _ in range(V+1)]
+    temp = list(map(int,input().split()))
+    # print(temp)
+    visited = [False for _ in range(V+1)]
+    for i in range(0,len(temp),2):
+        st,ed = temp[i],temp[i+1]
+        # print(st,ed)
+        G[st][ed] = 1
+    #결과를 담을 리스트
+    result = []
+    for i in range(1,V+1):
+        if visited[i] == False:
+            result.extend(BFS(i))
+            # print(visited)
+            # print()
+
+    print('#{}'.format(tc),end = ' ')
+    for r in result:
+        print(r, end = ' ')
+    print()
+```
+
+- 다른 코드
+
+```python
+#채린
+for t in range(1,11):
+    v,e=map(int,input().split())
+    graph=[[] for _ in range(v+1)]
+    visited = [ False for _ in range(v+1)]
+    temp_list= list(map(int,input().split()))
+ 
+    #그래프 완성하기
+    for i in range(0,len(temp_list),2):
+        a=temp_list[i]
+        b=temp_list[i+1]
+        graph[b].append(a) #ed의 인접리스트에 왜 st를 넣을까? 거꾸로 받아서 한쪽으로만 가게하기 위해서?
+    #print(graph)
+ 
+    result='' #결과값
+    count=v
+    while count:#False(0)일때까지 반복
+        for i in range(1,len(graph)):
+            #현재 노드가 수행되지 않았다면
+            if visited[i] == False:
+ 				
+               for j in graph[i]:
+                    #선행 노드 중에 False가 있다면 진행하지마라.
+                    if visited[j]==False:
+                        break
+               #선행 노드 중 False가 없다면, 방문표시하고, 해당 정점을 저장한 뒤, 노드 수-1을 해라
+               else:
+                    visited[i]=True
+                    result+=str(i)+' '
+                    count-=1
+    print('#{} {}'.format(t,result))
+```
+
+- DFS로 풀기
+
+```python
+#주아언니
+def DFS(v):
+    global result
+    visited[v] = 1
+    # 수행하면 추가
+    result += str(v) + " "
+ 
+    # 수행 후 해당 노드를 선행 노드로 둔 노드의 선행노드수 -1
+    for i in range(1, V+1):
+        if arr[v][i]:
+            burdenList[i] -= 1
+ 
+    # 수행한 노드에서 갈수있는 곳 & 수행하지 X & 선행노드수 0
+    # 일 경우에 넘어갈 수 있음
+    for i in range(1, V + 1):
+        if arr[v][i] == 1 and visited[i]==0 and burdenList[i] == 0:
+            DFS(i)
+ 
+ 
+ 
+for T in range(1, 11):
+    V, E = map(int, input().split())
+    arr = [[0]*(V+1) for _ in range(V+1)]
+ 
+    # 일을 수행했는지 여부
+    visited = [0]*(V+1)
+ 
+    path = list(map(int, input().split()))
+ 	#인접행렬 표시
+    for i in range(0, len(path),2):
+        arr[path[i]][path[i+1]] = 1
+ 
+    # 노드별로 선행노드가 몇갠지
+    # 선행노드가 0개: 해당 노드 수행가능
+    burdenList = [0]*(V+1)
+ 
+    startList = []
+ 
+    # 시작노드 구하기
+    # 다른 노드에서 오는 간선이 없는 노드에서 시작가능
+    for i in range(1, V+1):
+        count = 0
+        for j in range(1, V+1):
+            count += arr[j][i]
+        if count == 0:
+            startList.append(i)
+ 
+    # 노드별 선행노드 개수
+    for i in range(1, V+1):
+        burden = 0
+        for j in range(1,V+1):
+            burden += arr[j][i]
+        burdenList[i] = burden
+ 
+    # 시작점마다 DFS수행
+    result = ''
+    for i in startList:
+        DFS(i)
+ 
+    print("#{} {}".format(T, result))
+```
+
+- 
+
+```python
+#의수
+for tc in range(1, 11):
+    # V 노드갯수, E 간선개수
+    V, E = map(int, input().split())
+    # 입력받는 부분
+    arr = list(map(int, input().split()))
+    # 인접행렬 초기화
+    work = [[] for _ in range(V+1)]
+    # 도착 노드가 저장될 임시 리스트
+    temp = []
+    # 결과값들이 저장 될 리스트
+    res = [False] * (V+1)
+    # 2개씩 잘라서 저장
+    for i in range(0, len(arr), 2):
+        # 인접행렬 저장
+        work[arr[i]].append(arr[i+1])
+        # 도착노드 저장
+        temp.append(arr[i+1])
+ 
+    for n in range(1, V):
+        if n not in temp:
+            # 순서를 같이 저장하기 위해서 리스트 형태로 저장
+            res[n] = [1, n]
+            # BFS활용
+            q = []
+            q.append(n)
+            while q:
+                nn = q.pop(0)
+                for w in work[nn]:
+                    # 결과값이 저장되어 있지 않은 부분이라면
+                    if not res[w]:
+                        # 결과값에 저장 (전 순위보다 1증가시켜서 저장) ?????????
+                        res[w] = [res[nn][0]+1, w]
+                        q.append(w)
+                    # 여러개의 간선이 있는 부분을 처리하기 위한 조건(이미 res에 저장되어 있다)
+                    else:
+                        if res[w][0] < res[nn][0] + 1:
+                            res[w][0] = res[nn][0] + 1
+                            q.append(w)
+    # 인덱싱을 편하기 위해서 추가했던것을 제거
+    res.pop(0)
+    # 들어가는 순서에 따라 정렬한다.
+    # 같은 순서일 때는 상관 없으므로 정렬 안함
+    res.sort(key=lambda x: x[0])
+    print('#{} '.format(tc), end='')
+    for r in res:
+        print(r[1], end=' ')
+    print()
+```
+
+- 
+
+```python
+#지형
+def dfs(node,r_graph,result):
+   	#해당 인접리스트를 for로 돌려본다
+    for r_node in r_graph[node]:
+        #만약 결과에 해당 노드가 있으면 지나가라
+        if r_node in result: continue
+        #아니라면 해당 노드로 dfs반복
+        dfs(r_node,r_graph,result)
+    #for문이 끝나면 node를 결과값에 저장해라
+    result.append(node)
+for tc in range(1,11):
+    v,e=map(int,input().split())
+    node=list(map(int, input().split()))
+    r_graph=[[] for _ in range(v+1)]
+    result=[]
+    for i in range(0,len(node),2):
+        #st,ed를 거꾸로 받는다!
+        r_graph[node[i+1]].append(node[i])
+    for i in range(1,v+1):
+        #i가 결과값에 이미 있다면 지나가라
+        if i in result: continue
+        #아니라면, dfs 진행
+        dfs(i,r_graph,result)
+    print('#{}'.format(tc),end=' ')
+    for node in result:
+        print(node,end=' ')
+    print()
+```
+
+
+
+#### **다시풀어보기...!**
