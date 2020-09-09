@@ -361,6 +361,139 @@ print(tree)
 
 
 
+## SWEA_1231_중위순회
+
+```python
+'''
+중위순회 이용하여 풀기
+총 노드의 개수는 100개를 넘어가지 않음
+루트 정점의 번호는 반드시 1
+정점 번호와 알파벳이 함께 주어짐, 알파벳 뒤의 숫자는 정점과 연결된 자식노드들
+중위순회는 왼쪽을보고 오른쪽을 보기전 중간에 print를 함
+
+각 정점 idx대로 알파벳을 담을 list
+연결된 것을 인접행렬로 표시
+중위순회를 함수로 만들어 정점을 print하고 그 인덱스값을 토대로 문자를 출력
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def inOrder(idx):
+    #자손이 몇개 들어있는지 나눔
+    if L[idx]: #왼쪽이면
+        inOrder(L[idx])
+    print(V[idx],end = '')
+    if R[idx]:#오른쪽이면
+        inOrder(R[idx])
+
+for tc in range(1,11):
+    #정점의 총수
+    N = int(input())
+    #정점(idx-1)에 알파벳을 담을 list
+    V = [''] * (N+1)
+    L = [0] * (N+1)
+    R = [0] * (N+1)
+
+    for _ in range(N):
+        info = list(input().split())
+        #정점의 단어를 정점idx에 넣어둠
+        V[int(info[0])] = info[1]
+        #부모idx
+        p = int(info[0])
+        for i in range(2,len(info)):
+            c = int(info[i])
+            #왼쪽자식idx
+            if c%2==0:
+                L[p] = c
+            else:#오른쪽 자식idx
+                R[p] = c
+    print('#{}'.format(tc),end = ' ')
+    inOrder(1)
+    print()
+```
+
+- 다른코드
+
+```python
+#병훈
+def inorder(idx):
+    if idx > N:
+        return
+    inorder(idx*2)
+    print(tree[idx],end='')
+    inorder(idx*2+1)
+ 
+for t in range(1,11):
+    N = int(input())
+    tree = [0]*(N+1)
+    for i in range(1,N+1):
+        element = input().split()
+        tree[i] = element[1]
+    print("#{} ".format(t),end='')
+    inorder(1)
+    print()
+```
+
+- 
+
+```python
+#의수
+def LPR(x):
+    if L[x]:
+        LPR(L[x])
+    print(P[x], end='')
+    if R[x]:
+        LPR(R[x])
+ 
+for tc in range(1, 11):
+    N = int(input())
+    L = [0] * (N + 1)
+    R = [0] * (N + 1)
+    P = [0] * (N + 1)
+    for _ in range(N):
+        data = list(input().split())
+        if len(data) == 4:
+            L[int(data[0])] = int(data[2])
+            R[int(data[0])] = int(data[3])
+            P[int(data[0])] = data[1]
+        elif len(data) == 3:
+            L[int(data[0])] = int(data[2])
+            P[int(data[0])] = data[1]
+        else:
+            P[int(data[0])] = data[1]
+ 
+    print('#{}'.format(tc), end=' ')
+    LPR(1)
+    print()
+```
+
+- 
+
+```python
+def inOrder(index):
+    if tree[index * 2] != 0:
+        inOrder(index * 2)
+    print(tree[index], end="")
+    if tree[index * 2 + 1] != 0:
+        inOrder(index * 2 + 1)
+ 
+ 
+#도균
+for test_case in range(1, 11):
+    N = int(input())
+    tree = [0] * 400
+    for _ in range(N):
+        i = list(input().split())
+        n = int(i[0])
+        w = i[1]
+        tree[int(n)] = w
+    print('#{}'.format(test_case), end=' ')
+    inOrder(1)
+    print()
+```
+
+
+
 ## 수식 트리 : 후위순회로 풀어야됨!
 
 - 수식을 표현하는 이진 트리
@@ -370,7 +503,7 @@ print(tree)
 
 
 
-## 이진 탐색 트리 : 개념정도..
+## 이진 탐색 트리(BST) : 개념정도..
 
 - 탐색작업을 효율적으로 하기 위한 자료구조
 - 모든 원소는 서로 다른 유일한 키를 가짐
@@ -386,7 +519,7 @@ print(tree)
     - (키값x = 루트노드의 키값)인 경우 : 원하는 원소를 찾았으므로 탐색 연산 성공
     - (키값x < 루트노드의 키값)인 경우 : 루트노드의 왼쪽 서브트리에 대해서 탐색연산 수행
     - (키값x > 루트노드의 키값)인 경우 :  루트노드의 오른쪽 서브트리에 대해서 탐색연산 수행
-  - 반복
+  - 서브트리에 대해서 순환적으로 반복
 
 
 
@@ -396,6 +529,7 @@ print(tree)
     - 탐색 실패한 위치가 삽입위치가 됨
 
 - 삭제 연산
+  - 개인적으로공부....
 
 
 
@@ -480,6 +614,7 @@ def heappop():
     heapcount -= 1
     parent = 1
     child = parent * 2
+    #오른쪽자식 idx는 홀수, 왼쪽자식은 짝수
     if child + 1 <= heapcount:#오른쪽 자식 존재
         if heap[child] > heap[child+1]:
             child = child + 1
