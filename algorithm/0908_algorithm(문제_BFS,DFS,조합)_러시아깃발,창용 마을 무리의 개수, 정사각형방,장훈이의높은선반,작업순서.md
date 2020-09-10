@@ -282,7 +282,54 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,cnt))
 ```
 
+- 선생님 풀이
 
+```python
+#선생님 풀이
+'''
+무향그래프
+'''
+def BFS(v):
+    queue = [v]
+    visited[v] = 1
+    while queue:
+       #위에서 한명 꺼내기
+        curr = queue.pop(0)
+        for i in adj[curr]:
+            if not visited[i]:
+                visited[i] = 1
+                queue.append(i)
+                
+
+                
+def DFS(v):
+    visited[v] = 1
+    for i in adj[v]:
+        if not visited[i]:
+            DFS(i)
+    
+    
+    
+T = int(input())
+for tc in range(1,T+1):
+    V,E = map(int,input().split())
+    #인접리스트
+    adj = [[] for _ in range(V+1)]
+    
+    for i in range(E):
+        A,B = map(int,input().split())
+        adj[A].append(B)
+        adj([B]).append(A)
+        
+    visited = [0] *(V+1)
+    ans = 0
+    for i in range(1,V+1):
+        if visited[i] == 0:
+            ans += 1
+            BFS(i)
+            DFS(i)
+    print('#{} {}'.format(tc,ans))
+```
 
 ## SWEA_1861_정사각형 방
 
@@ -371,6 +418,103 @@ for tc in range(1,T+1):
     print('#{} {} {}'.format(tc,START,MAX))
 ```
 
+-  선생님 코드
+
+```python
+dr = [-1,1,0,0] #상하좌우
+dc = [0,0,-1,1]
+def BFS(stR,stC):
+    global ans_num,ans_dist
+    queue = [(stR,stC)]
+    cnt = 0
+    while queue:
+        r,c = queue.pop(0)
+        #하나 꺼냈다는 것은 한칸 이동하는 거니까  +1
+        cnt += 1
+        for i in range(4):
+            nr = r+ dr[i]
+            nc = c + dc[i]
+            #띠를 둘러놔서 범위쳌 필요없음, 다음좌표 - 현재좌표의 값이 1이라면 이동가능!
+            #범위체크 필요없음->0으로 둘러줬기 때문
+            if arr[nr][nc] - arr[r][c] == 1:
+                queue.append((nr,nc))
+      #지금 cnt가 구한 거리값보다 크다면
+      if cnt >= ans_dist:
+        if cnt == ans_dist:
+            #같으면 시작점 더 작은값으로 갱신
+            ans_num = min(ans_num, arr[stR][stC])
+        else:
+            #아니라면 그냥 갱신
+            ans_num = arr[stR][stC]
+        #dist 갱신
+        #요거 위치는 else밑에 있어도 됨...ㅎ
+        ans_dist = cnt
+
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    #띠를 두르는 작업 상하좌우 한칸씩 더 크게 만들기
+    #범위체크 하기 싫다면 0으로 띠를 둘러라
+    arr = [[0]*(N+2) for_ in range(N+2)]
+    #실제로 사용하는 곳은 1부터N까지
+    for i in range(1,N+1):
+        tmp = list(map(int,input().split()))
+        #1부터 N까지
+        for j in range(1,N+1):
+            #tmp는 한개차이가 나니 -1
+            arr[i][j] = tmp[j-1]
+    ans_dist = 0 #거리담기
+    ans_num = 0 #시작 번호담기
+    #모든 지점 다해보기
+    for i in range(1,N+1):
+        for j in range(1,N+1):
+            BFS(i,j)
+    print('#{} {} {}'.format(tc,ans_num,ans_dist))
+```
+
+- 정사각형 방 다른 풀이
+
+> 처음부터 돌면서 시작점의 길이가 가장 적은 것을 출력해야됨
+
+```python
+dr = [-1,1,0,0]
+dc = [0,0,-1,1]
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    #N*N+1
+    dist = [1] *(N*N+1) #거리를 담음
+    num = [0]*(N*N+1)#좌표를 담음
+    #방입력
+    arr = []
+    for i in range(N):
+        arr.append(list(map(int,input().split())))
+        for j in range(N):
+            #해당 방 인덱스에 좌표 넣기
+            num[arr[i][j]] =(i,j) 
+     #2번부터 끝번호까지 수행
+     for i in range(2,N*N+1):
+        for d in range(4):
+            #다음좌표 확인
+            #num[i][0] =행,[1]=열
+            nr = num[i][0] + dr[d]
+            nc = num[i][1] + dc[d]
+            #범위안에 들어오면서, 다음자리가 현재내 방번호보다 하나 작다면
+            if 0 <=nr <N and 0 <= nc < N and i - 1 == arr[nr][nc]:
+                #현재방은 전방+1거리만큼 이동가능
+                dist[i] = dist[i-1]+1
+                break
+    	ans_num,ans_dist = N*N ,0
+      
+        for i in range(1,N*N+1):
+            if dist[i] > ans_dist:
+                ans_num = i
+                ans_dist = dist[i]
+    print('#{} {} {}'.format(tc,ans_num-(ans_dist-1),ans_dist))
+```
+
 
 
 ## SWEA_1486_장훈이의 높은 선반
@@ -431,6 +575,28 @@ for tc in range(1,T+1):
 
 
     print('#{} {}'.format(tc,MIN-B))
+```
+
+- 선생님 코드
+
+```python
+T = int(input())
+
+for tc in range(1,T+1):
+    N,B = map(int,input().split())
+    M = list(map(innt,input().split()))
+    ans =987654321
+    
+    #비트마스킹 방식으로 powerset
+    
+    for i in range(1,1<<N):
+        total = 0
+        for j in range(N):
+        	if i & (1<<j):
+                total +=H[j]
+        if total >= B and total < ans:
+            ans = total
+    print('#{} {}'.format(tc,ans-B))
 ```
 
 
@@ -523,6 +689,94 @@ for tc in range(1,2):
     print()
 ```
 
+- 선생님 코드
+
+```python
+for tc in range(1,11):
+    V,E = map(int,input().split())
+    #작업관계
+    edges = list(map(int,input().split()))
+    #선행작업
+    prev_arr = [[0] * (V+1) for _ in range(V+1)]
+    
+    orders = []
+    #방문배열
+    wordk = [0]*(V+1)
+    for i in range(0,len(edges),2):
+        st,ed = edges[i],edges[i+1]
+        arr[st][ed] = 1
+        #그 작업을 위한 선행작업을 담는다
+        prev_arr[ed][st] = 1
+    #선행작업이 하나도 없는 일은 미리 담아두자
+    for i in range(1,len(prev_arr)):
+        if prev_arr[i].count(1) == 0:
+            order.append(i)
+            work[i] = 1
+            
+    #작업을 할차례
+    #V가 되면 그만
+    while len(order) != V:
+        for i in range(1,V+1):
+            해당 작업을 안했다
+            if word[i] == 0:
+                #선행작업을 확인
+                for j in range(1,V+1):
+                    #선행작업이 있네?
+                    if prev_arr[i][j] ==1:
+                        #그거 안했어? 그럼 멈춰
+                        if wordk[j] == 0:
+                            break
+                #for_else 조기 브레이크 안걸렷어? 그럼 일해~
+                else:
+                    order.append(i)
+                    work[i] = 1
+       print('#{}'.format(tc),end = ' ')
+       for i in order:
+            print(i,end = ' ')
+        print()
+```
+
+- 선생님 다른 풀이
+
+```python
+def DFS(v):
+    #노드 방문을 했으니 작업했음을 표시
+    work[v] = 1 
+    #해당작업의 후행 작업 순회
+    for w in adj[v]:
+        #해당작업을 하지 않았으면 수행
+        if not work[w]:
+            DFS(w)
+    #스택에 v작업 담기
+    stack.append(v)
+        
+
+
+for tc in range(1,11):
+    V,E = map(int,inpuu().split())
+    #인접리스트
+    adj =[[] for _ in range(V+1)]
+    work = [0] *(V+1) #일을했는지 안했는지 확인
+    count = [0] *(V+1) #선행작업 카운트
+    
+    stack = []
+    edge = list(map(int,input().split()))
+    for i in range(0,E):
+        st,ed = edge[i*2], edge[i*2+1]
+        adj[st].append(ed)
+        count[ed]+= 1 #선행작업 개수 증가.
+    for i in range(1,V+1):
+        if count[i] == 0: #선행작업이 없는 노드 먼저 시작
+            DFS(i)
+    
+    print('#{}'.format(tc,)end = '')
+    print(*stack[::-1])
+        
+```
+
+
+
+- 
 - 다른 코드
 
 ```python
