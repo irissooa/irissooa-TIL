@@ -154,7 +154,7 @@ $ python manage.py migrate
 
 ```python
 class ArticleForm(forms.Form): #모델.py와 비슷하게 작성, new.html을 장고의 form으로 대체할거야, 
-    title  - forms.CharField(max_length=10) #input text
+    title  = forms.CharField(max_length=10) #input text
     content = forms.CharField() #여기엔 모델에 있는 textfiled가 존재하지 않음, 일단 charfield 사용
 ```
 
@@ -282,7 +282,7 @@ class ArticleForm(forms.Form): #모델.py와 비슷하게 작성, new.html을 �
          (REGION_A,'서울'),
          (REGION_B,'대전'),
      ]
-     title  - forms.CharField(max_length=10) #input text
+     title  = forms.CharField(max_length=10) #input text
      content = forms.CharField(widget=forms.Textarea) #여기엔 모델에 있는 textfiled가 존재하지 않음, charfield 사용, 이걸 textarea로 바꾸려면 widget을 이용해야됨!
      region = forms.ChoiceField(choices=REGIONS, widget=forms.RadioSelect) #default가 select, select태그를 만들어줌, widget으로 radio스타일로 바꿈!
 ```
@@ -307,7 +307,7 @@ from .models import Article
 #         (REGION_A,'서울'),
 #         (REGION_B,'대전'),
 #     ]
-#     title  - forms.CharField(max_length=10) #input text
+#     title  = forms.CharField(max_length=10) #input text
 #     content = forms.CharField(widget=forms.Textarea)
 #     region = forms.ChoiceField(choices=REGIONS, widget=forms.RadioSelect)
     
@@ -323,7 +323,7 @@ class ArticleForm(forms.ModelForm):
     class Meta:
         #이 폼은 아티클 모델에 대해서 만들어질거다
         model = Article
-        fileds = '__all__' #모델의 필드 전부다 사용
+        feilds = '__all__' #모델의 필드 전부다 사용
         #textarea도 장고가 알아서 모델을 읽고, 형태, 유효성 검사 등 알아서 만들어줌
 ```
 
@@ -1055,7 +1055,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         #~~~/crud/templates 와 같음
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'CRUD'/ 'templates'],
         #True라서, App에 있는건 자동으로 읽고있음
         'APP_DIRS': True,
  #(후략)

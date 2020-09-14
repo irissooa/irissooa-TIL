@@ -226,7 +226,7 @@ INSTALLED_APPS = [
 
    - `from . import views`이 코드를 써줘야 하는데, 지금 내가 있는 폴더 안에서 가져올때는 `.`을 쓴다. 그리고 거기서 `views.py`를 불러온다.
 
-   - 세번째로 `app_name`을 등록해줘야 한다. 왜냐면 위치의 오류를 //////////??
+   - 세번째로 `app_name`을 등록해줘야 한다. 왜냐면 위치를 정확하게 잘 알기 위해!
 
    - 그리고 `urlpatterns`라는 이름으로 적어줘야 함. 그래야 장고가 인식할 수 있음. 
 
@@ -408,8 +408,7 @@ INSTALLED_APPS = [
   ```
 
   - `<a href="{% url 'articles:new' %}">새 글쓰기</a>` 
-    
-    - `앱이름:html`, articles안에 있는 new.html로 들어간다는 뜻임. 새글쓰기 글자를 눌렀을때 !! 
+    - `앱이름:name`, articles안에 있는 new.html로 들어간다는 뜻임. 새글쓰기 글자를 눌렀을때 !! 
   - `{% for article in articles %}`
   
   - articles에 있는 데이터 수만큼 for문을 통해 반복한다는 뜻임!! 
@@ -423,8 +422,7 @@ INSTALLED_APPS = [
   - title은 article의 title을 불러오는 것임
   
   - `<a href="{% url 'articles:detail' article.pk %}">상세 페이지</a>`
-  
-    - 상세페이지를 누르면 articles의 detail로 가는데, 여기서는 특정 페이지로 가야하기 때문에 동적 url을 사용한다. 그걸 사용하려면,  반드시 위처럼 한칸 띄우고, `article.pk`를 적어준다. 
+  - 상세페이지를 누르면 articles의 detail로 가는데, 여기서는 특정 페이지로 가야하기 때문에 동적 url을 사용한다. 그걸 사용하려면,  반드시 위처럼 한칸 띄우고, `article.pk`를 적어준다. 
   -  위를 다 수행한 뒤 보낼곳 url이름을 적어줌 article.pk를 넘겨줘 articles의 pk디테일로 보내짐
   
     
@@ -472,20 +470,20 @@ INSTALLED_APPS = [
          return redirect('articles:detail', article.pk)
      ```
      
-
    - new함수는 new.html로 정보를 보내기만 하기 때문에, context가 필요없다!
 
    - `title = request.POST.get('title')`
 
      - new.html에서 post방식으로 저장한 데이터를 title에 할당함. POST에 저장이 되어 있는 것임.
-     - ~~근데 `get('title')`이 new .html의 title의 name값인가????~~
+     - `get('title')`은 `models.py`의 title에 저장된 정보를 가져옴!
 
      
 
    - `return redirect('articles:detail', article.pk)`
 
      - 글이 다 써졌으면, 해당 글 디테일 페이지로 redirecting해줌(모듈불러옴) 
-     - 위를 다 수행한 뒤 보낼곳 url 이름을 적어주고, article.pk를 넘겨줘 articles의 pk디테일로 보내짐
+     - ~~위를 다 수행한 뒤 보낼곳 url 이름을 적어주고, article.pk를 넘겨줘 articles의 pk디테일로 보내짐~~
+     - articles(app_name) views.py의 detail함수로 보냄!
 
    
 
@@ -513,11 +511,13 @@ INSTALLED_APPS = [
      {% endblock content %}
      ```
 
-     `<form action="{% url 'articles:create' %}" method="POST"` :POST방식으로 저장된 정보를 action에 있는 url인 create로 넘겨준다! 정보를 넘겨주면 create view함수로 가게 되고, (**정확히 모르겠다**)
+     `<form action="{% url 'articles:create' %}" method="POST"` :POST방식으로 저장된 정보를 action에 있는 url인 create로 넘겨준다! 정보를 넘겨주면 create view함수로 가게 됨!
 
      `{% csrf_token %}`: 누군가가 내 create에 마구 요청을 보내면 비용이 많이 들기 때문에 장고에서 아무나 create에 요청을 할 수 없게 장치를 해둔것이고 그게 바로 이것이다. `사이트간 요청 위조`이다. POST를 쓸때는 이 토큰이 무조건 필요함!! 
 
-     `<a href="{% url 'articles:index' %}">[뒤로가기]</a>`: 뒤로가기 버튼을 누르면 `article/index` 로 감(**근데 view로 가는건지 html로 가는건진 모르겠다....,ㅠ**)
+     `<a href="{% url 'articles:index' %}">[뒤로가기]</a>`: 뒤로가기 버튼을 누르면 `article/index` 로 감(**views.py의 index함수로 감!**)
+     
+     
 
     #### GET vs POST
 
@@ -592,14 +592,14 @@ INSTALLED_APPS = [
        <form action="{% url 'articles:delete' article.pk %}" method="POST">
        {% csrf_token %}
        <input type="submit" class="btn btn-danger" value="삭제하기">
-       <a href="{% url 'articles:update' article.pk %}" method="POST">수정하기</a>
+       <a href="{% url 'articles:update' article.pk %}">수정하기</a>
        </form>
      {% endblock content %}
      ```
 
      `<form action="{% url 'articles:delete' article.pk %}" method="POST">`: 삭제는 db를 변경해야하므로 post방식
 
-     `<a href="{% url 'articles:update' article.pk %}" method="POST">수정하기</a>` : 수정은 a태그가 맞다. 수정할 수 있는 화면을 보여주는 거지 db에서 조회해서 내용을 보여주기만 하면 됨(**근데 우리는 a태그는 get방식, 폼태그는 post방식으로 쓰는걸로 이해했고,,, 그럼 수업때는 a태그가 맞다고 한 이유가 수정한 페이지를 보여주기 때문이었다, 몰라;;;;;;;**
+     `<a href="{% url 'articles:update' article.pk %}">수정하기</a>` : 수정은 a태그가 맞다. 수정할 수 있는 화면을 보여주는 거지 db에서 조회해서 내용을 보여주기만 하면 됨
 
    
 
@@ -610,26 +610,25 @@ INSTALLED_APPS = [
     `urls.py`
 
     ```python
-    
     urlpatterns = [
     
         path('delete/<int:article_pk>/', views.delete, name="delete"),
     ```
-
-    `views.py`
-
-    ```python
+    
+`views.py`
+    
+```python
     def delete(request, article_pk):
         article = Article.objects.get(pk=article_pk)
         article.delete()
         return redirect('articles:index')
     ```
-
     
 
-    `delete.html`
-
-    이거 필요없음 왜냐면 바로 index.url로 가는거니까~
+    
+`delete.html`
+    
+이거 필요없음 왜냐면 바로 index.url로 가는거니까~
 
 
 
