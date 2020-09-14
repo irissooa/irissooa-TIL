@@ -848,6 +848,8 @@ def delete(request, pk):
 
 ## CRUD
 
+[CRUD순서 정리 참고](https://github.com/irissooa/irissooa-TIL/blob/master/web/0820_django.md)
+
 > 지금 뭘 하는가? 웹사이트를 만듦
 >
 > 게시판을 갖고 있는 웹사이트
@@ -1146,6 +1148,8 @@ venv/
 .vscode/
 db.sqlite3
 ```
+
+
 
 
 
