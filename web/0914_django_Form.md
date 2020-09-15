@@ -1031,6 +1031,8 @@ $python manage.py runserver
 
 11. base.html만듦
 
+> manage.py랑 같은 위치에 templates폴더를 만든 뒤 그 아래에 base.html을 만듦
+
 ```html
 <!DOCTYPE html>
 <html lang="ko">
@@ -1055,7 +1057,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         #~~~/crud/templates 와 같음
-        'DIRS': [BASE_DIR / 'CRUD'/ 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         #True라서, App에 있는건 자동으로 읽고있음
         'APP_DIRS': True,
  #(후략)
