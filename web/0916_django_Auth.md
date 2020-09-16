@@ -737,3 +737,51 @@ def update(request):
 ![image-20200916155617854](0916_django_Auth.assets/image-20200916155617854.png)
 
 - 비밀번호 `폼`여기를 누르면 `http://127.0.0.1:8000/accounts/password/` 이 페이지로 감 주소를 보면 accouts, password 이 이름 떄문에 일부러 app이름을 accounts라고 한거야! password를 만들거면 이름을 password로 일치시켜주자
+
+
+
+## Workshop
+
+- index만들기
+- urls.py
+
+```python
+path('',views.index,name='index'),
+```
+
+- views.py
+
+```python
+from django.contrib.auth import get_user_model
+
+#user모델에 있는 모든 유저를 다 긁어와서 보여줘야됨
+User = get_user_model()
+
+def index(request):
+    users = User.objects.all()
+    context = {
+        'users':users,
+    }
+    return render(request,'accounts/index.html',context)
+```
+
+- index.html
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>유저목록</h1>
+<hr>
+{% for user in users %}
+<h2>{{user.first_name}}</h2>
+<h2>{{user.last_name}}</h2>
+<h2>{{user.email}}</h2>
+<hr>
+{% endfor %}
+{% endblock content %}
+```
+
+
+
+![image-20200916173522272](0916_django_Auth.assets/image-20200916173522272.png)
