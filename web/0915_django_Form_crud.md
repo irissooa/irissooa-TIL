@@ -84,6 +84,16 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
 ```
 
+- 여기서 `imagekit`를 사용하기 위해서 `settings.py`의 `INSTALLED_APPS`에 추가해야됨
+
+```python
+INSTALLED_APPS = [
+    'articles',
+    'imagekit',
+```
+
+
+
 10. views.py
 
 ```python
