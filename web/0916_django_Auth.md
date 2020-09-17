@@ -431,7 +431,7 @@ def login(request):
 
 ![image-20200916111626420](0916_django_Auth.assets/image-20200916111626420.png)
 
-- `articles` > `base.html`
+-  `base.html`
 
 > - `container` 클래스 안에 구문 추가
 > - 세션을 가지고 있으므로 다른 페이지를 왔다갔다해도 username이 유지된다.
@@ -495,7 +495,7 @@ def logout(request):
     return redirect('articles:index')
 ```
 
-- `articles` > `base.html`
+-  `base.html`
 
   - 하지만 로그아웃을 하면 로그아웃 버튼이 여전히 살아있음, 이를 위한 인증 처리가 필요함!
 
@@ -540,7 +540,7 @@ SESSION_SAVE_EVERY_REQUEST = True
   - 단, 이것은 권한과는 관련없으며 사용자가 활성화 상태(active) 이거나 유효한 세션(valid session)을 가지고 있는지도 확인하지 않음
   - 일반적으로` request.user` 에서 이 속성을 사용하여 미들웨어의 `django.contrib.auth.middleware.AuthenticationMiddleware` (`settings.py` > `MIDDLEWARE` 내부에 있는 있음)를 통과했는지 확인한다
 
-- login required decorder
+- login required decorator
 
   - 사용자가 로그인 했는지 확인하는 view를 위한 데코레이터
   - 로그인 하지 않은 사용자를 settings.LOGIN_URL에 설정된 경로로 redirect시킴
@@ -554,7 +554,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 
 
-- `articles` > `base.html`
+-  `base.html`
   - `is_authenticated` True면 로그인돼있다면 logout버튼, 아니라면 로그인,signup보여주기
 
 ```html
