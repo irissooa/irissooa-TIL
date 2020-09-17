@@ -200,9 +200,12 @@ def create(request):
 {% extends 'base.html' %}
 {% block content %}
 <h1>글쓰기 페이지</h1>
-<form action="">
-{{form.as_p}}
+<form action="{% url 'articles:create' %}" method='POST' enctype="multipart/form-data">
+  {% csrf_token %}
+  {{form.as_p}}
+  <button class='btn btn-primary'>제출하기</button>
 </form>
+<a href="{% url 'articles:index' %}">메인페이지</a>
 {% endblock content %}
 ```
 
