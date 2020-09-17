@@ -130,9 +130,80 @@
 >
 > 인증시스템에 관한 기본 이름이랑 일치하게 하려고! 아니면 하나하나 바꿔줘야됨!
 
+
+
+#### index
+
+- urls.py
+
+```python
+path('',views.index,name='index'),
+```
+
+- views.py
+
+> User를 def밖에 정의하는 이유?
+>
+> 한번만 쓰면 되기때문에 굳이 안에 넣을 이유가 없음 
+>
+> User자체가 바뀌지 않기 때문
+>
+> `users = User.objects.all()`이거는 밖에 있으면 서버가 켜질때 한번만 업데이트 됨, 근데 계속 업데이트를 해야되는 정보이기 때문에 def함수 안에 넣어줌!
+
+```python
+from django.contrib.auth import get_user_model
+
+#user모델에 있는 모든 유저를 다 긁어와서 보여줘야됨
+User = get_user_model()
+
+def index(request):
+    users = User.objects.all()
+    context = {
+        'users':users,
+    }
+    return render(request,'accounts/index.html',context)
+```
+
+- index.html
+
+> `<h1>{{request.user}}님, 반갑습니다.</h1>` 여기서 request는 생략가능!
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<a href="{% url 'accounts:update' %}">회원정보수정</a>
+<a href="{% url 'accounts:logout' %}">로그아웃</a>
+{% else %}
+<a href="{% url 'accounts:signup' %}">회원가입하기</a>
+<a href="{% url 'accounts:login' %}">로그인</a>
+{% endif %}
+<h1>{{request.user}}님, 반갑습니다.</h1>
+<h1>유저목록</h1>
+<hr>
+{% for user in users %}
+<h2>{{user.first_name}}</h2>
+<h2>{{user.last_name}}</h2>
+<h2>{{user.email}}</h2>
+<hr>
+{% endfor %}
+{% endblock content %}
+```
+
+
+
+![image-20200916173522272](0916_django_Auth.assets/image-20200916173522272.png)
+
+
+
+
+
 #### signup
 
 > signup 유저 create
+>
+> user table에 새로 뭔가 만드는 일
 
 - urls.py
 
@@ -152,26 +223,28 @@ urlpatterns = [
 
 > CRUD 중 Create와 동일한 구조를 가짐 ->User를 Create한거다!
 >
-> 역할 2가지 필요
->     1. 회원가입 작성 페이지(GET)
->         2. 회원가입을 실제로 하는 회원가입 로직(POST)
+> model, form  두가지를 이미 django에서 만들어 놓은 걸 쓸거다!
 >
+> 역할 2가지 필요
+> 1. 회원가입 작성 페이지(GET)
+>
+> 2. 회원가입을 실제로 하는 회원가입 로직(POST)
 
 ```python
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
-
 def signup(request):
     if request.method == 'POST':
+        #data= 이렇게 keyword 생략가능, 위치로 알기 때문
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             #유효성 맞다면 메인페이지로 가기
             return redirect('articles:index')
     else:
-        #빌트인 폼을 이용하기 떄문에 import해옴
+        #빌트인 폼(UserCreationForm)을 이용할거라 import해옴
         form = UserCreationForm()
     context = {
         'form' : form,
@@ -274,7 +347,10 @@ def login(request):
     if request.method == 'POST':
         form=AuthenticationForm(request,request.POST)
         if form.is_valid():
-            #로그인
+            #로그인 용 폼을 만들어 템플릿에게 준다
+            #로그인 : 아이디, 비번 통해 user가 있는지 체크
+            #cliend - 쿠키에 세션아이디도 적어줘야됨
+            #server-세션아이디-사용자정보-적어야됨
             #이렇게 하면 에러가 남, why? user의 정보를 가져옴(form.get_user())
             login(request,form.get_user()) #get_user(self) -> user 정보
             return redirect('articles:index')
@@ -302,10 +378,15 @@ def login(request):
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+
+@require_http_methods(['GET', 'POST'])
 def login(request):
     if request.method == 'POST':
         form=AuthenticationForm(request,request.POST)
         if form.is_valid():
+            #로그인 : 아이디, 비번 통해 user가 있는지 체크
+            #client - 쿠키에 세션아이디도 적어줘야됨
+            #server-세션아이디-사용자정보-적어야됨
             auth_login(request,form.get_user())
             return redirect('articles:index')
 
@@ -330,19 +411,21 @@ def login(request):
 
 >  GET이나 POST나 같은 url로 보내기 떄문에 action없어도 됨
 >
-> 정확히는 페이지를 보여주는 url이랑 로직을 처리하는 url이 같아서 
+>  정확히는 페이지를 보여주는 url이랑 로직을 처리하는 url이 같아서 
+>
+>  =>이런경우 그냥 action을 입력하지 않는게 좋은 것같다! 나중에 next~이런 거 뒤에 올때 그 페이지로 가야 되기 때문에! 만약 입력해두면 딱!! 그 페이지로만 감!
 
 ```html
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>로그인</h1>
- 
+<h1>로그인</h1>
   <form action="{% url 'accounts:login' %}" method='POST'>
   {% csrf_token %}
   {{ form.as_p }}
   <input type="submit">
   </form>
+  <a href="{% url 'accounts:index' %}">메인페이지</a>
 {% endblock content %}
 ```
 
@@ -374,12 +457,41 @@ path('logout/',views.logout, name='logout'),
 
 - views.py
 
+> 아래와 같이 적는다면 오류가 난다!
+>
+> Why? 
+>
+> redirect (GET요청!) - /accounts/logout/
+>
+> 근데 POST만 적으라고 돼있다? -> 405 error!
+>
+> 
+>
+> login_required가 있으면 로그인창으로 가게 됨 => 로그인 성공 -> `return redirect(request.GET.get('next') or 'accounts:index')` => account:logout 로 redirect가 되는데 -> redirect는 get방식 -> 근데 logout함수는 post만 받음 -> method not allowed 405 error가 뜬다 ! 
+>
+> -> 그래서 login_required를 없앤다! 
+>
+> 
+>
+> 그렇기 때문에 login_required 데코레이터를 쓰지않고! `if request.user.is_authenticated:`(함수X, 속성O)를 이용함!
+
 ```python
 from django.contrib.auth import logout as auth_logout
 
 #session만 지우는 것!
+#로그아웃용 페이지 보여줘야? ㄴㄴ
+#로그아웃-session table해당 row를 삭제
+#팔찌도 떼준다-쿠키에서 세션아이디를 삭제해줌
 def logout(request):
     auth_logout(request)
+    return redirect('articles:index')
+
+#아래와 같이 수정!
+@require_POST
+#session만 지우는 것!
+def logout(request):
+    if request.user.is_authenticated:
+        auth_logout(request)
     return redirect('articles:index')
 ```
 
@@ -508,14 +620,66 @@ from django.contrib.auth.decorators import login_required
   - `@login_required` 데코레이터가 기본적으로 인증 성공 후 사용자를 redirect 할 경로를 `next`라는 문자열 매개 변수에 저장
   - 우리가 url로 접근하려고 했던 그 주소가 로그인하지 않으면 볼 수 없는 곳이라서, django가 로그인 페이지로 강제로 redirect!
   - 로그인을 다시 정상적으로 하고 나면 원래 요청했던 주소로 보내주기 위해 keep 해준 것
+  - `request.GET.get('next')` 있으면 request.GET.get('next')
+  - 없으면? `'articles:index'`
+  
+  > Q. 근데 `return redirect(request.GET.get('next') or 'articles:index')` 처리했음에도 왜 로그인하면 메인페이지로 가는가?
+  >
+  > A. 로그인 안한상태에서
+  >
+  > 1. update로 요청이 감
+  >
+  > 2. login required가 동작함
+  >
+  > 3. login page로 redirect가 동작하는데, next=원래 있던곳(update)를 넣어서 보내줌
+  >
+  > 4. login url : GET요청
+  >
+  > 5. 로그인 요청 - POST 보냄
+  >
+  > 6. 지금 현재 request url에 next가 있으면? next로,
+  >
+  > 7. 없으면? index로 보냄
+  >
+  > 8. 근데!!!print(request.GET.get('next'))를 해보니 None이 뜸
+  >
+  >    1) request.GET.get('next') 잘못되거나 -> 잘못된것 없음!!!!
+  >
+  >    2) login.html의 form에서 next를 전달하지 못하고 있는거 아닐까? -> 이게 문제!!!! action에서 accounts:login으로 가니까 뒤에 next=~ 이 url과 일치하지 않음!!! 그래서 그냥 action을 지우면 해당 url로 알아서 감
+  >
+  >    
 
 ```sh
- if request.method == 'POST':
+#views.py > login 함수
+if request.method == 'POST':
  	form=AuthenticationForm(request,request.POST)
     if form.is_valid():
     	auth_login(request,form.get_user())
     	#아래와같이 바꿔줌!
         return redirect(request.GET.get('next') or 'articles:index')
+```
+
+- login.html
+
+> action을 적고 안적고의 차이!!
+>
+> 적게된다면 해당 url로 가게되니까 그 뒤에 next~가 나오게 됐을 때 `request.GET.get('next')`이 값이 None이 됨!
+>
+> 그렇기 때문에 액션을 적지 않으면 해당 url로 이동!
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>로그인</h1>
+  {% comment %} GET이나 POST나 같은 url로 보내기 떄문에 action없어도 됨 {% endcomment %}
+  <form action="" method='POST'>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit">
+  </form>
+  <a href="{% url 'accounts:index' %}">메인페이지</a>
+{% endblock content %}
 ```
 
 
@@ -528,11 +692,14 @@ from django.contrib.auth.decorators import login_required
 > 4. next파라미터 주소로 redirect됨
 > 5. require_POST로 인해 405 에러 발생
 > 6. 405error! , redirect는 무조건 url요청이기에 GET!근데 POST만 들어갈 수있기 떄문에 에러!(method not allowed)로직상 같이 붙어 있으면 안됨!
+>
+> - 그리고 만약 html에서 GET방식(a태그,,)으로 받으면 똑같이 405에러나서 form태그로 바꿔줘야됨!
+>
 > 7. 위의 다른 경우들은 다 GET도 처리할 수 있기 때문에 괜찮지만 delete는 post만이기 때문에 걸림
 >
 > 결론: login_required 데코레이터는 GET method요청을 처리할 수 있는 view에서만 사용
 
-- `accounts` > `views.py` > `delete 뷰함수`
+- `articles` > `views.py` > `delete 뷰함수`
 
 ```python
 @login_required
@@ -680,6 +847,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
 - urls.py
 
+> `articles`와는 달리 pk가 필요하지 않은 것은 index.html에서 update.html로 갈때 `{% if user.is_authenticated %}`여기의 user에 어떤 user인지 나와있음!
+
 ```python
 path('update/', views.update, name='update'),
 ```
@@ -708,10 +877,15 @@ class CustomUserChangeForm(UserChangeForm):
 
 - views.py
 
-> 비로그인 상태에서 강제로 url로 회원 정보 수정 페이지 들어가면 로그인 페이지로 넘어가고 로그인하면 자동으로 회원 정보 수정 페이지로 redirect 해준다.
+> `@ login_required`비로그인 상태에서 강제로 url로 회원 정보 수정 페이지 들어가면 로그인 페이지로 넘어가고 로그인하면 자동으로 회원 정보 수정 페이지로 redirect 해준다.
+>
+> =>**update.html의 `<form action="" method="POST">`에서 action이 공백이어야 해당 페이지로 이동**
+>
+> why? 만약 `accounts:update`로 action을 지정하면 절대경로가 되어  `/accounts/update/`로 밖에 안가지만 만약 로그인 뒤에 `next~`페이지로 가려면 상대경로가 돼야함!
 
 ```python
 from django.contrib.auth.decorators import login_required
+from .forms import CustomUserChangeForm
 
 @ login_required
 def update(request):
@@ -740,37 +914,183 @@ def update(request):
 
 
 
-## Workshop
+### Password
 
-- index만들기
-- urls.py
+0. password를 내가 그대로 저장하면 무슨 일어날까?
+1. 나(관리자)-db에 접속가능, 모든 데이터 확인가능
+
+> 모든 유저의 아이디와 비번 내가 get할 수 있음
+
+2. db가 털렸을 때, 모든 내 이용자의 password 털림
+3. 원래 password가 뭔지 모르게끔 해야됨! -> 해시 함수
+
+> 암호용 해시 함수는 매핑된 해싱 값만을 알아가지고는 원래 입력 값을 알아내기 힘들다는 사실에 의해 사용될 수 있음
+
+
+
+##### 비밀번호 변경 기능 추가
+
+- `accounts`>`urls.py`
+
+>`password/`가 돼야하는 이유는 위에 나온 `폼`을 눌렀을 때 해당 주소로 일치시켜주기 위해서!! 함수이름은...무슨 함수인지 알게하기 위해? 모르겠당...ㅎ
 
 ```python
-path('',views.index,name='index'),
+path('password/', views.change_password, name='change_password'),
 ```
 
-- views.py
+- `accounts` > `views.py`
+
+> `PasswordChangeForm(user=request.user,data=request.POST)` 원래 앞이 user값, 두번째가 request.post 근데 만약 위치 모르면 둘다 key값주면 위치 바껴도 괜춘!!!
 
 ```python
-from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,PasswordChangeForm
 
-#user모델에 있는 모든 유저를 다 긁어와서 보여줘야됨
-User = get_user_model()
-
-def index(request):
-    users = User.objects.all()
-    context = {
-        'users':users,
-    }
-    return render(request,'accounts/index.html',context)
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {'form': form,}
+    return render(request, 'accounts/change_password.html', context)
 ```
 
-- index.html
+- change_password.html
+
+```html
+{% extends 'articles/base.html' %}
+
+{% block content %}
+  <h1>비밀번호 변경</h1>
+  <form action="" method="POST">
+    {% csrf_token %}
+    {% buttons submit='변경' reset="Cancel" %}{% endbuttons %}
+  </form>
+{% endblock  %}
+```
+
+- base.html
+
+```html
+<a href="{% url 'accounts:change_password' %}">비번변경</a>
+```
+
+
+
+##### 로그인 유지! update_session_auth_hash
+
+- 비밀번호 변경 후 로그아웃 되버리는 증상 발생
+  - 원인 : 비밀번호가 변경되면서 기존 세션과의 회원 인증 정보가 일치하지 않게 되어 버렸기 때문
+- `update_session_auth_hash` 메서드를 사용하면 해결할 수 있다.
+  - 현재 사용자의 인증 세션이 무효화 되는 것을 막고, 세션을 유지한 상태로 업데이트.
+  - 현재 request와 새로운 session hash가 생긴 업데이트 된 user 객체를 적절히 업데이트.
+
+- `accounts` > `views.py`
+
+> 인자 순서 주의!!!
+>
+> `PasswordChangeForm(user=request.user,data=request.POST)`
+>
+> `update_session_auth_hash(request,form.user)`
+
+```python
+from django.contrib.auth import get_user_model,update_session_auth_hash
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST) 
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user) 
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {'form': form,}
+    return render(request, 'accounts/change_password.html', context)
+```
+
+
+
+
+
+
+
+## 회원 탈퇴
+
+- `accounts` > `urls.py`
+
+```python
+path('delete/',views.delete,name='delete'),
+```
+
+- `accounts` > `views.py`
+
+> 아래와 같이 적는다면 오류가 난다!
+>
+> Why? 
+>
+> redirect (GET요청!) - /accounts/delete/
+>
+> 근데 POST만 적으라고 돼있다? -> 405 error!
+>
+> 
+>
+>  `@required_POST`가 있는 함수 `@login_required`가 설정된다면 로그인 이후 next 매개변수를 해당 함수로 다시 redirect되면서 `@required_POST` 때문에 405에러 발생
+>
+> 
+>
+> 그렇기 때문에 login_required 데코레이터를 쓰지않고! `if request.user.is_authenticated:`(함수X, 속성O)를 이용함!
+
+```python
+@login_required
+@require_POST
+def delete(request):
+    #이미 request에 id가 담겨있다!(update와 같음)
+    request.user.delete()
+    return redirect('accounts:index')
+
+#아래와 같이 수정
+@require_POST
+def delete(request):
+    #이미 request에 id가 담겨있다!(update와 같음)
+    if request.user.is_authenticated:
+        request.user.delete()
+    return redirect('accounts:index')
+```
+
+
+
+
+
+--------------
+
+- `accounts`> `index.html`
 
 ```html
 {% extends 'base.html' %}
 
 {% block content %}
+{% if user.is_authenticated %}
+  <a href="{% url 'accounts:update' %}">회원정보수정</a>
+  <form action="{% url 'accounts:delete' %}" method='POST'>
+  {% csrf_token %}
+  <button>회원탈퇴하기</button>
+  </form>
+  {% comment %} <a href="{% url 'accounts:logout' %}">로그아웃</a> {% endcomment %}
+  <form action="{% url 'accounts:logout' %}" method="POST">
+  {% csrf_token %}
+  <button>로그아웃</button>
+</form>
+<a href="{% url 'accounts:password' %}">비밀번호 변경하기</a>
+{% else %}
+<a href="{% url 'accounts:signup' %}">회원가입하기</a>
+<a href="{% url 'accounts:login' %}">로그인</a>
+{% endif %}
+<h1>{{request.user}}님, 반갑습니다.</h1>
 <h1>유저목록</h1>
 <hr>
 {% for user in users %}
@@ -784,4 +1104,5 @@ def index(request):
 
 
 
-![image-20200916173522272](0916_django_Auth.assets/image-20200916173522272.png)
+
+
