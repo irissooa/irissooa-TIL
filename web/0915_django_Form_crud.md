@@ -57,13 +57,29 @@ urlpatterns = [
 
 9. models.py
 
+> `ProcessedImageField`의 인자  `blank=true` : 빈칸이어도 괜찮다는 뜻
+>
+> `image = models.ImageField(blank=True)`
+>
+> 다시 이미지 필드(`Thumbnail`) 씀->이미지 크기 조절(width,height)
+
 ```python
 from django.db import models
+from imagekit.models import ProcessedImageField
+from imagekit.processors import Thumbnail
 
 # Create your models here.
 class Article(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
+    image = ProcessedImageField(
+        blank=True, 
+        #사용자가 올린 이미지 가공을 해서 원본그대로가 아니라 썸네일처럼 잘라서 올림
+        processors=[Thumbnail(200,300)],
+        format='JPEG',
+        options={'quality':90},
+        upload_to='%Y/%m/%d',
+    )
     created_at = models.DateTimeField(auto_now=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 ```
