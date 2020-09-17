@@ -130,7 +130,9 @@
 >
 > 인증시스템에 관한 기본 이름이랑 일치하게 하려고! 아니면 하나하나 바꿔줘야됨!
 
+-----------------
 
+> Index 만들어봄...근데 signup부터는 모든 accounts > Index는 base.html에 항상 있어야 될 것들 적고, articles > Index로 보낼 예정
 
 #### index
 
@@ -197,7 +199,7 @@ def index(request):
 
 
 
-
+----------------------
 
 #### signup
 
@@ -234,7 +236,9 @@ urlpatterns = [
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.views.decorators.http import require_http_methods, require_POST
 
+@require_http_methods(['GET','POST'])
 def signup(request):
     if request.method == 'POST':
         #data= 이렇게 keyword 생략가능, 위치로 알기 때문
@@ -263,7 +267,7 @@ def signup(request):
 
 {% block content %}
   <h1>회원가입</h1>
-  <form action="{% url 'accounts:signup' %}" method='POST'>
+  <form action="" method='POST'>
   {% csrf_token %}
   {{ form.as_p }}
   <input type="submit">
@@ -341,8 +345,9 @@ urlpatterns = [
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.views.decorators.http import require_http_methods, require_POST
 
-
+@require_http_methods(['GET','POST'])
 def login(request):
     if request.method == 'POST':
         form=AuthenticationForm(request,request.POST)
@@ -420,12 +425,12 @@ def login(request):
 
 {% block content %}
 <h1>로그인</h1>
-  <form action="{% url 'accounts:login' %}" method='POST'>
+  <form action="" method='POST'>
   {% csrf_token %}
   {{ form.as_p }}
   <input type="submit">
   </form>
-  <a href="{% url 'accounts:index' %}">메인페이지</a>
+  <a href="{% url 'articles:index' %}">메인페이지</a>
 {% endblock content %}
 ```
 
@@ -467,7 +472,7 @@ path('logout/',views.logout, name='logout'),
 >
 > 
 >
-> login_required가 있으면 로그인창으로 가게 됨 => 로그인 성공 -> `return redirect(request.GET.get('next') or 'accounts:index')` => account:logout 로 redirect가 되는데 -> redirect는 get방식 -> 근데 logout함수는 post만 받음 -> method not allowed 405 error가 뜬다 ! 
+> login_required가 있으면 로그인창으로 가게 됨 => 로그인 성공 -> `return redirect(request.GET.get('next') or 'articles:index')` => account:logout 로 redirect가 되는데 -> redirect는 get방식 -> 근데 logout함수는 post만 받음 -> method not allowed 405 error가 뜬다 ! 
 >
 > -> 그래서 login_required를 없앤다! 
 >
@@ -477,6 +482,7 @@ path('logout/',views.logout, name='logout'),
 
 ```python
 from django.contrib.auth import logout as auth_logout
+from django.views.decorators.http import require_http_methods, require_POST
 
 #session만 지우는 것!
 #로그아웃용 페이지 보여줘야? ㄴㄴ
@@ -575,7 +581,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 ```python
 if request.user.is_authenticated:
-        return redirect('article:index')
+        return redirect('articles:index')
 ```
 
 
@@ -678,7 +684,7 @@ if request.method == 'POST':
   {{ form.as_p }}
   <input type="submit">
   </form>
-  <a href="{% url 'accounts:index' %}">메인페이지</a>
+  <a href="{% url 'articles:index' %}">메인페이지</a>
 {% endblock content %}
 ```
 
@@ -904,6 +910,21 @@ def update(request):
     return render(request,'accounts/update.html', context)
 ```
 
+- `update.html`
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>회원정보 수정</h1>
+  <form action="" method='POST'>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <input type="submit" value='수정하기'>
+  </form>
+{% endblock content %}
+```
+
 
 
 - 회원정보는 `admin`에 가서 이메일주소, 이름, 성을 입력해야 보임!
@@ -1059,7 +1080,7 @@ def delete(request):
     #이미 request에 id가 담겨있다!(update와 같음)
     if request.user.is_authenticated:
         request.user.delete()
-    return redirect('accounts:index')
+    return redirect('articles:index')
 ```
 
 
