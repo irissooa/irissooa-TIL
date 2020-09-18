@@ -615,6 +615,7 @@ INSTALLED_APPS = [
         path('delete/<int:article_pk>/', views.delete, name="delete"),
     ```
     
+
 `views.py`
     
 ```python
@@ -622,10 +623,9 @@ INSTALLED_APPS = [
         article = Article.objects.get(pk=article_pk)
         article.delete()
         return redirect('articles:index')
-    ```
-    
+```
 
-    
+
 `delete.html`
     
 이거 필요없음 왜냐면 바로 index.url로 가는거니까~
@@ -687,7 +687,7 @@ INSTALLED_APPS = [
 
 12. `modify`
 
-    `urls.py`
+    - `urls.py`
 
     ```python
     urlpatterns = [
@@ -697,7 +697,7 @@ INSTALLED_APPS = [
     
     ```
 
-    `views.py`
+    - `views.py`
 
     ```python
     def modify(request, article_pk):
@@ -716,7 +716,7 @@ INSTALLED_APPS = [
 
     
 
-    끝,,,,`
+    끝,,,,
 
 
 
