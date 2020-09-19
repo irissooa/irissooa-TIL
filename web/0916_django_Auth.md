@@ -561,7 +561,10 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 
 -  `base.html`
+  
   - `is_authenticated` True면 로그인돼있다면 logout버튼, 아니라면 로그인,signup보여주기
+  
+  > 여기 문제!logout을 a태그로 하면 a는 GET방식이기 때문에 FORM태그로 배꿔 줘야됨!!!!!!!!
 
 ```html
 {% if request.user.is_authenticated %}
