@@ -19,7 +19,7 @@
 >
 > master : 메인 줄기, 함부로 건드리면 안됨
 
-![image-20200918094531675](0918_Django Project_form,auth,pair project.assets/image-20200918094531675.png)
+![image-20200918094531675](0918_Django_Project_form,auth,pair_project.assets/image-20200918094531675.png)
 
 
 
@@ -141,7 +141,7 @@ cf64208 add
 ba590a0 create README.md
 ```
 
-![image-20200918100342322](0918_Django Project_form,auth,pair project.assets/image-20200918100342322.png)
+![image-20200918100342322](0918_Django_Project_form,auth,pair_project.assets/image-20200918100342322.png)
 
 ```sh
 SOOA@SAMSUNG MINGW64 ~/Desktop/branch (login)
@@ -153,7 +153,7 @@ Switched to branch 'master'
 
 > 코드가 완전히 결점이 없는지 보장할 수 없을 때 master(메인 branch)에 바로 작성하는것이 아니라, login이라는 새로운 branch에 commit을 함!
 
-![image-20200918100417983](0918_Django Project_form,auth,pair project.assets/image-20200918100417983.png)
+![image-20200918100417983](0918_Django_Project_form,auth,pair_project.assets/image-20200918100417983.png)
 
 
 
@@ -195,7 +195,7 @@ ba590a0 create README.md
 >
 > 코드를 작성하고, master와 병합해도 되는 상태면, 병합해서 과거의 데이터와 현재의 데이터의 싱크를 맞춰줌 이런식으로 계속 merge해가며 하나의 branch로 만듦
 
-![image-20200918101108269](0918_Django Project_form,auth,pair project.assets/image-20200918101108269.png)
+![image-20200918101108269](0918_Django_Project_form,auth,pair_project.assets/image-20200918101108269.png)
 
 - branch를 하나로 합해 commit들이 다 보여짐
 
@@ -330,7 +330,7 @@ $ git commit -m'signup'
  1 file changed, 5 insertions(+)
 ```
 
-![image-20200918103428091](0918_Django Project_form,auth,pair project.assets/image-20200918103428091.png)
+![image-20200918103428091](0918_Django_Project_form,auth,pair_project.assets/image-20200918103428091.png)
 
 - `SOOA@SAMSUNG MINGW64 ~/Desktop/branch (master|MERGING)`
 - 현재 merge된 코드들 충돌이 일어나면 위처럼 보여짐
@@ -340,7 +340,7 @@ $ git commit -m'signup'
 - 코드가 이렇게 다른데 뭐가 맞나요?라고 물어봄
 - 사실은 이코드가 맞다고 보여주면 됨
 
-![image-20200918104544908](0918_Django Project_form,auth,pair project.assets/image-20200918104544908.png)
+![image-20200918104544908](0918_Django_Project_form,auth,pair_project.assets/image-20200918104544908.png)
 
 > 1, 2번 방법은 새로운 코드이기 때문에 병합해도 관계없음
 >
