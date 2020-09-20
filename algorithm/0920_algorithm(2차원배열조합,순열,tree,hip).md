@@ -327,3 +327,48 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,tree[L_node]))
 ```
 
+
+
+
+
+## 부분집합의 합
+
+> 알고리즘 거의 초반에 비트로 부분집합 구하는 것 배워서 풀었던 문제를 주아언니랑 같이 조합으로 풀었다!(뿌듯!)
+
+```python
+numberList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+M = len(numberList)
+
+def com(idx,sidx):
+    global count
+    if sidx == N:
+        if sum(sel) == K:
+            print(sel)
+            count +=1
+        return
+    if idx == M:
+        return
+
+    sel[sidx] = numberList[idx]
+    # 뽑고가고
+    com(idx + 1, sidx + 1)
+    # 안뽑고가고
+    com(idx + 1, sidx)
+
+    
+T = int(input())
+for T in range(1, T+1):
+
+
+    N, K = map(int, input().split())
+
+    sel = [0]*N
+    count = 0
+
+    com(0,0)
+
+
+
+    print("#{} {}".format(T, count))
+```
+
