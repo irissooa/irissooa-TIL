@@ -238,7 +238,7 @@ for tc in range(1,T+1):
   - DFS 보다 **최단으로 갈 수 있는 거리(최적화)**를 더 쉽게 구할 수 있음!(DFS로는 보장할 수 없음)
 - 예시
 
-![image-20200904110052672](0903_algorithm(문제)_BFS, Queue.assets/image-20200904110052672.png)
+![image-20200904110052672](0903_algorithm(문제)_BFS,Queue.assets/image-20200904110052672.png)
 
 - v -> w
 - visit[w] = 1
@@ -255,7 +255,7 @@ for tc in range(1,T+1):
 - 1번에서 7번까지 가는 경로가 3가지인데 그중 가장 짧은 것이 2번만에 가는 것이다
 - 이런식으로 추가해서 생성할 수 있음, 하지만 방문이랑 D랑 같이 쓰면 간편하기 때문에 같이 쓰는 경우도 많음
 
-![image-20200904111540803](0903_algorithm(문제)_BFS, Queue.assets/image-20200904111540803.png)
+![image-20200904111540803](0903_algorithm(문제)_BFS,Queue.assets/image-20200904111540803.png)
 
 - 문제풀기
 
@@ -464,11 +464,11 @@ for tc in range(1,T+1):
 
 ## SWEA_5099_피자굽기
 
-![image-20200904101126044](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101126044.png)
+![image-20200904101126044](0903_algorithm(문제)_BFS,Queue.assets/image-20200904101126044.png)
 
-![image-20200904101635000](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101635000.png)
+![image-20200904101635000](0903_algorithm(문제)_BFS,Queue.assets/image-20200904101635000.png)
 
-![image-20200904101751106](0903_algorithm(문제)_BFS, Queue.assets/image-20200904101751106.png)
+![image-20200904101751106](0903_algorithm(문제)_BFS,Queue.assets/image-20200904101751106.png)
 
 - 한바퀴 돌고 1번을 예로 들면 치즈 양이 7이니까 7//2=3 으로 꺼냈다가 다시 넣음
 - 제일 앞 꺼내고 제일 뒤로 보냄

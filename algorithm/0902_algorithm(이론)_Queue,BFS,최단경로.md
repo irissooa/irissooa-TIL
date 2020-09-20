@@ -53,11 +53,11 @@ perm(N,0)
 - 선입선출구조(First In First Out)
   - 큐에 삽입한 순서대로 원소가 저장되어, 가장 먼저 삽입된 원소는 가장 먼저 삭제됨
 
-![image-20200902103925765](0902_algorithm(이론)_Queue,BFS, 최단경로 등.assets/image-20200902103925765.png)
+![image-20200902103925765](0902_algorithm(이론)_Queue,BFS,최단경로.assets/image-20200902103925765.png)
 
 ### 큐의 연산 과정
 
-![image-20200902104146127](0902_algorithm(이론)_Queue,BFS, 최단경로 등.assets/image-20200902104146127.png)
+![image-20200902104146127](0902_algorithm(이론)_Queue,BFS,최단경로.assets/image-20200902104146127.png)
 
 ### 큐의 구현
 
@@ -352,7 +352,7 @@ def BFS(G,V):#그래프G, 탐색 시작점v
 
 #### 연습문제 3
 
-![image-20200902150719073](0902_algorithm(이론)_Queue,BFS, 최단경로 등.assets/image-20200902150719073.png)
+![image-20200902150719073](0902_algorithm(이론)_Queue,BFS,최단경로.assets/image-20200902150719073.png)
 
 출력값 : 
 
