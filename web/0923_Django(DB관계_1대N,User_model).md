@@ -39,7 +39,12 @@
 
 
 
+#### Abstract base classes
 
+- 몇 가지 공통 정보를 여러 다른 모델에 넣을 때 사용하는 클래스
+- 데이터베이스 테이블을 만드는 데 사용되지 않으며, 대신 다른 모델의 기본 클래스로 사용되는 경우 해당 필드가 하위 클래스의 필드에 추가됨
+
+![image-20200923144115871](0923_Django(DB관계_1대N,User_model).assets/image-20200923144115871.png)
 
 
 
@@ -80,6 +85,12 @@
 >
 > 마이그레이션 초기화할때 `__init__`을 지우면안되고 숫자로 돼있는거만 지우고, dbsqlite3파일도 지움!
 
+- `settings.py`
+
+```python
+AUTH_USER_MODEL = 'accounts.User'
+```
+
 - `articles` > `models.py`
   - `settings.py`에 `AUTH_USER_MODEL`에 대해 나와 있지 않음
   - `AUTH_USER_MODEL = 'auth.User'`가 기본값이기 때문이다.
@@ -95,7 +106,7 @@ user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 - `forms.py` > `ArticleForm`
 
 ```python
-fields = ('title', 'content',) # 구문 수정
+fields = ['title', 'content',] # 구문 수정
 ```
 
 - `get_user_model()` : return 값이 `class`
@@ -210,9 +221,27 @@ def delete(request, article_pk):
 
 - `articles` > `models.py` > `Comment` Class
 
+> 하나의 모델에는 여러 외래키가 있어도됨
+
 ```python
-# 구문 추가
-user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+class Comment(models.Model):
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    #(생략)
+```
+
+- `forms.py`
+
+> exclude 수정
+
+```python
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        # fields = '__all__'
+        #제외할 것을 적어줘도됨, 이건 foreign key이기 때문에 안보여지게 할거야
+        exclude = ['article','user',]
 ```
 
 
@@ -220,26 +249,100 @@ user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 1. comments_create logic 수정
    - `views.py` > `comments_create` view
 
+> user에 대한 정보를 받아옴, 사실상 들어가는 정보는 user_id임 클래스변수 user에 객체 자체를 넣어줌
+
 ```python
 comment.user = request.user # 구문 추가
+```
+
+- `comments_create`뷰함수
+
+```python
+@require_POST
+def comments_create(request,pk):
+     #댓글작성은 detail 페이지에서 보여짐
+    # article = Article.objects.get(pk=pk)
+    article = get_object_or_404(Article,title__startswith='A',pk=1)
+    comment_form = CommentForm(request.POST)
+    if comment_form.is_valid():
+        #기본값은 true인데 comment_form.save(commit=False)이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
+        comment = comment_form.save(commit=False)
+        #그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음
+        comment.article = 
+        #user에 대한 정보를 받아옴, 사실상 들어가는 정보는 user_id임 클래스변수 user에 객체 자체를 넣어줌
+        comment.user = request.user
+        #넣을 거 다 넣었으니 이제 save, data를 받을 떄 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
+        comment.save()
+        return redirect('articles:detail',article.pk)
+    context = {
+        'comment_form':comment_form,
+        'article':article,
+    }
+    #에러메세지를 담고 detail페이지로 넘어감
+    return render(request,'articles/detail.html',context)
+```
+
+- `detail.html`
+
+  > ` {{ comment.user }}`댓글 작성자 표시
+
+```html
+{% for comment in comments %}
+  <ul>
+    {{ comment.user }}<li>{{comment.content}}</li>
+    <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method='POST' class='d-inline'>
+    {% csrf_token %}
+    <input type="submit" value='DELETE'>
+    </form>
+  </ul>
+    {%empty%}
+    <p>댓글이 아직 없어요.</p>
+  {% endfor %}
 ```
 
 
 
 2. 비로그인 유저 댓글 작성 form 숨기기
 
+- `views.py`
+
+```python
+@require_POST
+def comments_create(request,pk):
+     #댓글작성은 detail 페이지에서 보여짐
+    # article = Article.objects.get(pk=pk)
+    if request.user.is_authenticated: #이 구문 추가(인증된 유저만!)
+        article = get_object_or_404(Article,title__startswith='A',pk=1)
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.article = 
+            comment.user = request.user
+            comment.save()
+            return redirect('articles:detail',article.pk)
+        context = {
+            'comment_form':comment_form,
+            'article':article,
+        }
+        return render(request,'articles/detail.html',context)
+    #로그인하지 않았을때
+    return reirect('accounts:login')
+```
+
+
+
+- `detail.html`
+
 ```html
-detail.html
-{% if user.is_authenticated %}
-  <form action="{% url 'articles:comments_create' article.pk %}" method="POST">
+{% if request.user.is_authenticated %}
+    <h4>댓글작성</h4>
+    <form action="{% url 'articles:comments_create' article.pk %}" mehtod='POST'>
     {% csrf_token %}
-    {{ comment_form }}
-    <input type="submit" value="submit">
-  </form>
-  <hr>
-{% else %}
-  <a href="{% url 'accounts:login' %}">[댓글을 작성하려면 로그인하세요]</a>
-  <hr>
+    {{comment_form}}
+    <input type="submit">
+    </form>
+    {% else %}
+    <a href="{% url 'acoounts:login' %}">[댓글을 작성하려면 로그인 하세요.]</a>
 {% endif %}
 ```
 
@@ -249,104 +352,338 @@ detail.html
 
 - detail.html
 
+> `{% if request.user == comment.user %}`
+
 ```html
-{% if request.user == comment.user %}
-  <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method="POST" style="display: inline;">
-    {% csrf_token %}
-    <input type="submit" value="DELETE">
-  </form>
-{% endif %}
+<ul>
+    {{ comment.user }}<li>{{comment.content}}</li>
+    {% if request.user == comment.user %}
+      <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method='POST' class='d-inline'>
+      {% csrf_token %}
+      <input type="submit" value='DELETE'>
+      </form>
+    {% endif %}
+  
 ```
 
 - `views.py` > `comments_delete` view
 
 ```python
 @require_POST
-def comments_delete(request, article_pk, comment_pk):
-    if request.user.is_authenticated:
-        comment = get_object_or_404(Comment, pk=comment_pk)
-        if request.user == comment.user: # 이 조건 추가됨
+def comments_delete(request,article_pk,comment_pk):
+    # comment = Comment.objects.get(pk=comment_pk)
+    if request.user.is_authenticated: # 이 구문 추가(인증된 유저만!)
+        comment = get_object_or_404(Comment,pk=comment_pk)
+        if request.user == comment.user: # 이 구문 추가(작성한유저만!)
             comment.delete()
-        return redirect('articles:detail', article_pk)
-    return HttpResponse('You are Unauthorized', status=401)
+    return redirect('articles:detail',article_pk)
 ```
 
 
 
-### 프로필 이미지 기능 추가(gravatar 프로필 이미지)
-
 #### 1. ModelForm Custom
 
-> ```
-> accounts` > `forms.py
-> from django.contrib.auth.forms import UserCreationForm
-> 
-> class CustomUserCreationForm(UserCreationForm):
->     class Meta(UserCreationForm.Meta):
->         fields = UserCreationForm.Meta.fields + ('email',)
-> ```
+- `accounts` > `forms.py`
 
-> `signup` view
->
-> - 기존에 import 했던 `UserCreationForm` 삭제, `CustomUserCreationForm` 추가
-> - `UserCreationForm` -> `CustomUserCreationForm` 변경
+```python
+from django.contrib.auth.forms import UserCreationForm
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        fields = UserCreationForm.Meta.fields + ('email',)
+```
 
-
-> `index` view
->
-> ```
-> import hashlib
-> 
-> def index(request):
->     if request.user.is_authenticated:
->         gravatar_url = hashlib.md5(request.user.email.encode('utf-8').lower().strip()).hexdigest()
->     else:
->         gravatar_url = None
->     visits_num = request.session.get('visits_num', 0)
->     request.session['visits_num'] = visits_num + 1
->     request.session.modified = True
->     articles = Article.objects.all()
->     context = {'articles': articles, 'visits_num': visits_num, 'gravatar_url': gravatar_url,}
->     return render(request, 'articles/index.html', context)
-> ```
-
-> `base.html` (구문 추가)
->
-> ```
-> <img src="https://s.gravatar.com/avatar/{{ gravatar_url }}?s=80" alt="프로필이미지">
-> ```
+- `signup` view
+  - 기존에 import 했던 `UserCreationForm` 삭제, `CustomUserCreationForm` 추가
+  - `UserCreationForm` -> `CustomUserCreationForm` 변경
 
 
 
-#### (2) Custom template tags and filters (django custom template tag 공식 문서)
 
-**모든 페이지에서 이미지가 나오도록 수정한다.**
 
-> `accounts` app > `templatetags` folder 생성
->
-> - 폴더 내부에 `__init__.py`, `gravatar.py` 생성
+------------
 
-> ```
-> gravatar.py
-> import hashlib
-> from django import template
-> 
-> register = template.Library()
-> 
-> @register.filter # 기존의 템플릿 라이브러리에 아래의 함수(custom filter)가 추가된다는 의미인 decorator
-> def makemd5(email): # {{ email | ssafy }} 와 같은 경우 필터 앞에 있는 왼쪽에 있는 값
->     return hashlib.md5(email.encode('utf-8').lower().strip()).hexdigest()
-> ```
+### Model relationships(M : N) 
 
-> ```
-> base.html
-> {% load gravatar %} <!-- 가장 맨 위에 코드 추가 -->
-> 
-> <img src="https://s.gravatar.com/avatar/{{ request.user.email|makemd5 }}?s=80" alt="프로필이미지"> <!-- 코드 수정-->
-> ```
+- **User : Article = M : N**
+  - User는 여러 개의 Article에 LIKE 할 수 있고
+  - Article은 여러 User 로 부터 LIKE 받을 수 있다.
 
-> `index` view
->
-> - (1)에서 새로 작성했던 코드가 굳이 있을 필요가 없다.
-> - django custom template tag를 사용했기 때문이다.
+- **모델링은 현실 세계를 최대한 유사하게 반영하기 위해서 해야한다.**
+
+- 일상에 가까운 예시를 통해 db를 모델링하고, 내부에서 일어나는 데이터의 흐름을 어떻게 제어할 수 있는지에 대해 고민
+
+**환자와 의사의 예약 시스템을 구축하라는 프로젝트**
+
+- 모델링(`models.py`)
+
+  ```python
+  from django.db import models
+  
+  class Doctor(models.Model):
+      name = models.TextField()
+  
+      def __str__(self):
+          return f'{self.pk}번 의사 {self.name}'
+  
+  
+  class Patient(models.Model):
+      name = models.TextField()
+      doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+  
+      def __str__(self):
+          return f'{self.pk}번 환자 {self.name}'
+  ```
+
+
+
+#### 1. 1:N의 한계 (shell_plus로 객체 생성 후 확인)
+
+- 불필요한 필드(같은 환자 이름을 가진 필드)를 또 만들어야 하는 문제점이 발생한다.
+- 수정을 할 수 없고 계속 추가해야됨!
+- 문제점
+  - 방문 예약을 바꾸는 것이 불가능(새로운 객체 생성)
+  - 다른 의사를 방문한 기록을 남길 수 없음
+
+- `python manage.py shell_plus`
+
+```sh
+In [1]: doctor1 = Doctor.objects.create(name='justin')
+
+In [2]: doctor2 = Doctor.objects.create(name='eric')
+
+In [3]: patient1 = Patient.objects.create(name='tony', doctor=doctor1)
+
+In [4]: patient2 = Patient.objects.create(name='harry', doctor=doctor2)
+
+In [5]: doctor1
+Out[5]: <Doctor: 1번 의사 justin>
+
+In [6]: doctor2
+Out[6]: <Doctor: 2번 의사 eric>
+
+In [7]: patient1
+Out[7]: <Patient: 1번 환자 tony>
+
+In [8]: patient2
+Out[8]: <Patient: 2번 환자 harry>
+
+#환자가 의사를 바꾸고싶은데 수정을 못하고 다시 추가로 만들어줘야됨!
+In [9]: patient3 = Patient.objects.create(name='tony', doctor=doctor2)
+
+In [10]: patient3
+Out[10]: <Patient: 3번 환자 tony>
+
+In [11]: patient3.doctor.name
+Out[11]: 'eric'
+
+In [12]: patient4 = Patient.objects.create(name='harry', doctor=doctor1)
+
+#하나의 patient가 여러 의사를 지정받을 수 없음!
+In [13]: patient4 = Patient.objects.create(name='harry', doctor=doctor1, doctor=doctor2)
+  File "<ipython-input-13-2775590f4f3f>", line 1
+    patient4 = Patient.objects.create(name='harry', doctor=doctor1, doctor=doctor2)
+                                                                   ^
+SyntaxError: keyword argument repeated
+```
+
+
+
+#### 2. 중개모델 생성 - `models.py`에 Reservation model 추가
+
+[![중개 모델](0923_Django(DB관계_1대N,User_model).assets/67262400-9c610880-f4df-11e9-9904-a8ebb314966b.JPG)](https://user-images.githubusercontent.com/52685250/67262400-9c610880-f4df-11e9-9904-a8ebb314966b.JPG)
+
+- 1 : N 의 한계점을 해결하기 위해 중개모델을 생성하여 어느 의사가 어느 환자와 매칭되는지 알 수 있다.
+- `hospitals` > `models.py`
+
+```python
+class Reservation(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.doctor_id}번 의사의 {self.patient_id}번 환자'
+```
+
+- 기존의 `db.sqlite3`, `0001_initial.py` 삭제 후(`__init__`이건 삭제하면 안됨) 다시 migration 과정 진행
+
+- 중개 모델이 생겼으므로 `doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)` 이 구문은 필요가 없게 된다.
+
+```sh
+In [1]: doctor1 = Doctor.objects.create(name='justin')
+
+In [3]: patient1 = Patient.objects.create(name='tony')
+
+#진료예약을 하나 만든것과 같은 것
+In [4]: reservation1 = Reservation.objects.create(doctor=doctor1, patient=patient1)
+
+IN[5] : reservation1
+Out[5]: <Reservation: 1번 의사의 1번 환자>
+
+#역참조 '_set.all()'
+In [6]: doctor1.reservation_set.all()
+Out[6]: <QuerySet [<Reservation: 1번 의사의 1번 환자>]>
+
+In [7]: patient1.reservation_set.all()
+Out[7]: <QuerySet [<Reservation: 1번 의사의 1번 환자>]>
+
+In [8]: patient2 = Patient.objects.create(name='harry')
+
+In [9]: reservation2 = Reservation.objects.create(doctor=doctor1, patient=patient2)
+
+IN[10]: reservation2
+Out[10]: <Reservation: 1번 의사의 2번 환자>
+
+#오늘 내 환자 몇명이었지?
+In [11]: doctor1.reservation_set.all()
+Out[11]: <QuerySet [<Reservation: 1번 의사의 1번 환자>, <Reservation: 1번 의사의 2번 환자>]>
+
+In [12]: for reservation in doctor1.reservation_set.all():
+    ...:     print(reservation.patient.name)
+    ...: 
+tony
+harry
+```
+
+
+
+#### (3) 중개 모델을 직접 거치지 않고 바로 가져오기 - `Through` option
+
+- `Through option`
+  - 중개 모델을 거치지 않고 직접 서로 테이블을 참조하는 option
+  - `ManyToManyField`는 **실제적인 물리적인 필드가 DB에 생기는 것이 아니다.**
+    - 보통 복수형을 적는다! (외래키는 보통 단수형)
+- `models.py`
+
+```python
+class Patient(models.Model):
+    name = models.TextField()
+    doctors = models.models.ManyToManyField(Doctor,through='Reservation')
+    def __str__(self):
+        return f'{self.pk}번 환자 {self.name}'
+```
+
+- `shell_plus`
+
+```sh
+In [1]: patient1 = Patient.objects.get(pk=1)
+
+In [2]: patient1
+Out[2]: <Patient: 1번 환자 tak>
+
+#진료를 조회함
+In [3]: patient1.reservation_set.all()
+Out[3]: <QuerySet [<Reservation: 1번 의사의 1번 환자>]>
+
+#의사만 출력, 내가 진료받는 의사로 patient에서 바로 접근(through option을 통해!)
+In [4]: patient1.doctors.all()
+Out[4]: <QuerySet [<Doctor: 1번 의사 justin>]>
+
+In [5]: doctor2 = Doctor.objects.create(name='eric')
+
+In [6]: Reservation.objects.create(doctor=doctor2, patient=patient1)
+Out[6]: <Reservation: 2번 의사의 1번 환자>
+
+In [7]: patient1.reservation_set.all()
+Out[7]: <QuerySet [<Reservation: 1번 의사의 1번 환자>, <Reservation: 2번 의사의 1번 환자>]>
+
+#나를 진료해주는 의사가 누구인지 바로 조회
+In [8]: patient1.doctors.all()
+Out[8]: <QuerySet [<Doctor: 1번 의사 justin>, <Doctor: 2번 의사 eric>]>
+
+In [10]: doctor2
+Out[10]: <Doctor: 2번 의사 eric>
+
+In [11]: doctor2.patient_set.all()
+Out[11]: <QuerySet [<Patient: 1번 환자 tony>]>
+```
+
+
+
+#### 4. Doctor도 patients 를 참조할 수 없을까? - `related_name` option
+
+> 역참조! 필드가 있는곳에서 참조하는건 참조, 필드가 없는 곳에서 자기를 참조하는 것을 참조하는 것이 역참조!
+
+- `related_name`
+
+  - 참조되는 대상이 참조하는 대상을 찾을 때(역참조), 어떻게 불러 올지에 정의한다.
+  - MTOM(ManyToMany) 필드가 없는 테이블이 있는 테이블을 참조할 때 사용한다.
+  - 필수적으로 사용하는 건 아니지만 필수적인 상황이 발생할 수 있다.
+
+  ```python
+  doctors = models.ManyToManyField(Doctor, related_name='patients') # 구문 추가
+  # through='reservation'는 삭제
+  ```
+
+- `models.py` 
+
+  ```python
+  class Doctor(models.Model):
+      name = models.TextField()
+  
+      def __str__(self):
+          return f'{self.pk}번 의사 {self.name}'
+  
+  
+  class Patient(models.Model):
+      name = models.TextField()
+      #through='Reservation'(삭제)->중개모델을 지웠기 때문에 없앰
+      #역참조 related_name인자가 있다->중개모델 클래스 지워도 괜춘
+      doctors = models.ManyToManyField(Doctor, related_name='patients')
+  
+      def __str__(self):
+          return f'{self.pk}번 환자 {self.name}'
+  
+  '''
+  Doctor가 Patient참조 역참조
+  중개모델을 앞으로는 직접만들지 않을거야!
+  '''
+  
+  # class Reservation(models.Model):
+  #     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+  #     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+      
+  #     def __str__(self):
+  #         return f'{self.doctor.pk}번 의사의 {self.patient.pk}번 환자'
+  ```
+
+- shell_plus로 확인
+
+  ```sh
+  In [1]: doctor1 = Doctor.objects.create(name='justin')
+  
+  In [3]: patient1 = Patient.objects.create(name='tony')
+  
+  In [4]: doctor1
+  Out[4]: <Doctor: 1번 의사 justin>
+  
+  In [5]: patient1
+  Out[5]: <Patient: 1번 환자 tony>
+  
+  In [6]: doctor1.patients.add(patient1)
+  
+  In [8]: doctor1.patients.all()
+  Out[8]: <QuerySet [<Patient: 1번 환자 tony>]>
+  
+  In [9]: patient1.doctors.all()
+  Out[9]: <QuerySet [<Doctor: 1번 의사 justin>]>
+  
+  In [10]: patient1.doctors.remove(doctor1)
+  
+  In [11]: patient1.doctors.all()
+  Out[11]: <QuerySet []>
+  
+  In [12]: doctor1.patients.all()
+  Out[12]: <QuerySet [<Patient: 1번 환자 tony>,<Patient: 2번 환자 harry>]>
+  ```
+
+- 위와 같은 상황일 때 `manytomany_patient_doctors` 테이블이 새로 생성된다.
+
+- 중개 모델을 생성하지 않고 `doctor`에서는 `patients.all()`로, `patients`에서는 `doctors.all()`로 서로 접근할 수 있다.(ManytoMany 필드의 특징!)
+
+
+
+- 그렇다면 중개모델은 필요가 없는가??? => **아님!!!!**
+  - 예약한 시간 정보를 담는다거나 하는 경우(= 추가적인 필드가 필요한 경우)에는 반드시 중개모델을 만들어서 진행을 해야되는 상황도 있다.
+  - 다만 그럴 필요가 없는 경우 위와 같이 해결할 수 있다.
+
