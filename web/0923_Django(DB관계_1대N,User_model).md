@@ -381,7 +381,7 @@ def comments_delete(request,article_pk,comment_pk):
 
 
 
-#### 1. ModelForm Custom
+#### ModelForm Custom
 
 - `accounts` > `forms.py`
 
