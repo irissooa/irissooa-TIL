@@ -313,7 +313,9 @@ def detail(request, pk):
 
 >  기본값은 true인데 `comment_form.save(commit=False)`이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
 >
-> 그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음        
+>  그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음       
+>
+>  `comment.article = article`여기서 comment의 article필드는 Comment Model(models.py)에서   만든 필드명! 그 comment.article에  `article = Article.objects.get(pk=pk)`의 pk 값으로 받아온 article의 정보를 넣어주는것
 
 ```python
 @require_POST
@@ -325,7 +327,7 @@ def comments_create(request,pk):
         # Create, but don't save the new comment instance.
         comment = comment_form.save(commit=False)
         comment.article = article
-        #넣을 거 다 넣었으니 이제 save, data를 받을 떄 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
+        #넣을 거 다 넣었으니 이제 save, data를 받을 때 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
         comment.save()
         return redirect('articles:detail',article.pk)
     context = {
