@@ -229,13 +229,15 @@ Out[8]:'first comment'
   - **article**
 - Article이 Comment을 참조(역참조)
   - **comment_set**
-  - django에서는 역참조시 `모델이름_set`형식의 manager를 만든다
+  - django에서는 역참조시 `소문자모델이름_set`형식의 manager를 만든다
 
 
 
 ## related_name
 
 > 외래키 3번쨰 인자 related_name='comments'역참조시 원하는 이름으로 바꿀 수 있음 이렇게 하면 comment_set 명령어는 더이상 못씀
+>
+> `models.py`
 
 `article = models.ForeignKey(Article,on_delete=models.CASCADE, related_name='comments')`
 
@@ -309,7 +311,7 @@ def detail(request, pk):
 
 - `articles` > `views.py`
 
->  #기본값은 true인데 `comment_form.save(commit=False)`이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
+>  기본값은 true인데 `comment_form.save(commit=False)`이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
 >
 > 그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음        
 
