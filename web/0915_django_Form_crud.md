@@ -62,6 +62,12 @@ urlpatterns = [
 > `image = models.ImageField(blank=True)`
 >
 > 다시 이미지 필드(`Thumbnail`) 씀->이미지 크기 조절(width,height)
+>
+> - 수정일자 : auto_now=True 사용
+>   auto_now=True 는 django model 이 save 될 때마다 현재날짜(date.today()) 로 갱신됩니다.
+>   주로 최종수정일자 field option 으로 주로 사용됩니다. 
+> - 생성일자 : auto_now_add=True 사용
+>   auto_now_add=True 는 django model 이 최초 저장(insert) 시에만 현재날짜(date.today()) 를 적용합니다.
 
 ```python
 from django.db import models
@@ -80,8 +86,8 @@ class Article(models.Model):
         options={'quality':90},
         upload_to='%Y/%m/%d',
     )
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 ```
 
 - 여기서 `imagekit`를 사용하기 위해서 `settings.py`의 `INSTALLED_APPS`에 추가해야됨
