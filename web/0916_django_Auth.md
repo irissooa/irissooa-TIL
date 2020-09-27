@@ -899,7 +899,7 @@ from .forms import CustomUserChangeForm
 @ login_required
 def update(request):
     if request.method == 'POST':
-         #모델폼이기 떄문에 첫번쨰 인자가 data, form이면 request가 첫번째 인자
+         #모델폼이기 때문에 첫번째 인자가 data, form이면 request가 첫번째 인자
         form = CustomUserChangeForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
