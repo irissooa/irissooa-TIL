@@ -77,6 +77,23 @@
 
 ### User - Article 관계(1 : N 관계)
 
+0. `accounts` > `models.py`
+
+> 기본유저 모델을 쓰면 추가를 하거나 대체를 할 수 없기 때문에 프로젝트 시작전에 대체를 먼저 하고 시작함!
+> 아래의 기능은 나중에 써도됨, 기존의 User와 기능적으로는 완전히 동일하지만 대체를 해야되는건 나중에 수정 가능하게 하기 위해서
+
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+# Create your models here.
+
+
+class User(AbstractUser):
+    pass
+```
+
+
+
 1. `settings.AUTH_USER_MODEL`
 
 > `앱이름.모델이름`-> 장고가 auth모델을 쓰는것이 아니라 대체를 함!
