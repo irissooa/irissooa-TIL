@@ -227,8 +227,7 @@ def delete(request, article_pk):
         article = get_object_or_404(Article, pk=article_pk)
         if request.user == article.user: # 이 구문 추가
             article.delete()
-        else:
-            return redirect(article)
+   
     return redirect('articles:index')
 ```
 
