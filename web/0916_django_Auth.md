@@ -977,22 +977,27 @@ def change_password(request):
             return redirect('articles:index')
     else:
         form = PasswordChangeForm(request.user)
-    context = {'form': form,}
+    context={
+        'form':form,
+    }
     return render(request, 'accounts/change_password.html', context)
 ```
 
 - change_password.html
 
 ```html
-{% extends 'articles/base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
-  <h1>비밀번호 변경</h1>
-  <form action="" method="POST">
-    {% csrf_token %}
-    {% buttons submit='변경' reset="Cancel" %}{% endbuttons %}
-  </form>
-{% endblock  %}
+<h1>비밀번호 변경</h1>
+
+<form action=""method='POST'>
+{% csrf_token %}
+{{form.as_p}}
+<button>변경</button>
+</form>
+
+{% endblock content %}
 ```
 
 - base.html
@@ -1033,7 +1038,9 @@ def change_password(request):
             return redirect('articles:index')
     else:
         form = PasswordChangeForm(request.user)
-    context = {'form': form,}
+    context={
+        'form':form,
+    }
     return render(request, 'accounts/change_password.html', context)
 ```
 
