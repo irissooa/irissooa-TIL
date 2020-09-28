@@ -103,6 +103,12 @@ def create(request):
 
 ## Form Customizing
 
+> User를 AUTH_USER_MODEL로 새로 만들었기 때문에 기존에 import해왔던 일반 폼들도 customizing을 해줘야된다! 왜냐하면 장고의 원래 User를 쓰는 것이 아니기 때문!
+>
+> 그대로 UserCreationForm, UserChangeForm을 쓴다면 Attribute Error뜸!
+>
+> ![image-20200929000425891](0927_django_월말평가준비.assets/image-20200929000425891.png)
+>
 > 아래처럼 `Class Meta:`만 먼저 해보고 만약 오류가 난다면 [django github](https://github.com/django/django/blob/master/django/contrib/auth/forms.py)에 들어가서 찾아본다!
 
 ```python
