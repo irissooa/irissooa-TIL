@@ -302,7 +302,7 @@ def comments_create(request,pk):
         #기본값은 true인데 comment_form.save(commit=False)이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
         comment = comment_form.save(commit=False)
         #그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음
-        comment.article = 
+        comment.article = article
         #user에 대한 정보를 받아옴, 사실상 들어가는 정보는 user_id임 클래스변수 user에 객체 자체를 넣어줌
         comment.user = request.user
         #넣을 거 다 넣었으니 이제 save, data를 받을 떄 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
