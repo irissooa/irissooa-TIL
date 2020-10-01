@@ -104,8 +104,6 @@ class User(AbstractUser):
     pass
 ```
 
-
-
 1. `settings.AUTH_USER_MODEL`
 
 > `앱이름.모델이름`-> 장고가 auth모델을 쓰는것이 아니라 대체를 함!
@@ -173,6 +171,73 @@ fields = ['title', 'content',] # 구문 수정
   - 아래와 같은 상황은 `user_id`를 `1`로 선택한 예시화면이다.
 
 [![model](0923_Django(DB관계_1대N,User_model).assets/67252556-7111f580-f4ae-11e9-9c8d-ac9586a3fd39.JPG)](https://user-images.githubusercontent.com/52685250/67252556-7111f580-f4ae-11e9-9c8d-ac9586a3fd39.JPG)
+
+```sh
+$ python manage.py makemigrations
+
+# 첫번째 상황(null 값이 허용되지 않는 user_id 가 아무 값도 없이 article 에 추가되려 하기 때문)
+$ python manage.py makemigrations
+You are trying to add a non-nullable field 'user' to article without a default; we can't do that (the database needs something to populate existing rows).
+Please select a fix:
+ 1) Provide a one-off default now (will be set on all existing rows with a null value for this column)
+ 2) Quit, and let me add a default in models.py
+Select an option: # 1 입력하고 enter
+
+# 두번째 상황(그럼 기존 article 의 user_id 로 어떤 데이터를 넣을건지 물어봄, 현재 admin 의 pk 값인 1을 넣자)
+Please enter the default value now, as valid Python
+The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now
+Type 'exit' to exit this prompt
+>>> # 1 입력하고 enter (그럼 현재 작성된 모든 글은 admin 이 작성한 것으로 됨)
+```
+
+- 유저모델 대체 후 회원가입 시 에러 발생
+
+- AbstractBaseUser의 모든 subclass와 호환되는 forms
+
+  - AuthenticationForm, SetPasswordForm, PasswordChangeForm, AdminPasswordChangeForm
+
+- User와 연결되어 있어서 커스텀 유저 모델을 사용하려면 다시 작성하거나 확장해야 하는 forms (ModelForm)
+
+  - UserCreationForm, UserChangeForm
+
+- `UserCreateForm()` 을 재정의 해보자.
+
+  ```python
+  # accounts/forms.py
+  
+  from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+  
+  
+  class CustomUserCreationForm(UserCreationForm):
+  
+      class Meta(UserCreationForm.Meta):
+          model = get_user_model()
+          fields = UserCreationForm.Meta.fields + ('email',)
+  ```
+
+  ```python
+  # accounts/views.py
+  
+  from .forms import CustomUserChangeForm, CustomUserCreationForm
+  
+  
+  def signup(request):
+      if request.user.is_authenticated:
+          return redirect('articles:index')
+  
+      if request.method == 'POST':
+          form = CustomUserCreationForm(request.POST)
+          if form.is_valid():
+              user = form.save()
+              auth_login(request, user)
+              return redirect('articles:index')
+      else:
+          form = CustomUserCreationForm()
+      context = {
+          'form': form,
+      }
+      return render(request, 'accounts/signup.html', context)
+  ```
 
 
 
