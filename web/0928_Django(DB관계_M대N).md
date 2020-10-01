@@ -27,7 +27,7 @@
 
 ## A many-to-many relationship
 
-![image-20200928093941422](0928_Django(DB관계_N대M).assets/image-20200928093941422.png)
+![image-20200928093941422](0928_Django(DB관계_M대N).assets/image-20200928093941422.png)
 
 > 한계 : 환자가 다른 의사한테 또 진료를 받고 싶다면 필드를 한번 더 사용해야되고, harry라는 환자가 두명의 의사한테 동시에 진료를 받을 수 없었음!
 >
@@ -35,17 +35,17 @@
 
 
 
-![image-20200928094442508](0928_Django(DB관계_N대M).assets/image-20200928094442508.png)
+![image-20200928094442508](0928_Django(DB관계_M대N).assets/image-20200928094442508.png)
 
 > 각각의 모델과 1:N의 관계를 맺음, 지금 1번의사한테 두명의 환자가 예약되어있는 것을 보여줌 
 >
 > 데이터를 조회할 때 아래와 같이 shell_plus에 입력했음
 >
-> ![image-20200930185919266](0928_Django(DB관계_N대M).assets/image-20200930185919266.png)
+> ![image-20200930185919266](0928_Django(DB관계_M대N).assets/image-20200930185919266.png)
 
 
 
-![image-20200928094500784](0928_Django(DB관계_N대M).assets/image-20200928094500784.png)
+![image-20200928094500784](0928_Django(DB관계_M대N).assets/image-20200928094500784.png)
 
 > 의사가 환자들을 조회를 하고 싶다!
 >
@@ -55,13 +55,13 @@
 >
 > 두 모델간 종속관계가 없어 둘중 어느 모델에 써도 관계 없음! Doctor에 적어도 상관없음
 >
-> ![image-20200928094531785](0928_Django(DB관계_N대M).assets/image-20200928094531785.png)
+> ![image-20200928094531785](0928_Django(DB관계_M대N).assets/image-20200928094531785.png)
 >
 > 참조되는 모델의 복수형으로 적으면 됨!
 >
 > 조회할때의 명령어는 이렇게 씀!
 >
-> ![image-20200930190154615](0928_Django(DB관계_N대M).assets/image-20200930190154615.png)
+> ![image-20200930190154615](0928_Django(DB관계_M대N).assets/image-20200930190154615.png)
 >
 > 1번환자를 조회하고
 >
@@ -69,17 +69,17 @@
 >
 > 내가 오늘 진료를 받을 의사만 보여줌! Patient가 바로 의사를 참조하는 것처럼 보이게 함 
 >
-> ![image-20200928094722487](0928_Django(DB관계_N대M).assets/image-20200928094722487.png)
+> ![image-20200928094722487](0928_Django(DB관계_M대N).assets/image-20200928094722487.png)
 >
 > 하지만 여전히 Doctor는 Reservation을 통해서만 Patient를 참조할 수 있음!
 >
 > ManyToManyField는 종속관계는 없지만 역참조를 하면 Doctor도 patient를 참조할 수 있음!
 >
-> ![image-20200928094732248](0928_Django(DB관계_N대M).assets/image-20200928094732248.png)
+> ![image-20200928094732248](0928_Django(DB관계_M대N).assets/image-20200928094732248.png)
 >
 > `related_name=`역참조시 사용하는 `manager`를 변경함
 >
-> ![image-20200930191025532](0928_Django(DB관계_N대M).assets/image-20200930191025532.png)
+> ![image-20200930191025532](0928_Django(DB관계_M대N).assets/image-20200930191025532.png)
 >
 > `related_name`을 설정하고 나면 이전에 사용했던 명령어 `patient_set`은 쓸 수 없음!
 
@@ -87,9 +87,9 @@
 
 
 
-![image-20200928095013372](0928_Django(DB관계_N대M).assets/image-20200928095013372.png)
+![image-20200928095013372](0928_Django(DB관계_M대N).assets/image-20200928095013372.png)
 
->![image-20200930191833211](0928_Django(DB관계_N대M).assets/image-20200930191833211.png)
+>![image-20200930191833211](0928_Django(DB관계_M대N).assets/image-20200930191833211.png)
 
 
 
@@ -123,7 +123,7 @@
   - ManyToManyField가 동일한 모델(self)을 가리키는 정의에서만 사용
   - 재귀적 정의(대댓글 관계)
   
-  ![image-20201001132426350](0928_Django(DB관계_N대M).assets/image-20201001132426350.png)
+  ![image-20201001132426350](0928_Django(DB관계_M대N).assets/image-20201001132426350.png)
   
   - 예시처럼 동일한 모델을 가리키는 경우 Person 클래스에 person_set 매니저를 추가 하지 않는다.
   - 대신 대칭적(symmetrical)이라고 간주하며, source인스턴스(참조하는)가 target 인스턴스(참조되는)를 참조하면 target 인스턴스도 sourxe인스턴스를 참조하게 됨
@@ -150,7 +150,7 @@
 >
 > 그냥 like_users도 users, related_name도 원래 기본대로 할래! 라고 했을 때 아래와 같은 역참조시 충돌됐다는 오류가 남!
 >
-> ![image-20200930230608193](0928_Django(DB관계_N대M).assets/image-20200930230608193.png)
+> ![image-20200930230608193](0928_Django(DB관계_M대N).assets/image-20200930230608193.png)
 >
 > related_name을 더해라! 이상황에서는 이 인자가 필수가 돼버림!
 >
@@ -185,7 +185,7 @@
 >
 > 이 테이블의 이름 규칙 `articles_article_like_users(앱이름_그 필드가 참조하는 모델의 이름_그모델에 작성된 필드 이름)` 각각의 모델에 대한 외래키를 가지고 있음!
 >
-> ![image-20200930235216291](0928_Django(DB관계_N대M).assets/image-20200930235216291.png)
+> ![image-20200930235216291](0928_Django(DB관계_M대N).assets/image-20200930235216291.png)
 
 ```python
 from django.db import models
@@ -360,7 +360,6 @@ def like(request, article_pk):
 
 > `path('<username>/'`에서 `str:`은 기본값이기 때문에 생략가능!
 >
-> 
 
 ```python
 from django.urls import path
@@ -534,7 +533,7 @@ def profile(request, username):
 >
 > `source_id`->`target_id`
 >
-> ![image-20201001135409568](0928_Django(DB관계_N대M).assets/image-20201001135409568.png)
+> ![image-20201001135409568](0928_Django(DB관계_M대N).assets/image-20201001135409568.png)
 >
 > 그럼 Followings의 중개모델은? source와 target모델이 같음!
 >
@@ -561,7 +560,7 @@ def profile(request, username):
 >
 > User모델이 변경됐기 때문에 migration해야됨!
 >
-> ![image-20201001180217457](0928_Django(DB관계_N대M).assets/image-20201001180217457.png)
+> ![image-20201001180217457](0928_Django(DB관계_M대N).assets/image-20201001180217457.png)
 
 ```python
 from django.db import models
@@ -875,7 +874,7 @@ def index(request):
     articles = Article.objects.select_related('user').annotate(likes=Count('like_users')).order_by('-pk')
 ```
 
-![image-20201001215321072](0928_Django(DB관계_N대M).assets/image-20201001215321072.png)
+![image-20201001215321072](0928_Django(DB관계_M대N).assets/image-20201001215321072.png)
 
 
 
@@ -900,10 +899,10 @@ def index(request):
 
 ## GIT
 
-![image-20200928125050746](0928_Django(DB관계_N대M).assets/image-20200928125050746.png)
+![image-20200928125050746](0928_Django(DB관계_M대N).assets/image-20200928125050746.png)
 
-![image-20200928125225667](0928_Django(DB관계_N대M).assets/image-20200928125225667.png)
+![image-20200928125225667](0928_Django(DB관계_M대N).assets/image-20200928125225667.png)
 
-![image-20200928125249043](0928_Django(DB관계_N대M).assets/image-20200928125249043.png)
+![image-20200928125249043](0928_Django(DB관계_M대N).assets/image-20200928125249043.png)
 
 2. .git 폴더를 삭제한 다음 다시 gitinit을 하면 됨,(프로젝트를 새로 만든 다음에)
