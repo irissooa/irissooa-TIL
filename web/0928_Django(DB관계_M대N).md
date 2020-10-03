@@ -27,6 +27,8 @@
 
 ## A many-to-many relationship
 
+> [공식문서](https://docs.djangoproject.com/en/3.1/ref/models/fields/#manytomanyfield)
+
 ![image-20200928093941422](0928_Django(DB관계_M대N).assets/image-20200928093941422.png)
 
 > 한계 : 환자가 다른 의사한테 또 진료를 받고 싶다면 필드를 한번 더 사용해야되고, harry라는 환자가 두명의 의사한테 동시에 진료를 받을 수 없었음!
@@ -104,8 +106,9 @@
 
 > DB Reperesentation(데이터베이스에서의 표현)
 
-- django는 M:N관계를 나타내는 **중개 테이블**(intermediary join table)을 만든다
+- django는 M:N관계를 나타내는 **중개 조인 테이블**(intermediary join table)을 만든다
 - 테이블 이름은 ManyToManyField의 이름과 이를 포함하는 모델의 이름을 조합하여 생성함
+- `db_table` 옵션을 사용하여 조인 테이블의 이름을 변경할 수도 있다.
 
 > Arguments
 
@@ -116,6 +119,8 @@
   - ForeignKey의 related_name과 동일
   
 - `through`
+  
+  - django는 다대다 관계를 관리하는 중개 테이블을 자동으로 생성
   - 중개 테이블을 **직접** 작성하려는 경우 지정
   - 일반적으로 **추가 데이터**를 M:N 관계와 연결하려는 경우에 사용
   
@@ -126,13 +131,25 @@
   ![image-20201001132426350](0928_Django(DB관계_M대N).assets/image-20201001132426350.png)
   
   - 예시처럼 동일한 모델을 가리키는 경우 Person 클래스에 person_set 매니저를 추가 하지 않는다.
-  - 대신 대칭적(symmetrical)이라고 간주하며, source인스턴스(참조하는)가 target 인스턴스(참조되는)를 참조하면 target 인스턴스도 sourxe인스턴스를 참조하게 됨
+  - 대신 대칭적(`symmetrical`)이라고 간주하며, source인스턴스(참조하는)가 target 인스턴스(참조되는)를 참조하면 target 인스턴스도 sourxe인스턴스를 참조하게 됨
+  - 즉, 내가 당신의 친구라면 당신도 내 친구가 됨
   - self와 M:N관계에서 대칭을 원하지 않는 경우 **`semmetrical`를 `False`로 설정함**(기본값이 True)
   - Folllow도 마찬가지! 내가 팔로우 한다고 상대도 팔로우 되는게 아님! 그래서 False로 바꿔야됨!
   
 - etc.....
 
 
+
+**중개 테이블 필드 생성 규칙**
+
+1. 소스(source model) 및 대상(target model) 모델이 다른 경우
+   - id
+   - `<containing_model>_id`
+   - `<other_model>_id`
+2. ManyToManyField가 동일한 모델을 가리키는 경우
+   - id
+   - `from_<model>_id`
+   - `to_<model>_id`
 
 
 
@@ -183,7 +200,7 @@
 >
 > 이것은 핵심이 중개모델을 만드는 것! 그래서 필드의 변화가 없고 그래서 defalut값이 필요없다!
 >
-> 이 테이블의 이름 규칙 `articles_article_like_users(앱이름_그 필드가 참조하는 모델의 이름_그모델에 작성된 필드 이름)` 각각의 모델에 대한 외래키를 가지고 있음!
+> 이 중개 테이블의 이름 규칙 `articles_article_like_users(앱이름_그 필드가 참조하는 모델의 이름_그모델에 작성된 필드 이름)` 각각의 모델에 대한 외래키를 가지고 있음!
 >
 > ![image-20200930235216291](0928_Django(DB관계_M대N).assets/image-20200930235216291.png)
 
@@ -203,8 +220,18 @@ class Article(models.Model):
     
     def __str__(self):
         return self.title
-
 ```
+
+
+
+**이제 사용 가능한 ORM 명령어는 다음과 같다.**
+
+- `article.user` : 게시글을 작성한 유저 - 1:N
+- `article.like_users` : 게시글을 좋아요한 유저 - M:N
+- `user.article_set`: 유저가 작성한 게시글들 → 역참조 - 1:N
+- `user.like_articles`: 유저가 좋아요한 게시글들 → 역참조 - M:N
+
+
 
 
 
@@ -281,7 +308,25 @@ def like(request, article_pk):
     return redirect('accounts:login')
 ```
 
-- `base.html`
+**view & urls**
+
+> https://docs.djangoproject.com/en/3.1/ref/models/querysets/#filter
+>
+> https://docs.djangoproject.com/en/3.1/ref/models/querysets/#django.db.models.query.QuerySet.exists
+
+- `filter()` 
+  - 조건에 맞는 여러 행을 출력한다. (조건에만 맞는다면 전부 가져온다.)
+- `exists()`
+  - 최소한 하나의 레코드가 존재하는지 여부를 확인하여 알려 준다. 
+- `.get` 이 아닌 `.filter` 를 사용하는 이유 → 데이터가 없는 경우의 오류 여부
+  - `.get()` 은 유일한 값을 꺼낼 때 사용한다.(ex. pk) 유일한 값을 꺼낸다는 것은 해당 데이터가 존재하지 않는 경우가 없다는 뜻이다. 값이 없으면 에러(DoesNoetExist error) 가 발생하기 때문에 무조건 존재하는 값에 접근할 때 사용한다.
+  - `.filter()` 의 경우 조건에 맞는 여러 개의 데이터를 가져온다. 이때 데이터가 1개도 없어도 빈 쿼리셋을 반환한다. (몇 개인지 보장할 수 없을 때)
+
+
+
+- **font awesome 을 활용한 like 버튼 만들기**
+
+>  `base.html`
 
 ```html
 <head>
@@ -420,6 +465,7 @@ def profile(request, username):
 {% block content %}
 <h1 class="text-center">{{ person.username }}의 프로필</h1>
 <hr>
+<!-- bootstrap 점보트론 들어갈 곳 -->
 <!--팔로우/언팔로우 버튼/팔로워수/팔로잉 수-->
 {% include 'accounts/_follow.html' %}
 
@@ -678,6 +724,14 @@ context = {
 
 
 
+
+
+
+
+
+
+
+
 -------------------
 
 정규수업과정 끝
@@ -695,7 +749,7 @@ context = {
 
 > `person.follwers.all`이나 `person.followings.all` 이런것들이 계속 반복돼서 쓰이고 있음
 >
-> 이때 `with` template tag가 있음! 기능상으로 바뀐건 없음! 
+> 이때 [`with` template tag](https://docs.djangoproject.com/en/3.1/ref/templates/builtins/#with)가 있음! 기능상으로 바뀐건 없음! 
 >
 > - 복잡한 변수를 더 간단한 이름으로 저장(캐시)하며, 여러 번 DB를 조회할 때(특히 비용이 많이 드는) 유용하게 사용가능하다.
 >
