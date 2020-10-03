@@ -104,7 +104,7 @@
 - M:N관계를 나타내기 위해 사용하는 필드
 - 하나의 필수 위치 인자(M:N 관계로 설정할 모델 클래스)가 필요하다
 
-> DB Reperesentation(데이터베이스에서의 표현)
+> 데이터베이스에서의 표현
 
 - django는 M:N관계를 나타내는 **중개 조인 테이블**(intermediary join table)을 만든다
 - 테이블 이름은 ManyToManyField의 이름과 이를 포함하는 모델의 이름을 조합하여 생성함
@@ -131,9 +131,9 @@
   ![image-20201001132426350](0928_Django(DB관계_M대N).assets/image-20201001132426350.png)
   
   - 예시처럼 동일한 모델을 가리키는 경우 Person 클래스에 person_set 매니저를 추가 하지 않는다.
-  - 대신 대칭적(`symmetrical`)이라고 간주하며, source인스턴스(참조하는)가 target 인스턴스(참조되는)를 참조하면 target 인스턴스도 sourxe인스턴스를 참조하게 됨
+  - 대신 대칭적(`symmetrical`)이라고 간주하며, source인스턴스(참조하는)가 target 인스턴스(참조되는)를 참조하면 target 인스턴스도 source인스턴스를 참조하게 됨
   - 즉, 내가 당신의 친구라면 당신도 내 친구가 됨
-  - self와 M:N관계에서 대칭을 원하지 않는 경우 **`semmetrical`를 `False`로 설정함**(기본값이 True)
+  - self와 M:N관계에서 대칭을 원하지 않는 경우 **`symmetrical`를 `False`로 설정함**(기본값이 True)
   - Folllow도 마찬가지! 내가 팔로우 한다고 상대도 팔로우 되는게 아님! 그래서 False로 바꿔야됨!
   
 - etc.....
@@ -196,7 +196,7 @@
 > - article이 user를 참조할 때 users-> like_users/ `article.like_users`(이 게시글에 좋아요를 누른 유저들을 조회)
 > - article이 user를 역참조할 때 `related_name = 'like_articles'`/ `user.like_articles`(유저가 좋아요한 게시글들 조회)
 >
-> M:N관계 필드를 추가해 models.py가 변경이 됐으니 migration해줌! 이거는 필드값이 추가된것처럼 보이지만 1:N관계필드를 추가했을 때는 default값을 물어보는게 나왔었는데, ManyToManyField는 실제 물리적 필드가 아니기 때문에 Aricile과 User에 필드가 새로 생기는 것이 아니라 테이블 하나가 더 생기는 것일 뿐!
+> M:N관계 필드를 추가해 models.py가 변경이 됐으니 migration해줌! 이거는 필드값이 추가된것처럼 보이지만 1:N관계필드를 추가했을 때는 default값을 물어보는게 나왔었는데, ManyToManyField는 실제 물리적 필드가 아니기 때문에 Article과 User에 필드가 새로 생기는 것이 아니라 테이블 하나가 더 생기는 것일 뿐!
 >
 > 이것은 핵심이 중개모델을 만드는 것! 그래서 필드의 변화가 없고 그래서 defalut값이 필요없다!
 >
@@ -279,9 +279,17 @@ urlpatterns = [
 >
 > WHY! `.get()`이 아니라 왜 `.filter()`를 썼냐?
 >
-> `.filter()` : 해당조건을 만족하는 쿼리셋을 리턴함! 0개,1개,2개,,,등 에러를 발생시키지 않음
+> > https://docs.djangoproject.com/en/3.1/ref/models/querysets/#filter
+> >
+> > https://docs.djangoproject.com/en/3.1/ref/models/querysets/#django.db.models.query.QuerySet.exists
 >
-> 하지만 `.get()`은 값이 없다면 에러가남!
+> - `filter()` 
+>   - 조건에 맞는 여러 행을 출력한다. (조건에만 맞는다면 전부 가져온다.)
+> - `exists()`
+>   - 최소한 하나의 레코드가 존재하는지 여부를 확인하여 알려 준다. 
+> - `.get` 이 아닌 `.filter` 를 사용하는 이유 → 데이터가 없는 경우의 오류 여부
+>   - `.get()` 은 유일한 값을 꺼낼 때 사용한다.(ex. pk) 유일한 값을 꺼낸다는 것은 해당 데이터가 존재하지 않는 경우가 없다는 뜻이다. **값이 없으면 에러(DoesNoetExist error) 가 발생**하기 때문에 무조건 존재하는 값에 접근할 때 사용한다.
+>   - `.filter()` 의 경우 조건에 맞는 여러 개의 데이터를 가져온다. 이때 데이터가 1개도 없어도 빈 쿼리셋을 반환한다. (몇 개인지 보장할 수 없을 때)
 
 ```python
 @require_POST
@@ -308,19 +316,7 @@ def like(request, article_pk):
     return redirect('accounts:login')
 ```
 
-**view & urls**
 
-> https://docs.djangoproject.com/en/3.1/ref/models/querysets/#filter
->
-> https://docs.djangoproject.com/en/3.1/ref/models/querysets/#django.db.models.query.QuerySet.exists
-
-- `filter()` 
-  - 조건에 맞는 여러 행을 출력한다. (조건에만 맞는다면 전부 가져온다.)
-- `exists()`
-  - 최소한 하나의 레코드가 존재하는지 여부를 확인하여 알려 준다. 
-- `.get` 이 아닌 `.filter` 를 사용하는 이유 → 데이터가 없는 경우의 오류 여부
-  - `.get()` 은 유일한 값을 꺼낼 때 사용한다.(ex. pk) 유일한 값을 꺼낸다는 것은 해당 데이터가 존재하지 않는 경우가 없다는 뜻이다. 값이 없으면 에러(DoesNoetExist error) 가 발생하기 때문에 무조건 존재하는 값에 접근할 때 사용한다.
-  - `.filter()` 의 경우 조건에 맞는 여러 개의 데이터를 가져온다. 이때 데이터가 1개도 없어도 빈 쿼리셋을 반환한다. (몇 개인지 보장할 수 없을 때)
 
 
 
