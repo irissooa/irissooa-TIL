@@ -8,7 +8,7 @@
 >
 > User 대체 -> Custom user model
 >
-> 대체 후 회원가입 이뤄지지 않음, 대체한 후 회원가입 진행 안됨-> 회원가입에 대한 useer creationform이 기본적으로 장고가 user를 대체하기 전인 기본 user model로 만들어진 모델폼이기 떄문
+> 대체 후 회원가입 이뤄지지 않음, 대체한 후 회원가입 진행 안됨-> 회원가입에 대한 user creationform이 기본적으로 장고가 user를 대체하기 전인 기본 user model로 만들어진 모델폼이기 떄문
 >
 > 그래서 custom model로 만들어서 바꿔줘야됨(Userchangeform도 마찬가지)
 >
@@ -352,7 +352,7 @@ def like(request, article_pk):
 
 ## Profile
 
-> 프로필페이지를 만든 뒤 그안에 fallow를 만듦
+> 프로필페이지를 만든 뒤 그안에 follow를 만듦
 >
 > 계정에 관계가 있으니 accounts앱에! articles에 만들어도 관계없음 자기가 구성하기 나름
 
