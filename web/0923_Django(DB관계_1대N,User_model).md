@@ -202,6 +202,8 @@ Type 'exit' to exit this prompt
 
 - `UserCreateForm()` 을 재정의 해보자.
 
+  > get_user_model은 return값이 현재 사용하고 있는 User이기 때문에 다른 모델은 `()`없이 적었던 것과 달리 `()`를 붙여줌!!
+  
   ```python
   # accounts/forms.py
   
@@ -212,9 +214,9 @@ Type 'exit' to exit this prompt
   
       class Meta(UserCreationForm.Meta):
           model = get_user_model()
-          fields = UserCreationForm.Meta.fields + ('email',)
+        fields = UserCreationForm.Meta.fields + ('email',)
   ```
-
+  
   ```python
   # accounts/views.py
   
