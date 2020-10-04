@@ -491,8 +491,8 @@ def logout(request):
 > 작성하시오.
 
 ```sh
-MEDIA_URL='/media/'
-MEDIA_ROOT=[BASE_DIR/'media']
+MEDIA_URL='/uploaded_files/'
+MEDIA_ROOT=BASE_DIR/'uploaded_files'
 ```
 
 
@@ -554,10 +554,10 @@ PROTECT- foreignkey로 연결되어 있는 article이 사라지면 안됨(Protec
 ![image-20201004193818572](1004_django_hwws정리.assets/image-20201004193818572.png)
 
 ```sh
-accounts_user_followers - from_user_id, to_user_id
+accounts_user_followings - from_user_id, to_user_id
 ```
 
-
+![image-20201004215059524](1004_django_hwws정리.assets/image-20201004215059524.png)
 
 
 
@@ -581,13 +581,15 @@ View: 전달받은 데이터를 함수의 로직으로 가공하여 그 결과�
 > 작성하시오. (프로젝트의 이름은 crud 이며 app 이름은 articles이다. index.html 파일을
 > 렌더링 하는 함수의 이름은 index라고 가정한다.)
 
+![image-20201004194250973](1004_django_hwws정리.assets/image-20201004194250973.png)
+
 ```sh
 (a) articles
 (b) views
 (c) views.index, name='index'
 ```
 
-![image-20201004194250973](1004_django_hwws정리.assets/image-20201004194250973.png)
+
 
 ### templates and static
 
@@ -723,8 +725,8 @@ UserCreationForm은 auth.User에서 사용하는 폼인데 auth.User를 안쓰�
 ```sh
 (a) person.followings.all
 (b) person.followers.all
-(c) user
-(d) article.user
+(c) request.user
+(d) person
 (e) person.pk
 ```
 
@@ -760,7 +762,7 @@ Article 테이블에는 comment에 대한 정보가 없다
 
 ```sh
 ForiegnKey : answer_id #원래는 헷갈리지 않게 question으로 변수명을 지정해 줘야됨!
-table : articles_comment
+table : quetion_comment
 ```
 
 
