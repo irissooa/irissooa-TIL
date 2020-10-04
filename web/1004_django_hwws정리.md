@@ -328,7 +328,7 @@ $ python manage.py migrate
 
 ```sh
 my_post.title = "안녕하세요"
-my_post.title = "반갑습니다"
+my_post.content = "반갑습니다"
 my_post.save()
 ```
 
