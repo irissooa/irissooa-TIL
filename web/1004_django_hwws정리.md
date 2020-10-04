@@ -983,7 +983,666 @@ on_delete 옵션
 
 
 
+![image-20201004211530670](1004_django_hwws정리.assets/image-20201004211530670.png)
 
+```python
+from django.db import models 
+class Article(models.Model):    
+    title = models.CharField(max_length=100)    
+    content = models.TextField()    
+    image = models.ImageField(blank=True, upload_to="%Y/%m/%d")    
+    created_at = models.DateTimeField(auto_now=True)    
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+```
+
+- image모델을 정의할때  `upload_to=%Y/%m/%d `와 같은 형식을 사용함
+- `/`를 적으면 폴더가 3개 생김! Y/M/D폴더 이렇게 3개로 만들어짐
+- media / 20200915 / 이미지 파일 형태로 저장된다
+- 그리고 모델을 변경했기 때문에 makemigrations, migrate를 해야됨!!
+
+```sh
+$python manage.py makemigrations
+$python manage.py migrate
+$python manage.py runserver
+```
+
+
+
+###  Password Change
+> /accounts/password/
+> 비밀번호 수정 기능을 구현한다.
+>
+> 이거는 로그인이 유지되는 코드!
+
+```python
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,PasswordChangeForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model,update_session_auth_hash
+@require_http_methods(['GET','POST'])
+def password(request):
+	if request.method == 'POST':
+        #이거 원래 앞이 user값, 두번째가 request.post 근데 만약 위치 모르면 둘다 key값주면 위치 바껴도 괜춘!!!
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            #이렇게 로그인이 유지됨
+            user = form.save()
+            update_session_auth_hash(request,request.user)
+            return redirect('accounts:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {
+        'form' : form,
+    }
+    return render(request,'accounts/password.html',context)
+```
+
+
+
+### Model
+
+```python
+from django.db import models
+
+# Create your models here.
+class Article(models.Model): # 상속
+    title = models.CharField(max_length=10)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
+
+
+class Comment(models.Model):
+    #article(외래키) 필수 인자: 참조하는 클래스,on_delete옵션!,  related_name='comments'역참조시 원하는 이름으로 바꿀 수 있음 이렇게 하면 comment_set 명령어는 더이상 못씀
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+    comment = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.content
+
+```
+
+### Comment Create
+
+```python
+from django.shortcuts import render, redirect,get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods, require_POST
+from .models import Article,Comment
+from .forms import ArticleForm, CommentForm
+
+@require_POST
+def comments_create(request,pk):
+     #댓글작성은 detail 페이지에서 보여짐
+    # article = Article.objects.get(pk=pk)
+    article = get_object_or_404(Article,title__startswith='A',pk=1)
+    comment_form = CommentForm(request.POST)
+    if comment_form.is_valid():
+        #기본값은 true인데 comment_form.save(commit=False)이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
+        comment = comment_form.save(commit=False)
+        #그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음
+        comment.article = article
+        #넣을 거 다 넣었으니 이제 save, data를 받을 떄 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
+        comment.save()
+        return redirect('articles:detail',article.pk)
+    context = {
+        'comment_form':comment_form,
+        'article':article,
+    }
+    #에러메세지를 담고 detail페이지로 넘어감
+    return render(request,'articles/detail.html',context)
+
+```
+
+
+
+### Comment Read
+
+```html
+ <h4>댓글 목록</h4>
+  {% for comment in comments %}
+  <ul>
+    <li>{{comment.content}}</li>
+  </ul>
+  {% endfor %}
+  <hr>
+  <h4>댓글작성</h4>
+  <form action="{% url 'articles:comments_create' article.pk %}" mehtod='POST'>
+  {% csrf_token %}
+  {{comment_form}}
+  <input type="submit">
+  </form>
+{% endblock  %}
+
+```
+
+
+
+### Comment Delete
+
+```python
+@require_POST
+def comments_delete(request,article_pk,comment_pk):
+    # comment = Comment.objects.get(pk=comment_pk)
+    comment = get_object_or_404(Comment,pk=comment_pk)
+    comment.delete()
+    #인자로 받은 article_pk를 가져옴
+    #만약 article=comment.article로 받아온다면-> article.pk로 받아도되지만 최적화를 위해 인자로 받아라(?)
+    return redirect('articles:detail',article_pk)
+
+```
+
+
+
+### Auth_User
+
+- accounts > models
+
+> settings.py에 AUTH_USER_MODEL = 'accounts.User'씀
+> 프로젝트 시작 전 User모델을 미리 만들고 시작해야됨!
+
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+# Create your models here.
+
+#기본유저 모델을 쓰면 추가를하거나 대체를 할 수 없기 때문에 프로젝트 시작전에 대체를 먼저 하고 시작함!
+#아래의 기능은 나중에 써도됨, 기존의 User와 기능적으로는 완전히 동일하지만 대체를 해야되는건 나중에 수정가능하게 하기 위해서
+class User(AbstractUser):
+    pass
+```
+
+
+
+- accounts > forms
+
+```python
+from django.contrib.auth.forms import UserChangeForm,UserCreationForm
+from django.contrib.auth import get_user_model
+
+
+class CustomUserChangeForm(UserChangeForm):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'first_name', 'last_name',)
+
+
+class CUstomUserCreationForm(UserCreationForm):
+
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()#현재 프로젝트에 활성화된 모델임, 이거쓰는거 권장
+        field = UserCreationForm.Meta.fields + ('email',)
+```
+
+- articles > models
+
+```python
+from django.db import models
+from django.conf import settings
+
+# Create your models here.
+class Article(models.Model): # 상속
+#여기는 get_user_model을 참고하지 못하고 Auth_user_model을 적어야됨, user_id defalut를 1로 줌, 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,defalut=1)
+    title = models.CharField(max_length=10)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
+
+
+class Comment(models.Model):
+    #article(외래키) 필수 인자: 참조하는 클래스,on_delete옵션!,  related_name='comments'역참조시 원하는 이름으로 바꿀 수 있음 이렇게 하면 comment_set 명령어는 더이상 못씀
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+    #하나의 모델에는 여러 외래키가 있어도됨
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    comment = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.content
+```
+
+
+
+- articles > forms
+
+```python
+from django import forms
+from .models import Article,Comment
+
+
+class ArticleForm(forms.ModelForm):
+    
+    class Meta:
+        model = Article
+        fields = ['title','content']
+        # exclude = ['user']
+#detial페이지에서 보여져야됨->detail view에 적힘
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        # fields = '__all__'
+        #제외할 것을 적어줘도됨, 이건 foreign key이기 때문에 안보여지게 할거야
+        exclude = ['article','user',]
+```
+
+
+
+- articles > urls
+
+```python
+from django.urls import path
+from . import views
+
+
+app_name = 'articles'
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('create/', views.create, name='create'),
+    path('<int:pk>/', views.detail, name='detail'),
+    path('<int:pk>/update/', views.update, name='update'),
+    path('<int:pk>/delete/', views.delete, name='delete'),
+    path('<int:pk>/comments/',views.comments_create,name='comments_create'),
+    path('<int:article_pk>/comments/<int:comment_pk>/delete/',views.comments_delete,name='comments_delete'),
+]
+```
+
+
+
+- articles > views
+
+```python
+from django.shortcuts import render, redirect,get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods, require_POST
+from .models import Article,Comment
+from .forms import ArticleForm, CommentForm
+
+# Create your views here.
+def index(request):
+    articles = Article.objects.order_by('-pk')
+    context = {
+        'articles': articles,
+    }
+    return render(request, 'articles/index.html', context)
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def create(request):
+    if request.method == 'POST':
+        form = ArticleForm(request.POST) 
+        if form.is_valid():
+            article = form.save(commit=False)
+            article.user = request.user #user_id라고 적지않고 객체를 넣음
+            article.save()
+            return redirect('articles:detail', article.pk)
+    else:
+        form = ArticleForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'articles/create.html', context)
+
+#이제 폼이름 여러개니까 구분지어줌 comment_form
+def detail(request, pk):
+    # article = Article.objects.get(pk=pk)
+    article = get_object_or_404(Article,pk=pk)
+    comment_form = CommentForm()
+    #역참조 일어남, pk게시글이 가진 모든 댓글 가져옴
+    comments = article.commet_set.all()
+    context = {
+        'article': article,
+        'comment_form':comment_form,
+        'comments':comments,
+    }
+    return render(request, 'articles/detail.html', context)
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def update(request, pk):
+    # article = Article.objects.get(pk=pk)
+    article = get_object_or_404(Article,pk=pk)
+    #수정하는 유저와,게시글 작성 유저가 같은지 확인!
+    if request.user == article.user:
+        if request.method == 'POST':
+            form = ArticleForm(request.POST, instance=article)
+            if form.is_valid():
+                form.save()
+                return redirect('articles:detail', article.pk)
+        else:
+            form = ArticleForm(instance=article)
+    else:
+        return redirect('articles:index')
+    context = {
+        'form': form,
+        'article': article,
+    }
+    return render(request, 'articles/update.html', context)
+
+
+@require_POST
+def delete(request, pk):
+    if request.user.is_authenticated:
+        # article = Article.objects.get(pk=pk)
+        article = get_object_or_404(Article,pk=pk)
+        #user가 같아야 삭제
+        if request.user == article.user:
+            article.delete()
+            return redirect('articles:index')
+    return redirect('articles:detail',article.pk)
+
+
+@require_POST
+def comments_create(request,pk):
+     #댓글작성은 detail 페이지에서 보여짐
+    # article = Article.objects.get(pk=pk)
+    if request.user.is_authenticated:
+        article = get_object_or_404(Article,title__startswith='A',pk=1)
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            #기본값은 true인데 comment_form.save(commit=False)이거는 commit을 하지 않음 save는 하긴 할건데 아직 db에 작성하지말고 인스턴스만 만들어주되 저장은 좀만 기다려달라
+            comment = comment_form.save(commit=False)
+            #그러면 db에 저장이 안됐기 때문에 인스턴스에 값을 추가로 넣을 수 있음
+            comment.article = 
+            #user에 대한 정보를 받아옴, 사실상 들어가는 정보는 user_id임 클래스변수 user에 객체 자체를 넣어줌
+            comment.user = request.user
+            #넣을 거 다 넣었으니 이제 save, data를 받을 떄 내용+외래키를 받아와야되기 때문에 잠시 시간을 준거임
+            comment.save()
+            return redirect('articles:detail',article.pk)
+        context = {
+            'comment_form':comment_form,
+            'article':article,
+        }
+        #에러메세지를 담고 detail페이지로 넘어감
+        return render(request,'articles/detail.html',context)
+    #로그인하지 않았을때
+    return reirect('accounts:login')
+
+@require_POST
+def comments_delete(request,article_pk,comment_pk):
+    # comment = Comment.objects.get(pk=comment_pk)
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment,pk=comment_pk)
+        if request.user == comment.user:
+            comment.delete()
+    #인자로 받은 article_pk를 가져옴
+    #만약 article=comment.article로 받아온다면-> article.pk로 받아도되지만 최적화....를 위해...인자로 받아라??
+    return redirect('articles:detail',article_pk)
+```
+
+
+
+- articles > index.html
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-center">Articles</h1>
+  {% if request.user.is_authenticated %}
+    <a href="{% url 'articles:create' %}">NEW</a>
+  {% else %}
+    <a href="{% url 'accounts:login' %}">[새 글을 작성하려면 로그인 하세요]</a>
+  {% endif %}
+  <hr>
+  {% for article in articles %}
+  {% comment %} .user까지만 적어도 출력되는것이 같음 {% endcomment %}
+    <p><b>작성자 : {{article.user.username}}</b></p>
+    <p>글 번호: {{ article.pk }}</p>
+    <p>글 제목: {{ article.title }}</p>
+    <p>글 내용: {{ article.content }}</p>
+    <a href="{% url 'articles:detail' article.pk %}">[detail]</a>
+    <hr>
+  {% endfor %}
+{% endblock %}
+```
+
+
+
+- articles > detail.html
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2 class="text-center">DETAIL</h2>
+  <h3>{{ article.pk }} 번째 글</h3>
+  <hr>
+  <p>제목: {{ article.title }}</p>
+  <p>내용: {{ article.content }}</p>
+  <p>작성 시각: {{ article.created_at }}</p>
+  <p>수정 시각: {{ article.updated_at }}</p>
+  <hr>
+  {% comment %} requst없이 사용할수 있지만 명확하게 하기 위해서 써주는 편! {% endcomment %}
+  {% if request.user == article.user %}
+    <a href="{% url 'articles:update' article.pk %}">UPDATE</a><br>
+    <form action="{% url 'articles:delete' article.pk %}" method="POST">
+      {% csrf_token %}
+      <input type="submit" value="DELETE">
+    </form>
+  {% endif %}
+  <a href="{% url 'articles:index' %}">[back]</a>
+  <hr>
+  <h4>댓글 목록</h4>
+  {% if comments|length %}
+    {{comments|length}} 개의 댓글이 있습니다.
+  {% endif %}
+  {{comments.count}} 개
+  {% for comment in comments %}
+  <ul>
+    {{ comment.user }}<li>{{comment.content}}</li>
+    {% if request.user == comment.user %}
+      <form action="{% url 'articles:comments_delete' article.pk comment.pk %}" method='POST' class='d-inline'>
+      {% csrf_token %}
+      <input type="submit" value='DELETE'>
+      </form>
+    {% endif %}
+  </ul>
+    {%empty%}
+    <p>댓글이 아직 없어요.</p>
+  {% endfor %}
+  <hr>
+  {% if request.user.is_authenticated %}
+    <h4>댓글작성</h4>
+    <form action="{% url 'articles:comments_create' article.pk %}" mehtod='POST'>
+    {% csrf_token %}
+    {{comment_form}}
+    <input type="submit">
+    </form>a
+    {% else %}
+    <a href="{% url 'acoounts:login' %}">[댓글을 작성하려면 로그인 하세요.]</a>
+  {% endif %}
+{% endblock  %}
+```
+
+
+
+- accounts > views.py
+
+```python
+from django.shortcuts import render, redirect
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+)
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST, require_http_methods, require_safe
+from django.contrib.auth import update_session_auth_hash
+from .forms import CustomUserChangeForm,CustomUserCreationForm
+
+# Create your views here.
+@require_http_methods(['GET', 'POST'])
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('articles:index')
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)
+            return redirect('articles:index')
+    else:
+        form = CustomUserCreationForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/signup.html', context)
+
+
+@require_http_methods(['GET', 'POST'])
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('articles:index')
+        
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            # 로그인
+            auth_login(request, form.get_user())
+            print(request.GET.get('next'))
+            return redirect(request.GET.get('next') or 'articles:index')
+    else:
+        form = AuthenticationForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/login.html', context)
+
+
+@require_POST
+def logout(request):
+    auth_logout(request)
+    return redirect('articles:index')
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def update(request):
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/update.html', context)
+
+
+@require_POST
+def delete(request):
+    if request.user.is_authenticated:
+        request.user.delete()
+    return redirect('articles:index')
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {'form': form}
+    return render(request, 'accounts/change_password.html', context)
+```
+
+
+
+
+
+### Like
+
+- views.py
+
+```python
+@require_POST
+def like(request, article_pk):
+    if request.user.is_authenticated:
+        article = get_object_or_404(Article, pk=article_pk)
+       
+        if article.like_users.filter(pk=request.user.pk).exists():
+            article.like_users.remove(request.user)
+        else:
+            article.like_users.add(request.user)
+        return redirect('articles:index')
+    return redirect('accounts:login')
+```
+
+- models.py
+
+```python
+class Article(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_articles')
+    title = models.CharField(max_length=10)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
+```
+
+- index.html
+
+```html
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-center">Articles</h1>
+  {% if request.user.is_authenticated %}
+    <a href="{% url 'articles:create' %}">NEW</a>
+  {% else %}
+    <a href="{% url 'accounts:login' %}">[새 글을 작성하려면 로그인 하세요]</a>
+  {% endif %}
+  <hr>
+  {% for article in articles %}
+    <p><b>작성자 : <a href="{% url 'accounts:profile' article.user.username %}">{{ article.user }}</b></a></p>
+    <p>글 번호: {{ article.pk }}</p>
+    <p>글 제목: {{ article.title }}</p>
+    <p>글 내용: {{ article.content }}</p>
+    <form action="{% url 'articles:like' article.pk %}" method="POST" class="d-inline">
+      {% csrf_token %}
+      {% if request.user in article.like_user.all %}
+        <button class="btn btn-link" style="color: crimson;">
+          <i class="fas fa-heart"></i>
+        </button>
+      {% else %}
+        <button class="btn btn-link" style="color: black;">
+          <i class="fas fa-heart"></i>
+        </button>
+      {% endif %}
+    </form>
+    {{ article.likes }} 명이 이 글을 좋아합니다.
+    <br>
+    <a href="{% url 'articles:detail' article.pk %}">[detail]</a>
+    <hr>
+  {% endfor %}
+{% endblock %}
+```
 
 
 
