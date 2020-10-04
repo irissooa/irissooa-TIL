@@ -34,10 +34,20 @@ $python manage.py startapp articles
 ```
 
 6. settings에 installed_app에 앱이름 추가
-7. urls.py에 import모듈 path옆에 include 추가하고 articles앱에 urls분리를 함!
+7. 프로젝트의 `urls.py`에 import모듈 path옆에 include 추가하고 articles앱에 urls분리를 함!
+
+> (참고!) 만약 `runserver`를 해서 바로 열린 페이지를 `articles`의 `index`페이지로 보이게 하고싶다면 `from articles import views`를 한 뒤 `path('',views.index,name='index')`를 해주면 됨!
 
 ```python
-path('articles/', include('articles.urls'))
+from django.contrib import admin
+from django.urls import path, include
+from articles import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
+    path('articles/',include('articles.urls')),
+]
 ```
 
 8. articles에 urls.py를 만들고,  아래와 같은 세팅을 만듦
