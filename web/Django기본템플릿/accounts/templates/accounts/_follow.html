@@ -1,0 +1,19 @@
+<!-- 팔로워 수 / 팔로잉 수 -->
+<div class="jumbotron">
+    <p class="lead">
+      팔로워 수 : {{ person.followers.all|length }} / 팔로잉 수 : {{ person.followings.all|length }} 
+    </p>
+    <!-- 팔로우 버튼 / 언팔로우 버튼 -->
+    <!--나를 follow하면 안되니까! 나한테는 이 버튼들이 안보이게 함-->
+    {% if request.user != person %}
+      <form action="{% url 'accounts:follow' person.pk %}" method="POST">
+        {% csrf_token %}
+        <!--팔로우가 돼있다면 unfollow버튼을 보여주고 아니면 Follow를 보여줌-->
+        {% if request.user in person.followers.all %}
+          <button class="btn btn-secondary">Unfollow</button>
+        {% else %}
+          <button class="btn btn-primary">Follow</button>
+        {% endif %}
+      </form>
+    {% endif %}
+</div>

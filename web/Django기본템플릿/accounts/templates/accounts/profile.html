@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class='text-center'>{{person.username}}의 프로필</h1>
+<a href="{% url 'accounts:update' %}">MODIFY</a>
+<hr>
+<!--follow-->
+{% include 'accounts/_follow.html' %}
+<hr>
+<h2>{{person.username}}이 작성한 게시글</h2>
+{% for article in person.article_set.all  %}
+  <div>{{article.title}}</div>
+{% endfor %}
+
+<hr>
+<h2>{{person.username}}이 작성한 댓글</h2>
+{% for comment in person.comment_set.all  %}
+  <div>{{comment.context}}</div>
+{% endfor %}
+
+<hr>
+<h2>{{person.username}}이 좋아요 한 게시글</h2>
+{% for article in person.like_articles.all  %}
+  <div>{{article.title}}</div>
+{% endfor %}
+<hr>
+{% endblock content %}

@@ -669,21 +669,6 @@ def follow(request, user_pk):
 
 - 부트스트렙의 `jumbotron`을 가져다 follow로 쓸거야!
 - 팔로워수`person.followers.all|length`, 팔로잉수`person.followings.all|length`
-- `detail view함수`
-
-```python
-detail view에 다음 두 줄 구문 추가
-
-person = get_object_or_404(get_user_model(), pk=article.user_id) # template에서 person을 사용하기 위해 추가함
-context = {
-    'article': article,
-    'comment_form': comment_form,
-    'comments': comments,
-    'person': person,
-}
-```
-
-
 
 - 템플릿을 분할하는 것이 좋음!
   - 나중에 따로 사용할만하거나 해당페이지에서 정리가 좀 필요하다면 분할을 하는 것도 좋음!
@@ -716,6 +701,73 @@ context = {
 </div>
 ```
 
+- `accounts` > `admin.py`
+
+> admin 관리자 페이지에서 User를 볼 수 있음
+
+```python
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User
+
+# Register your models here.
+admin.site.register(User, UserAdmin)
+```
+
+![image-20201004133538311](0928_Django(DB관계_M대N).assets/image-20201004133538311.png)
+
+
+
+
+
+----------------
+
+여긴 내가 추가해봄
+
+## User들을 모두 보여주는 페이지
+
+> `accounts`에 `index`페이지를 만들어서 모든 user들을 다 보여주고 해당 유저의 프로필페이지로 가는 걸 만듦
+
+- `acccounts` > `urls.py`
+
+```python
+path('',views.index,name='index'),
+```
+
+- `accounts` > `views.py`
+
+```python
+User = get_user_model()
+def index(request):
+    users = User.objects.all()[::-1]     
+    context = {
+        'users':users,
+    }
+    return render(request,'accounts/index.html',context)
+```
+
+- `accounts` > `index.html`
+
+> 여기서 원래 for변수를 `user`로 했었는데 `{{user.username}}`했을 때는 정확하게 각 user들의 username값이 나왔지만 `url`에 인자로 준 `user.username`은 자꾸 login한 유저값이 들어가서 그 유저의 프로필로 이동했다
+>
+> 아마...원래의 request.user도 user로 쓰니까 혼동이 온게 아닐까...해서(현우's 생각)
+>
+> user변수를 new_user로 바꿔서 했더니 제대로 작동했다!
+
+```html
+{% extends 'base.html' %}
+{% block content %}
+{% for new_user in users %}
+  <a href="{% url 'accounts:profile' new_user.username %}"><h3>{{new_user.username}}</h3></a>
+  <hr>
+{% endfor %}
+{% endblock content %}
+```
+
+![image-20201004140113216](0928_Django(DB관계_M대N).assets/image-20201004140113216.png)
+
+![image-20201004140357144](0928_Django(DB관계_M대N).assets/image-20201004140357144.png)
+
 
 
 
@@ -729,6 +781,8 @@ context = {
 
 
 -------------------
+
+
 
 정규수업과정 끝
 
