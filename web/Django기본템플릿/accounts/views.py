@@ -35,7 +35,7 @@ def login(request):
         form = AuthenticationForm(request,request.POST)
         if form.is_valid():
             auth_login(request,form.get_user())
-            return redirect('articles:index')
+            return redirect(request.GET.get('next') or 'articles:index')
 
     else:
         form = AuthenticationForm()
@@ -99,11 +99,13 @@ def profile(request,username):
 
 @require_POST
 def follow(request,user_pk):
-    you = get_object_or_404(get_user_model(),pk=user_pk)
-    me = request.user
-    if me != you:
-        if you.followers.filter(pk=me.pk).exists():
-            you.followers.remove(me)
-        else:
-            you.followers.add(me)
-    return redirect('accounts:profile',you.username)
+    if request.user.is_authenticated:
+        you = get_object_or_404(get_user_model(),pk=user_pk)
+        me = request.user
+        if me != you:
+            if you.followers.filter(pk=me.pk).exists():
+                you.followers.remove(me)
+            else:
+                you.followers.add(me)
+        return redirect('accounts:profile',you.username)
+    return redirect('accounts:login')

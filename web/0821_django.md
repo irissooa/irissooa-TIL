@@ -124,7 +124,7 @@ $ pip install ipython django-extensions
 
 - 앱을 처음 설정할 때 데이터베이스를 미리 채워야 하는 상황이 존재하는데 이러한 초기 데이터를 제공하는 방법 중 하나
 
-- `dumpadata`
+- `dumpdata`
 
   - 특정 앱의 관련된 데이터베이스의 모든 데이터를 출력(`>`를 써주야됨)
 

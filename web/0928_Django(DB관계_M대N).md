@@ -646,25 +646,27 @@ urlpatterns = [
 ```python
 @require_POST
 def follow(request, user_pk):
-    # 상대방(user_pk로 정보를 가져와야됨)
-    you = get_object_or_404(get_user_model(), pk=user_pk)
-    # 나(요청안에 들어있음)
-    me = request.user
-	
-    if me != you:
-        #user(내가) 어떤 사람을 following하려함, person의 입장에서 이사람의 followers(이 사람을 following하고있는 사람)의 안에 내가 있다면 이미 following 하고 있단 뜻! 그렇다면 언팔
-        # if user in person.followers.all():
-        	#person.followers.remove(me)
-         #else:
-        	#person.followers.add(me)
-        
-        #만약 .exists 쿼리셋 API로 바꾼다면 아래처럼 바뀜!
-        if you.followers.filter(pk=me.pk).exists():
-            you.followers.remove(me)
-        else:#없다면 following
-            you.followers.add(me)
-    #프로필로 redirect할건데 상대방의 username을 가지고 그 사람의 profile로 가야됨!
-    return redirect('accounts:profile', you.username)
+    if request.user.is_authenticated:
+        # 상대방(user_pk로 정보를 가져와야됨)
+        you = get_object_or_404(get_user_model(), pk=user_pk)
+        # 나(요청안에 들어있음)
+        me = request.user
+
+        if me != you:
+            #user(내가) 어떤 사람을 following하려함, person의 입장에서 이사람의 followers(이 사람을 following하고있는 사람)의 안에 내가 있다면 이미 following 하고 있단 뜻! 그렇다면 언팔
+            # if user in person.followers.all():
+                #person.followers.remove(me)
+             #else:
+                #person.followers.add(me)
+
+            #만약 .exists 쿼리셋 API로 바꾼다면 아래처럼 바뀜!
+            if you.followers.filter(pk=me.pk).exists():
+                you.followers.remove(me)
+            else:#없다면 following
+                you.followers.add(me)
+        #프로필로 redirect할건데 상대방의 username을 가지고 그 사람의 profile로 가야됨!
+        return redirect('accounts:profile', you.username)
+    return redirect('accounts:login')
 ```
 
 - 부트스트렙의 `jumbotron`을 가져다 follow로 쓸거야!

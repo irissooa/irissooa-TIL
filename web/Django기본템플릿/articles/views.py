@@ -70,19 +70,18 @@ def delete(request,article_pk):
 
 @require_POST
 def comments_create(request,article_pk):
-    article = get_object_or_404(Article,pk=article_pk)
-    comment_form = CommentForm(request.POST)
-    if comment_form.is_valid():
-        comment = comment_form.save(commit=False)
-        comment.user = request.user
-        comment.article = article
-        comment.save()
-    context = {
-        'comment_form' :comment_form,
-        'article':article,
-    }
-    return redirect('articles:detail',article.pk)
-    
+    if request.user.is_authenticated:
+        article = get_object_or_404(Article,pk=article_pk)
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = request.user
+            comment.article = article
+            comment.save()
+        return redirect('articles:detail',article.pk)
+    return redirect('accounts:login')    
+## 궁금! 여기서 context로 detail에 보내니까 detail뷰에는 굳이 안적어도 되나?
+
 
 @require_POST
 def comment_delete(request,article_pk,comment_pk):
