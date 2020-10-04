@@ -967,6 +967,7 @@ on_delete 옵션
 
 ```sh
 (a) comments
+#=> post.comment_set.all 
 ```
 
 ```html
