@@ -274,7 +274,7 @@ TEMPLATES = [
 
 - 해당 앱의 `urls.py`에 `app_name='앱이름' `적어줌 (반드시 `app_name`이름으로 변수 설정)
 
-- 앱이름을 설정하면 모든 url 수정해줘야됨 `'앱이름:html'`
+- 앱이름을 설정하면 모든 url 수정해줘야됨 `'앱이름:name'`
 - url `'articles:index'`를 적어주면 앱이름 구별 가능
 
 ```html
