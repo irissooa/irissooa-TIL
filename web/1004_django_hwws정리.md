@@ -376,7 +376,10 @@ as_table, as_p, as_ul
 
 ```sh
 STATIC_URL = '/assets/'
-STATICFILES_DIRS = [BASE_DIR / 'assets']
+STATICFILES_DIRS = BASE_DIR / 'assets'
+#구글링해서 보면
+STATICFILES_DIRS = os.path.join(BASE_DIRS,'assets')
+#os.path.join는 경로 두개를 합치는 것...`/`를 사이사이에 넣어줌
 ```
 
 ![image-20201004195500365](1004_django_hwws정리.assets/image-20201004195500365.png)
@@ -384,6 +387,8 @@ STATICFILES_DIRS = [BASE_DIR / 'assets']
 ```sh
 MEDIA_URL = '/uploaded_files/'
 MEDIA_ROOT = BASE_DIR / 'uploaded_files'
+#구글링해서 보면
+MEDIA_ROOT = os.path.join(BASE_DIR,'uploaded_files')
 ```
 
 ![image-20201004195517808](1004_django_hwws정리.assets/image-20201004195517808.png)
