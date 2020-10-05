@@ -996,7 +996,244 @@ def create_comment(reqeust,article_pk):
 
 
 
+-------------
 
+위 코드가 정신없으니 전체 올려봄..
+
+- `api` >`urls.py`
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    #api의 버전이라고 생각하면됨, 해당 api의 버전명/articles/...
+    path('api/v1/articles/', include('articles.urls')),
+]
+```
+
+- `articles` > `models.py`
+
+```python
+from django.db import models
+
+
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class Comment(models.Model):
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+```
+
+- `articles` > `serializers.py`
+
+```python
+from rest_framework import serializers
+from .models import Article,Comment
+
+#여러개의 serializer모델을 만들어도됨
+#이건 list에서 사용할 serializer이니까 List를 적어둠
+class ArticleListSerializer(serializers.ModelSerializer):
+    #모델폼과 매우 유사함
+    class Meta:
+        model = Article
+        fields = ('id','title',)
+
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    #모델폼과 매우 유사함
+    class Meta:
+        model = Article
+        fields = ('id','title','content','created_at','updated_at',)
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('id','content','article',)
+        read_only_fields = ('article',) 
+```
+
+- `articles` > `urls.py`
+
+```python
+from django.urls import path
+from . import views 
+
+#templates를 사용하지 않기때문에 app_name없음
+
+urlpatterns = [
+    # path('',views.article_list),
+    # path('create/',views.create_article),
+    # path('<int:article_pk>/',views.article_detail),
+    # path('<int:article_pk>/delete/',views.delete_article),
+    # path('<int:article_pk>/update/',views.update_article),
+    
+    #과감히 url을 명시적으로 만들어보자
+    #행위는 제외!
+    #계층구조도 포함됨(articles)
+    path('',views.article_list_create),
+    path('<int:article_pk>/',views.article_detail_update_delete),
+    path('<int:article_pk>/comments/',views.create_comment),
+]
+```
+
+- `articles` > `views.py`
+
+```python
+#template없기때문에 render필요없음!
+from django.shortcuts import get_object_or_404
+
+#아래모듈 import해옴
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from .serializers import ArticleListSerializer,ArticleSerializer,CommentSerializer
+from .models import Article,Comment
+
+# #DRF에서는 이 데코레이터를 달아주지 않으면 오류가남!
+# @api_view(['GET'])
+# def article_list(request):
+#     #1. 모델에서 데이터를 가져온다(articles는 쿼리셋)
+#     articles = Article.objects.all()
+
+#     #2. 모델에서 가져온 데이터를 serializing한다.
+#     #many=True라는 걸 통해 여러개의 데이터가 들어간다는걸 알려줌
+#     serializer = ArticleListSerializer(articles,many=True)
+
+#     #serializer 자체는 data가 아님 serializer.data를 해야됨
+#     #3. 응답해준다(공식문서 Response)
+#     return Response(serializer.data)
+
+
+# #postman 이용, 그냥 홈페이지 요청을 보낼..수있고...저장도 해줘서 여러번 계속 안쳐도됨...?
+# #인자가 없는 친구들
+# @api_view(['POST'])
+# def create_article(request):
+#     # print(request.data)
+#     serializer = ArticleSerializer(data=request.data)
+#     if serializer.is_valid(raise_exception=True):
+#         serializer.save()
+#         return Response(serializer.data,status = status.HTTP_201_CREATED)
+
+
+
+
+
+# #아래는 인자가 있는 친구들
+
+# #더미데이터가 있으니 create를 하지않음
+# #이제 detail만들어봄
+# #상세요청 하나이기 때문에 GET요청
+# @api_view(['GET']) #default는 GET 괄호안에 안넣어도됨
+# def article_detail(request,article_pk):
+#     #결국 모델에 있는데이터를 가져와서 하는건데
+#     #위코드와 비슷하지 않을까?
+#     #차이점은 pk가 인자로 들어오는것과, 단일 객체이라는것
+#     #1. 모델에서 데이터를 가져온다(articles는 쿼리셋)
+#     article = get_object_or_404(Article,pk=article_pk)
+
+#     #2. 모델에서 가져온 데이터를 serializing한다.
+#     #단일객체 데이터가 들어간다는걸 알려줌
+#     serializer = ArticleSerializer(article)
+
+#     #serializer 자체는 data가 아님 serializer.data를 해야됨
+#     #3. 응답해준다(공식문서 Response)
+#     return Response(serializer.data)
+
+# @api_view(['DELETE'])
+# def delete_article(request,article_pk):
+#     article = get_object_or_404(Article,pk=article_pk)
+#     article.delete()
+#     #뭐가 삭제됐는지 알려주려고 id값을 넘겨줌
+#     #삭제는 제대로 됐는데 우리가 반환해줄건 없어!
+#     return Response({'id': article_pk }, status = status.HTTP_204_NO_CONTENT)
+
+
+# #업데이트가 가장 복잡!
+# @api_view(['PUT'])
+# def update_artice(request,article_pk):
+#     #create와 로직이 유사함
+#     #PUT으로 보낸다고 무조건 수정이 되는게 아니라 밑의 로직을 바꿔줘야되는거얌!
+#     #create랑 같은 로직을 쓰면 글이 새로 추가될뿐!
+#     #위에 PUT을 넣어준건 이런형태로 들어온다는걸 보여준것일 뿐 로직을 짜야됨
+#     #공식문서,,, update할 때는 instance를 넣어줘야됨
+#     article = get_object_or_404(Article,pk=article_pk)
+#     #instance로 첫번째 인자로 article을 주면 update가 됨!
+#     serializer = ArticleSerializer(article,data=request.data)
+#     if serializer.is_valid(raise_exception=True):
+#         serializer.save()
+#         return Response(serializer.data,status = status.HTTP_201_CREATED)
+
+
+
+
+
+##url 합함.....바뀐코드
+
+@api_view(['GET','POST'])
+def article_list_create(request):
+    #LIST
+    if request.method == 'GET':
+        #1. 모델에서 데이터를 가져온다(articles는 쿼리셋)
+        articles = Article.objects.all()
+
+        #2. 모델에서 가져온 데이터를 serializing한다.
+        #many=True라는 걸 통해 여러개의 데이터가 들어간다는걸 알려줌
+        serializer = ArticleListSerializer(articles,many=True)
+
+        #serializer 자체는 data가 아님 serializer.data를 해야됨
+        #3. 응답해준다(공식문서 Response)
+        return Response(serializer.data)
+    
+    #GET이 아니라면 POST(create)
+    else:
+        serializer = ArticleSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+
+
+@api_view(['GET','PUT','DELETE'])
+def article_detail_update_delete(request,article_pk):
+    #GET, PUT, DELETE에 중복으로 계속 article 정보를 불러오기 때문에 한번에 처리
+    article = get_object_or_404(Article,pk=article_pk)
+    #Detail
+    if request.method == 'GET':
+        serializer = ArticleSerializer(article)
+        return Response(serializer.data)
+    #Update
+    elif request.method == 'PUT':
+        serializer = ArticleSerializer(article,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data,status = status.HTTP_201_CREATED)
+
+    #Delete
+    else:
+        article.delete()
+        return Response({'id': article_pk }, status = status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST']):
+def create_comment(reqeust,article_pk):
+    article = get_object_or_404(Article,pk=article_pk)
+    serializer = CommentSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(article = article)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+```
 
 
 
