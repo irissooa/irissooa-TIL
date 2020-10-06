@@ -1,7 +1,5 @@
 # Django_Rest API
 
-> 다시보기필요...함....ㅠ
-
 > API Server
 
 ![image-20201005101747439](1005_Django_Rest_API.assets/image-20201005101747439.png)
@@ -108,18 +106,32 @@
 > 데이터를 표현하고, 메타데이터를 표현하고, 그 메타데이터를 표현하는 메타데이터를 포함함......
 >
 > 일단 심플하게 json을 표현이라고 함....
+>
+> ## 데이터 직렬화
+>
+> - 모든 프로그램통신에서 데이터는 반드시 문자열로 표현되어야함.
+> - 보내는쪽: 객체데이터를 문자로 변환하여 전송
+>   - 이를 직렬화 serializaion이라는 어려운 용어를 사용한다
+> - 받는쪽: 받은 문자열을 다시 객체로 변환하여 활용
+>   - 이를 역직렬화(Deserialization)이라고 한다
+> - 모든 언어에서 XML, JSON을 지원하며, 최근 대부분API서버에서는 Json포멧을 활용
+>
+> ## Json
+>
+> - 웹어플리케이션에서는 HTML포맷으로 통신
+> - API서버는 주로 JSON포맷으로 통신
+> - 장고 API뷰에서도 JSON포맷을 사용
+> - JSON: 타 언어, 플랫폼과 통신할 때 사용
+> - PICKLE: 파이썬 전용 포맷, 파이썬 버전의 특성의 영향을 받음
+> - {'KEY':Value}
+> - JavaScript Object Notation
+> - JavaScript객체 표기법
+> - 단순 문자열
+> - 가벼운 데이터 교환 형식
+> - 언어독립적은 Text
+> - 데이터 덩어리, 각 언어별로 받아서 개발을 하겠다
 
-- JSON
-
-  - {'KEY':Value}
-  - JavaScript Object Notation
-  - JavaScript객체 표기법
-  - 단순 문자열
-  - 가벼운 데이터 교환 형식
-  - 언어독립적은 Text
-  - 데이터 덩어리, 각 언어별로 받아서 개발을 하겠다
-
-  ![image-20201005104137864](1005_Django_Rest_API.assets/image-20201005104137864.png)
+![image-20201005104137864](1005_Django_Rest_API.assets/image-20201005104137864.png)
 
 ![image-20201005104227130](1005_Django_Rest_API.assets/image-20201005104227130.png)
 
