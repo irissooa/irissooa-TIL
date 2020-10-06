@@ -860,8 +860,9 @@ def article_detail_update_delete(request,article_pk):
 
 #### Comment
 
-- comment를 만들기 위해 model을 만들어줌
+![image-20201006112627655](1005_Django_Rest_API.assets/image-20201006112627655.png)
 
+- comment를 만들기 위해 model을 만들어줌
 - `articles` >`models.py`
 
 ```python
@@ -885,6 +886,15 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id','content','article',)
 ```
 
+- `articles` > `urls.py`
+
+```python
+#추가
+path('<int:article_pk>/comments/',views.comment_list_create),
+```
+
+
+
 - `articles` > `views.py`
 
 ```python
@@ -905,6 +915,27 @@ def create_comment(reqeust,article_pk):
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+@api_view(['GET','POST']):
+def comment_list_create(reqeust,article_pk):
+    article = get_object_or_404(Article,pk=article_pk)
+    if request.method == 'GET':
+        #아티클 아이디로 모든 댓글 찾아서
+        comments = article.comment_set.all()
+        #직렬화해서
+        serializer = CommentSerializer(comments,many=True)
+        #응답함
+        return Response(serializer.data)
+    #POST(create)
+    else:
+        #보낸 데이터를 시리얼라이저에 넣어서
+        serializer = CommentSerializer(data=request.data)
+        #검증하고
+        if serializer.is_valid(raise_exception=True):
+            #저장하고
+        	serializer.save()
+            #응답함
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 ```
 
 > 댓글..
@@ -936,8 +967,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        #조회했을때 나올 필드를! read_only_fields를 제외하고(따로 적어주지 않음) create, update등에서 쓰일예정(fields)
         fields = ('id','content','article',)
-        #아래 구문 추가
+        #id값은 원래 read_only이기 때문에 오류가 안남, article은 따로 지정해줘야됨
+        #튜플이기때문에 str로 인식해서 에러가 남 그래서 ,를 붙여줘야됨
+        #is_valid 검증에서 해당 필드가 없더라도 통과가능
         read_only_fields = ('article',) 
 ```
 
@@ -969,24 +1003,133 @@ from rest_framework.response import Response
 from .serializers import ArticleListSerializer,ArticleSerializer,CommentSerializer
 from .models import Article,Comment
 
-@api_view(['POST']):
-def create_comment(reqeust,article_pk):
-    #article 정보를 가져옴
+
+@api_view(['GET','POST']):
+def comment_list_create(reqeust,article_pk):
     article = get_object_or_404(Article,pk=article_pk)
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        #save()안에 article=article로 넣어줌
-        serializer.save(article=article)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    if request.method == 'GET':
+        #아티클 아이디로 모든 댓글 찾아서
+        comments = article.comment_set.all()
+        #직렬화해서
+        serializer = CommentSerializer(comments,many=True)
+        #응답함
+        return Response(serializer.data)
+    #POST(create)
+    else:
+        #보낸 데이터를 시리얼라이저에 넣어서
+        serializer = CommentSerializer(data=request.data)
+        #검증하고
+        if serializer.is_valid(raise_exception=True):
+            #저장하고
+            #article필드(필수키)에 article값을 넣어줌
+        	serializer.save(article = article)
+            #응답함
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 ```
 
 > 이제는 article값이 바로 들어감!
 >
 > ![image-20201005174013872](1005_Django_Rest_API.assets/image-20201005174013872.png)
 
+- 한 댓글의 디테일, 수정, 삭제
+
+- `articles` > `urls.py`
+
+```python
+#추가
+path('comments/<int:comment_pk>/',views.comment_update_delete)
+```
+
+- `articles` > `views.py`
+
+```python
+@api_view(['GET','PUT','DELETE'])
+def comment_update_delete(request,comment_pk):
+    comment = get_object_or_404(Comment,pk=comment_pk)
+    if request.method =='GET':
+        #댓글pk로 comment찾아서
+        #직렬화
+        #응답
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        #시리얼ㄹ라이저 만들엇
+        #data넣어주고,comment넣어주고
+        #(검증후)저장한다음
+        #응답
+        #위치인자로 comment, request.data만 적어도 되는데 그냥 헷갈리지말라고 적어줌
+        serializer = CommentSerializer(instance=comment,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+    else:
+        #찾은 comment삭제
+        #응답
+        comment.delete()
+        return Response({'id':comment_pk})
+```
+
+--------------
+
+#### 관리자 페이지에서 DB반영됐는지 확인하기 위해 작성
+
+- `admin.py`
+
+```python
+from django.contrib import admin
+from .models import Artist, Comment
+
+admin.site.register(Artist)
+admin.site.register(Comment)
+```
 
 
 
+------------
+
+추가, 이렇게도 할수있다 정도
+
+#### article 디테일 정보에 comment정보도 포함 되게 하고싶다
+
+> **HOW??**
+>
+> serializers.py를 고쳐야한다!
+>
+> field를 커스터마이징 해줘야됨
+
+- `articles` > `serializers.py`
+
+> CommentSerializer 밑에 작성
+
+```python
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ('id','content','article',)
+        read_only_fields = ('article',) 
+
+class ArticleSerializer(serializers.ModelSerializer):
+    #역참조랑 똑같은 이름으로 일부로 함
+    comment_set = CommentSerializer(
+        many=True,
+        read_only=True,
+    )
+    #장고에서 읽을수없는 이름이라면 어디서 가져올건지 source를 적어줘야됨 source를 적어줘야됨
+    # comments = CommentSerializer(many=True,source='comment_set')
+    
+    comment_count = serializers.IntegerField(
+        #위 comment_set에 .count는 serializer에서 쓰는 문법
+        source='comment_set.count',
+        read_only=True,
+    )
+    
+    #모델폼과 매우 유사함
+    class Meta:
+        model = Article
+        fields = '__all__'
+        #장고..customfield를 작성했을 땐 read_only를 하나하나 다 해줘야됨
+        # read_only_fields = ('comment_set','comment_count',)
+```
 
 
 
@@ -1055,11 +1198,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = ('id','title','content','created_at','updated_at',)
 
+
 class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        #조회했을때 나올 필드를! read_only_fields를 제외하고 create, update등에서 쓰일예정(fields)
         fields = ('id','content','article',)
+        #id값은 원래 read_only이기 때문에 오류가 안남, article은 따로 지정해줘야됨
+        #튜플이기때문에 str로 인식해서 에러가 남 그래서 ,를 붙여줘야됨
+        #is_valid 검증에서 해당 필드가 없더라도 통과가능
         read_only_fields = ('article',) 
 ```
 
@@ -1083,7 +1231,7 @@ urlpatterns = [
     #계층구조도 포함됨(articles)
     path('',views.article_list_create),
     path('<int:article_pk>/',views.article_detail_update_delete),
-    path('<int:article_pk>/comments/',views.create_comment),
+    path('<int:article_pk>/comments/',views.comment_list_create),
 ]
 ```
 
@@ -1225,13 +1373,27 @@ def article_detail_update_delete(request,article_pk):
         return Response({'id': article_pk }, status = status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST']):
-def create_comment(reqeust,article_pk):
+@api_view(['GET','POST']):
+def comment_list_create(reqeust,article_pk):
     article = get_object_or_404(Article,pk=article_pk)
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(article = article)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    if request.method == 'GET':
+        #아티클 아이디로 모든 댓글 찾아서
+        comments = article.comment_set.all()
+        #직렬화해서
+        serializer = CommentSerializer(comments,many=True)
+        return Response(serializer.data)
+    #POST(create)
+    else:
+        #보낸 데이터를 시리얼라이저에 넣어서
+        #검증하고
+        #저장하고
+        #응답하자
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            #article필드(필수키)에 article값을 넣어줌
+            serializer.save(article = article)
+            #응답함
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 ```
 
