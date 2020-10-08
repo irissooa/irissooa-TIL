@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block content %}
+  <h1 class='text-center'>SIGNUP</h1>
+  <form action="" method='POST'>
+    {% csrf_token %}
+    {% comment %} {{form.as_p}} {% endcomment %}
+    {% bootstrap_form form %}
+    <button class = 'btn btn-outline-secondary btn-sm'>SIGNUP</button>
+  </form>
+  
+{% endblock content %}

@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6d5f9ebb-8f2d-4640-a99e-e9b010a49bb6" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/web/0927_django_월말평가준비.assets/image-20200928145724996.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/0927_django_월말평가준비.assets/image-20200928150449883.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/0927_django_월말평가준비.assets/image-20200928164110167.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web/0927_django_월말평가준비.assets/image-20200929000425891.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/0927_django_월말평가준비.md" beforeDir="false" afterPath="$PROJECT_DIR$/web/0927_django_월말평가준비.md" afterDir="false" />
-    </list>
+    <list default="true" id="6d5f9ebb-8f2d-4640-a99e-e9b010a49bb6" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

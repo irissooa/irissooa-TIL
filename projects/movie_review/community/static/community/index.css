@@ -1,0 +1,4 @@
+/* 가상선택자 종류, 클릭하면 바뀌는 것! visited는 클릭했다는 뜻, 눌렀을때 빨개짐*/
+a:visited {
+  color:crimson;
+}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class='text-center'>Users</h1>
+{% for new_user in users %}
+  <a href="{% url 'accounts:profile' new_user.username %}">
+  <h3>{{new_user.username}}</h3>
+  </a>
+  <hr>
+{% endfor %}
+{% endblock content %}

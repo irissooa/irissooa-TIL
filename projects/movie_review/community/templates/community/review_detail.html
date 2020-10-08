@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% block content %}
+<h1 class = 'text-center'>REVIEW</h1>
+<hr>
+<h3><strong>{{review.title}}</strong></h3>
+<p>Movie {{review.movie_title}} Rank {{review.rank}}  Posted by
+  <a href="{% url 'accounts:profile' review.user.username %}">{{review.user}}</a></p>
+<p>create : {{review.created_at|date:'Y M D'}} / update : {{review.updated_at|date:'Y M D'}}</p>
+<br>
+<p>{{review.content}}</p>
+<hr>
+<h5>댓글 목록</h5>
+<form action="{% url 'community:comments' review.pk %}"method='POST'>
+{% csrf_token %}
+{% bootstrap_form comment_form %}
+<button class="btn btn-outline-secondary btn-sm">COMMENT</button>
+</form>
+<hr>
+{% for comment in comments %}
+  <p class='d-inline'>{{comment.user}} : {{comment.content}}</p>
+  <form action="{% url 'community:like_comment' review.pk comment.pk %}" method='POST' class='d-inline'>
+    {% csrf_token %}
+    {% if request.user in comment.like_comment.all %}
+     <button class='btn btn-link' style='color:crimson;'>
+        <i class="fas fa-heart"></i>
+      </button>
+    {% else %}
+      <button class='btn btn-link' style='color:black;'>
+        <i class="far fa-heart"></i>
+      </button>
+    {% endif %}
+  </form>
+  <p class='d-inline'>{{comment.like_comment.all|length}}명이 이 댓글을 좋아합니다.</p>
+  <br>
+{% endfor %}
+{% endblock content %}
+

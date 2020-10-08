@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+  {% comment %} <div style = 'background-size : cover; background-repeat:no-repeat; background-image: url({% static 'Love.jpg' %});'> {% endcomment %}
+
+
+{% block content %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+<link href="static/community/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+{% comment %} <link href="community\static\community\vendor\simple-line-icons\css\simple-line-icons.css" rel="stylesheet" type="text/css"> {% endcomment %}
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+<link href="static/community/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+<link href="community/css/landing-page.min.css" rel="stylesheet">
+<br>
+<link rel="stylesheet" type="text/css" href="{% static 'community/css/landing-page.css' %}">
+<!-- Icons Grid -->
+<section class="features-icons bg-light text-center">
+  {% comment %} <div class="container"> {% endcomment %}
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+          <div class="d-flex align-items-center justify-content-center">
+            <a href="{% url 'community:review_list'%}"><i class="fas fa-list-ul fa-5x" style="color:black"></i></a>
+          </div><br>
+          <h3>Review List</h3>
+          <p class="lead mb-0">World's <mark>Best</mark> Reviews</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
+          <div class="d-flex align-items-center justify-content-center">
+            <a href="{% url 'community:create'%}"><i class="fas fa-edit fa-5x" style="color:black"></i></a>
+          </div><br>
+          <h3>Create New Review</h3>
+          <p class="lead mb-0"><mark>Stack</mark> Your Reviews</p>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="features-icons-item mx-auto mb-0 mb-lg-3">
+          <div class="d-flex align-items-center justify-content-center">
+            <a href="{% url 'accounts:signup'%}"><i class="fas fa-users fa-5x" style="color:black"></i></a>
+          </div><br>
+          <h3>Sign Up</h3>
+          <p class="lead mb-0"><mark>A small step</mark> <br>to Become reviewer</p>
+        </div>
+      </div>
+    </div>
+  {% comment %} </div> {% endcomment %}
+</section>
+<br>
+<img src="{% static 'Love2.jpg' %}" class='d-inline-block'>
+
+{% endblock content %}

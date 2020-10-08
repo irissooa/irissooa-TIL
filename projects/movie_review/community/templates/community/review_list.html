@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'community/index.css' %}">
+{% endblock css %}
+
+{% block content %}
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">TITLE</th>
+      <th scope="col">MOVIE</th>
+      <th scope="col">LIKE</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for review in reviews %}
+    <tr>
+      <th scope='row'><a href="{% url 'accounts:profile' review.user.username  %}">{{review.user}}</a></th>
+      <td><a href="{% url 'community:review_detail' review.pk %}" class='text-info'>{{review.title}}</a></td>
+      <td>{{review.movie_title}}</td>
+      <td>
+      <form action="{% url 'community:like' review.pk %}" method='POST'>
+      {% csrf_token %}
+      {% if request.user in review.like.all %}
+     <button class='btn btn-link' style='color:crimson;'>
+        <i class="fas fa-heart"></i>
+      </button>
+      {% else %}
+       <button class='btn btn-link' style='color:black;'>
+        <i class="far fa-heart"></i>
+      </button>
+      {% endif %}
+      </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}
+
