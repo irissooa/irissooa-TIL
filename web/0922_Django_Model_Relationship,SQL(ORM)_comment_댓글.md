@@ -442,7 +442,7 @@ TIL
 
    ```python
    # orm #내림차순 정렬하고 싶다면 앞에 '-'붙이면 됨
-   User.objects.order_by('age')[:10]
+   User.objects.order_by('-age')[:10]
    ```
 
       ```sql
