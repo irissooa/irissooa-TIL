@@ -786,9 +786,13 @@ for tc in range(1,T+1):
 
 ## 2628_종이자르기
 
+### 1. DFS로 풀어보기
+
 > 이거 DFS로 풀었는데,,,,테케는 맞았지만 틀렷따!
 >
 > 아마 idx+1에서 문제가 생긴 것 같은데 IM끝나고 다시 해봐야갰다!
+>
+> 이거 날림.....너무 복잡하다...런타임에러뜸......ㅠ
 
 ```python
 import sys
@@ -813,7 +817,9 @@ def DFS(i,j):
 
 C,R=map(int,input().split())
 N=int(input())
+#전체 색종이 배열을 만듦
 arr=[[1]*C for _ in range(R)]
+#0으로 띠를 둘러줌
 arr.insert(0,[0]*C)
 arr.append([0]*C)
 
@@ -821,24 +827,45 @@ for x in arr:
     x.insert(0,0)
     x.append(0)
 # pprint(arr)
-for _ in range(N):
-    dir, idx = map(int,input().split())
 
+#색종이를 자르는 곳에 0으로 넣어주기
+for _ in range(N):
+    #가로,세로 & 점선번호
+    dir, idx = map(int,input().split())
+    #가로라면
     if dir==0:
-        arr.insert(idx+1,[0]*(len(arr[0])))
-        # print('가로추가')
-        # pprint(arr)
+        #해당 idx에 추가를 해주는데 가로에 추가된만큼 idx가 변동될수있음
+        #만약 앞에 0이 들어온게 있다면 idx에 그 수만큼 더해줘야됨..->이걸 어떻게 처리할까?
+        #idx앞에 0 이 있으면(제일앞 0 제외) 그 개수만큼 더해줌
+        plus = 1
+        for i in range(1,idx):
+            if arr[1][i] == 0:
+                plus += 1
+        arr.insert(idx+plus,[0]*(len(arr[0])))
+        print('가로추가',plus)
+        pprint(arr)
+    #세로라면
     else:
+        #세로도 마찬가지 idx를 어떻게 지정해줄까...
         for x in arr:
-            x.insert(idx+1,0)
-        # print('세로추가')
-        # pprint(arr)
-# print()
-# pprint(arr)
+            # 해당 idx에 추가를 해주는데 세로에 추가된만큼 idx가 변동될수있음
+            # 만약 앞에 0이 들어온게 있다면 idx에 그 수만큼 더해줘야됨..->이걸 어떻게 처리할까?
+            # idx앞에 0 이 있으면(제일앞 0 제외) 그 개수만큼 더해줌
+            plus = 1
+            for i in range(1, idx):
+                if arr[i][1] == 0:
+                    plus += 1
+            x.insert(idx+plus,0)
+        print('세로추가',plus)
+        pprint(arr)
+print()
+pprint(arr)
 #dfs돌리기
 visited = [[False for j in range(len(arr[0]))] for i in range(len(arr))]
 ans = []#넓이 값을 받을 리스트
+#세로값이 변동됐으니 len으로 그 값을 받음
 for i in range(len(arr)):
+    #가로값도 바꼈으니 arr의 첫번째 리스트의
     for j in range(len(arr[0])):
         if arr[i][j] == 1 and visited[i][j] == False:
             cnt = 1
@@ -881,6 +908,181 @@ print(arr)
  [0, 1, 1, 1, 0],
  [0, 0, 0, 0, 0]]
 '''
+```
+
+
+
+### 2. 현우's idea
+
+> 현우's idea로 다시 풀어봄... 아니 근데 이거 왜 자꾸 런타임에러??????????화난다......후ㅠㅠㅠㅠㅠㅠㅠㅠㅠ
+
+```python
+#가로, 세로
+c,r = map(int,input().split())
+arr = [[1 for j in range(c)] for i in range(r)]
+# pprint(arr)
+#자를 점선의 개수
+N = int(input())
+C = [0,r] #가로 idx
+R = [0,c] #세로 idx
+for _ in range(N):
+    #가로인지 세로인지, 점선idx
+    dir, idx = map(int,input().split())
+    #가로
+    if dir == 0:
+        C.append(idx)
+    else: #세로
+        R.append(idx)
+R.sort()
+C.sort()
+# print(R,C)
+MAX = 0
+#넓이를 어떻게 구하자ㅣ이이이이이이이이
+#가로는 리스트 안의 연속된 두개의 차, 세로도 마찬가지
+for rr in range(len(R)-1):
+    garo = R[rr+1]-R[rr]
+    print('가로',garo)
+    for cc in range(len(C)-1):
+        sero = C[cc+1]-C[cc]
+        print('세로',sero)
+        area = garo*sero
+        print('넓이',area)
+        if area > MAX:
+            MAX = area
+print(MAX)
+```
+
+
+
+### 3. 자른 가로, 세로 길이를 리스트에 넣고 MAX값만 곱함
+
+> 2번이랑 다를게 없어보이는데....2번은 런타임에러 뜨고 이건 정답...
+
+```python
+'''
+또..다른 아이디어...
+가로, 세로 자른 길이들을 담고 가장 큰 값들끼리 곱하기
+'''
+
+#가로, 세로
+c,r = map(int,input().split())
+arr = [[1 for j in range(c)] for i in range(r)]
+# pprint(arr)
+#자를 점선의 개수
+N = int(input())
+C = [0,r] #가로 idx
+R = [0,c] #세로 idx
+
+for _ in range(N):
+    #가로인지 세로인지, 점선idx
+    dir, idx = map(int,input().split())
+    #가로
+    if dir == 0:
+        C.append(idx)
+    else: #세로
+        R.append(idx)
+R.sort()
+C.sort()
+# print(R,C)
+garo,sero = [],[]
+#
+#넓이를 어떻게 구하자ㅣ이이이이이이이이
+#가로는 리스트 안의 연속된 두개의 차, 세로도 마찬가지
+for rr in range(len(R)-1):
+    garo.append(R[rr+1]-R[rr])
+    # print('가로',garo)
+    for cc in range(len(C)-1):
+        sero.append(C[cc+1]-C[cc])
+        # print('세로',sero)
+print(max(garo)*max(sero))
+```
+
+
+
+### 2번 가로,세로 순서를 바꿨더니 됐다....! 왜지????????
+
+```python
+'''
+이거도 망함....다시푼다..
+가로,세로 자를 배열의 idx를 각각 리스트에 저장
+제일 작은 idx부터 잘라진 사각형의 넓이를 구함
+넓이를 비교하며 가장 큰 값을 구함
+'''
+#가로, 세로
+c,r = map(int,input().split())
+arr = [[1 for j in range(c)] for i in range(r)]
+# pprint(arr)
+#자를 점선의 개수
+N = int(input())
+C = [0,r] #가로 idx
+R = [0,c] #세로 idx
+for _ in range(N):
+    #가로인지 세로인지, 점선idx
+    dir, idx = map(int,input().split())
+    #가로
+    if dir == 0:
+        C.append(idx)
+    else: #세로
+        R.append(idx)
+R.sort()
+C.sort()
+# print(R,C)
+MAX = 0
+
+#2번에 가로세로 순서만 바꿈!
+for cc in range(len(C)-1):
+    sero = C[cc+1]-C[cc]
+    # print('세로',sero)
+    for rr in range(len(R)-1):
+        garo = R[rr+1]-R[rr]
+        # print('가로',garo)
+        area = garo*sero
+        # print('넓이',area)
+        if area > MAX:
+            MAX = area
+print(MAX)
+```
+
+
+
+
+
+## 14696_딱지놀이
+
+```python
+'''
+두 딱지의 별 개수가 다르면 별이 많은 쪽의 딱지가 이김
+별의 개수가 같고 동그라미의 개수가 다르면 동그라미가 많은 쪽의 딱지가 이김
+이런식으로
+별(4) > 동그라미(3) > 네모(2) > 세모(1)의 순서!
+A와 B의 딱지문양수를 리스트에 넣고 idx가 제일 큰게 더 클면 이김
+'''
+import sys
+sys.stdin = open('input.txt','r')
+#총 라운드 수
+N = int(input())
+arr = []
+for _ in range(2*N):
+    temp = list(map(int,input().split()))
+    bin = [0]*4
+    for i in range(1,len(temp)):
+        bin[temp[i]-1] += 1
+    arr.append(bin)
+# print(arr)
+for i in range(0,2*N,2):
+    A = arr[i]
+    B = arr[i+1]
+    for j in range(3,-1,-1):
+        if A[j] == B[j]:
+            continue
+        elif A[j] > B[j]:
+            print('A')
+            break
+        else:
+            print('B')
+            break
+    else:
+        print('D')
 
 ```
 
