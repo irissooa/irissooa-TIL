@@ -110,6 +110,8 @@ sqlite> INSERT INTO classmates VALUES ('홍길동', 30, '서울'), ('김철수',
 
 # SQL과 django ORM
 
+> [SQL 내장모듈](https://yongbeomkim.github.io/django/dj-filter-orm-basic/)
+
 ## 기본 준비 사항
 
 ```bash
