@@ -174,7 +174,34 @@ TIL
     CREATE TABLE IF NOT EXISTS "users_user" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "first_name" varchar(10) NOT NULL, "last_name" varchar(10) NOT NULL, "age" integer NOT NULL, "country" varchar(10) NOT NULL, "phone" varchar(15) NOT NULL, "balance" integer NOT NULL);
     ```
 
+#### Database 생성
 
+#### sqlite3
+
+```sql
+sqlite3 tutorial.sqlite3 -- tutorial.sqlite3 DB 파일 생성 및 조회
+.databases -- database 생성
+.mode csv -- csv 모드로 변경
+.import hellodb.csv examples -- hellodb.csv 파일을 이용한 examples 라는 테이블 생성
+```
+
+#### 테이블 전체 조회
+
+```sql
+SELECT * FROM examples; -- 테이블 전체 조회
+1,"길동","홍",600,"충청도",010-2424-1232
+```
+
+#### 출력 형태 변경
+
+```sql
+.headers on
+.mode column
+SELECT * FROM examples;
+id          first_name  last_name   age         country     phone
+----------  ----------  ----------  ----------  ----------  -------------
+1           길동          홍           600         충청도       010-2424-1232
+```
 
 ---
 
@@ -433,6 +460,12 @@ SELECT last_name, COUNT(*) AS name_count FROM users GROUP BY last_name;
 3. 나이가 30살 이상인 사람의 인원 수
 
    -  ORM: `__gte` , `__lte` , `__gt`, `__lt` -> 대소관계 활용
+
+   > | 키워드           | 설명                                  | 사용예시                                                     |
+   > | ---------------- | ------------------------------------- | ------------------------------------------------------------ |
+   > | `__lt` /` __gt`  | 보다 작다 / 보다 크다                 | id가 1보다 큰 자료 검색<br />`Department.objects.filter(id__gt=1)` |
+   > | `__lte`/ `__gte` | 같거나 보다 작다/ 같거나 보다 크다    | x                                                            |
+   > | `__in`           | 주어진 리스트 안에 존재하는 자료 검색 | id가 2,3,5,인 자료 검색<br />`Department.objects.filtr(id__in=[2,3,5])` |
 
    ```python
    # orm
