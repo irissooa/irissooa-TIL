@@ -435,7 +435,7 @@ const isFalse = false
 
 - `undefined`
 
-  - 값이 업을 경우 JS가 자동으로 할당해주는 값
+  - 값이 없을 경우 JS가 자동으로 할당해주는 값
 
     ```javascript
     let first_name // 선언만 하고 할당하지 않음.
