@@ -879,6 +879,9 @@ async function logTodoTitle() {
 
 #### Axios 기본 틀
 
+- `.then` : 데이터를 받으면 내용을 콘솔에 기록
+- `.catch` : 오류가 발생하면 로그도 기록
+
 ```html
 <script>
 //기본 틀
@@ -896,13 +899,21 @@ async function logTodoTitle() {
 
 
 
-#### Get 요청을 보냄
+
+
+#### Get
+
+> GET : 입력한 url에 존재하는 자원에 요청
+>
+> ```javascript
+> axios.get(url,[,config])
+> ```
 
 - Axios로 첫 번째 요청을 보냄
 - `GET`일반적으로 데이터를 검색하는 데 사용 요청
 - 블로그 게시물 목록을 보내는 외부 API에 HTTP 요청함
-- `.then` : 데이터를 받으면 내용을 콘솔에 기록
-- `.catch` : 오류가 발생하면 로그도 기록
+-  GET은 서버에서 어떤 데이터를 가져와서 보여준다거나 하는 용도
+- 주소에 있는 쿼리스트링을 활용해서 정보를 전달하는 것이지 **GET메서드는 값이나 상태등을 바꿀 수 없음**
 
 ![image-20201014111701083](JavaScript_ECMAScript,Coding_Style_Guide,AJAX,Callback_Fuction,Promise.assets/image-20201014111701083.png)
 
@@ -968,249 +979,56 @@ async function logTodoTitle() {
 
 
 
-#### Like 기능 비동기적으로 구현(axios 적용) 
+#### POST
 
-1. `base.html` >  `head 태그` 
-
-   - `axios CDN` 추가
-
-2. `articles `> `index.html` 수정
-
-   - a 태그 삭제 -> 자바스크립트로 요청을 보내므로 필요 없음
-   - 조건문을 `i 태그` 클래스 안에 삽입
-   - 어떠한 article에 대한 버튼인지 하트에 정보를 더 추가해야함 (고유 클래스 부여)
-     - `like-button` 클래스 속성(자바스크립트에서 클래스를 찾기 위한 용도)
-     - 자바스크립트는 `data-id`를 통해 개별적인 오브젝트에 접근 가능
-   - `data-id` 는 [HTMLElement.dataset](https://developer.mozilla.org/ko/docs/Web/API/HTMLElement/dataset) 속성을 활용한 것으로 HTML 이나 DOM 요소의 커스텀 데이터 속성(data-*)에 대한 읽기와 쓰기 접근을 허용시킴.
-   - 어떤 게시글의 좋아요인지 알기 위해 `index.html`에 `data-id` 속성을 추가한다.
-
-   - **`data-id`를 통해 각 객체에 접근할 수 있다.**
-
-   - 구별할 수 있는 `article.pk`를 빌려와 사용한다.
-
-```html
-<i class="fas fa-heart like-button" style="color: crimson;" data-id="{{ article.pk }}"></i>
-<i class="fas fa-heart like-button" style="color: black;" data-id="{{ article.pk }}"></i>
-```
-
-- `dataset` 을 통해 개별적인 객체에 접근이 가능하다.
-  - 콘솔창에서 id가 새로 생성됨을 확인할 수 있다.
-
-```sh
-dataset: DOMStringMap {id: "4"}
-```
-
-
-
-3. Like button
-
-```html
-<script>
-    const likebuttons = document.querySelectorAll('.like-button')
-    likebuttons.forEach(function(button){
-        button.addEventListener('click', function(event){
-            // console.log(event)
-            const articleId = event.target.dataset.id
-            axios.get(`/articles/${articleId}/like/`)
-            		.then(function(response){
-                		console.log(response)
-            		})
-        })
-    })
-</script>
-```
-
-- 버튼이 한개만 있는 것이 아니므로 (각 article 별로 좋아요 버튼이 있음)
-
-- 모든 버튼을 다 가지고 와야함.
--  `document.querySelectorAll` 을 이용하여 모든 데이터를 가져오며, 반복문을 통해 개별적인 버튼에 대한 `addEventListentListener` 구현.
-- 이때 querySelectorAll의 인자로 i 태그 클래스 내에서 정의한 클래스명인 `like-button`를 사용
-- `event` 오브젝트 객체 안, 정확히는 `event.target.dataset.id`의 value에는 data-id의 값인 `{{article.id}}`이 저장되어있으며, 이를 좋아요 기능에 대한 url 주소를 불러올 variable routing값으로 쓰임.
-- urlpattern에 따라 좋아요의 url 주소는 `<int:article_id>/like/` 와 같이 정의 되어 있으며, 이 주소를 `axios.get`의 인자로 넘김.
-- 요청에 대한 응답(`.then` 메서드)으로, response 객체의 반환 값으로 views.py를 통해 redirect된 list.html 전체가 반환됨. 우리는 “좋아요” 기능만 구현하면 되므로, HTML 문서 전체를 반환할 필요가 없음. 이는 불필요한 응답이므로 views.py 수정이 필요함
-
-
-
-4. `articles` > `views.py`
-
-> 기존 redirect 로 인해 `index.html` 로 페이지가 로딩되는 것이 아닌 JSON 형태로 응답결과를 반환 받기로 변경한다.
+> 새로운 리소스를 생성(create)할 때 사용합니다.
 >
-> JSON 데이터에 liked 변수를 만들어서 template 에서 좋아요를 취소할지 추가할지를 판단할 수 있도록 한다.
+> ```javascript
+> axios.post("url주소",{data객체},[,config])
+> ```
+
+- post 메서드의 두 번째 인자는 본문으로 보낼 데이터를 설정한 객체 리터럴을 전달
+
+-  로그인, 회원가입 등 사용자가 생성한 파일을 서버에다가 업로드할때 사용합니다. Post를 사용하면 주소창에 쿼리스트링이 남지 않기때문에 GET보다 안전
+
+
+
+#### Delete
+
+> REST 기반 API 프로그램에서 데이터베이스에 저장되어 있는 내용을 삭제하는 목적으로 사용함
 >
->  liked 변수는 False로, 반대의 경우(좋아요를 누르는 경우)는 liked 변수에 True 값
->
-> 그래서 True False 값을 통해 좋아요 버튼의 style 값(여기서는 버튼의 색깔)을 변경한다.
+> ```javascript
+> axios.delete(URL,[,config]);
+> ```
 
-```python
-from django.http import JsonResponse
-
-@require_POST
-def like(request, article_pk):
-    if request.user.is_authenticated:
-        article = get_object_or_404(Article, pk=article_pk)
-        user = request.user
-
-        if article.like_users.filter(pk=user.pk).exists():
-        # if user in article.like_users.all():
-            article.like_users.remove(user)
-            liked = False
-        else:
-            article.like_users.add(user)
-            liked = True
-            
-		#앞으로는 json 파일에 담아서 같이 보낸다.
-        like_status = {
-            'liked': liked,
-            'count': article.like_users.count(),
-        }
-        #추가
-        return JsonResponse(like_status)
-        # return redirect('articles:index')
-    return redirect('accounts:login')
-```
-
-![image-20201014222049560](1014_JavaScript_ECMAScript,Coding_Style_Guide,AJAX,Callback_Fuction,Promise.assets/image-20201014222049560.png)
-
-
-
-5.  좋아요 색 변경
-
-> `event` > `target` > `style` > `color`에 색깔 정보가 있다.
-
-- `articles` > `index.html`
-
-> 좋아요 버튼 누를 때마다 버튼의 색깔만 바뀌고 좋아요 개수는 아직 변하지 않는다.
-
-```html
-<script>
-  // 1. 각 게시글별로 좋아요 버튼이 있으니 모두 선택해야 한다.
-  const likebuttons = document.querySelectorAll('.like-button')
-
-  // 2. forEach를 사용해서 각각의 좋아요 버튼을 클릭
-  likebuttons.forEach(button => {
-    button.addEventListener('click', function (event) {
-      // 항상 처음에는 console로 function의 인자를 찍어보고 어디로 들어가야 하는지 반드시 파악하자
-      // console.log(event)
-
-      // event.target.dataset.id 의 value는 data-id 값이 들어 있다.
-      const articleId = event.target.dataset.id // 이와 같이 사용하기 위해 console로 찍어서 경로를 확인해야 한다!
-      axios.get(`/articles/${articleId}/like/`) // 해당 상세 게시글의 좋아요 요청을 보낸다.(url주소는 urls.py 참고)
-        .then(response => {
-          // console.log(response) // 반드시 console로 먼저 확인
-          if (response.data.liked) {
-            // 좋아요 색깔을 빨갛게
-            event.target.style.color = 'crimson'
-          } else {
-            // 좋아요 색깔을 까맣게
-            event.target.style.color = 'black'
-          }
-        })
-        .catch(error => console.log(error)) // 반드시 console로 먼저 확인)
-    })
-  })
-</script> 
-```
-
-6. 좋아요 개수도 함께 출력
-
-- `like` view 함수의 `context` 안에 `'count': article.like_users.count(),` 추가
-- `index.html` 
-
-> span 태그로 숫자 부분만 감싸고 id 속성을 추가한다.
->
-> 각각이 다른 id 값을 가져야 하므로 id 작성시 article.pk 이용
-
-```html
-<!-- before -->
-<b>{{ article.like_users.all|length }}</b>명이 이 글을 좋아합니다. 
-
-<!-- after -->
-<b><span id="like-count-{{ article.pk }}">{{ article.like_users.all|length }}</span></b>명이 이 글을 좋아합니다. 
-```
-
-- `index.html`
-
-> `.then` 구문 안에 다음과 같은 구문 추가
->
-> id 속성에 접근하므로 `.querySelector` 안에 작성시 `#`을 꼭 붙여준다.
+- Delete메서드는 HTML Form 태그에서 기본적으로 지원하는 HTTP 메서드가 아님!
+- Delete메서드는 서버에 있는 데이터베이스의 내용을 삭제하는 것을 주 목적으로 하기에 두 번째 인자를 아예 전달하지 않음
 
 ```javascript
-document.querySelector(`#like-count-${articleId}`).innerText = response.data.count
-```
-
-- `index.html` - `post` 방식으로 보내기
-
-> `axios.get(~)`을 `axios.post(~)`로 바꾸면 403 error(forbidden)가 발생한다.
-
-```javascript
-// before
-axios.get(`/articles/${articleId}/like/`) 
-
-// after
-axios.post(`/articles/${articleId}/like/`) 
-```
-
-> 이를 해결하기 위해 쿠키에 `csrf`를 담아서 보내줘야 한다. [(공식 문서)](https://docs.djangoproject.com/en/2.2/ref/csrf/#setting-the-token-on-the-ajax-request)
-
-```javascript
-// axios.post(~) 이전에 아래 두 줄 추가
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+//예제코드
+axios.delete("/thisisExample/list/30").then(function(response){
+    console.log(response);
+      }).catch(function(ex){
+      throw new Error(ex)
+}
 ```
 
 
 
 
 
-7. 요청이 ajax 요청일 때만 받아들이게 하기
+#### PUT
 
-```python
-# views.py
+> REST 기반 API 프로그램에서 데이터베이스에 저장되어 있는 내용을 갱신하는 목적으로 사용됨
+>
+> ```javascript
+> axios.put(url[, data[, config]])
+> ```
 
-from django.http import JsonResponse, HttpResponseBadRequest
-
-@login_required
-def like(request, article_pk):
-    if request.is_ajax(): # if문으로 분기
-        article = get_object_or_404(Article, pk=article_pk)
-        if article.like_users.filter(pk=request.user.pk).exists():
-            article.like_users.remove(request.user)
-            liked = False
-        else:
-            article.like_users.add(request.user)
-            liked = True
-        context = {'liked': liked, 'count': article.like_users.count(),}
-        return JsonResponse(context)
-    else:
-        return HttpResponseBadRequest()
-```
-
-- 하지만 현재 상황은 django가 ajax 요청인지 아직 모른다.
-
-- django측에 ajax 요청임을 알려줘야 한다.
-
-- axios 공식 문서의 `Request Config`에서 `headers: {'X-Requested-With': 'XMLHttpRequest'},` 구문을 찾아 `index.html`에 붙여넣어야 한다. [(공식 문서)](https://github.com/axios/axios#request-config)
-
-- 추가로 `.headers.common`도 붙여줘야 한다. [(공식 문서)](https://github.com/axios/axios#global-axios-defaults)
-
-```javascript
-const articleId = event.target.dataset.id
-
-// ajax 요청임을 알려주는 구문 (이거 추가)
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest' 
-
-// POST 요청임을 알려주는 구문1 (이거 추가)
-axios.defaults.xsrfCookieName = 'csrftoken' 
-
-// POST 요청임을 알려주는 구문2 (이거 추가)
-axios.defaults.xsrfHeaderName = 'X-CSRFToken' 
-axios.post(`/articles/${articleId}/like/`)
-...
-```
+- PUT메서드는 HTML Form 태그에서 기본적으로 지원하는 HTTP 메서드가 아님
+- PUT메서드는 서버에 있는 데이터베이스의 내용을 변경하는 것을 주 목적으로 함
 
 
-
-![image-20201014201217613](1014_JavaScript_ECMAScript,Coding_Style_Guide,AJAX,Callback_Fuction,Promise.assets/image-20201014201217613.png)
 
 
 
@@ -1220,4 +1038,4 @@ axios.post(`/articles/${articleId}/like/`)
 
 [joshua1988.github.io](https://joshua1988.github.io/web-development/javascript/js-async-await/)
 
-[좋아요기능 참고](https://tothefullest08.github.io/javascript/2019/07/03/JS05_JS_in_Django_like_function/)
+[axios](https://velog.io/@zofqofhtltm8015/Axios-%EC%82%AC%EC%9A%A9%EB%B2%95-%EC%84%9C%EB%B2%84-%ED%86%B5%EC%8B%A0-%ED%95%B4%EB%B3%B4%EA%B8%B0)
