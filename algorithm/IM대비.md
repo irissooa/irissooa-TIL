@@ -1458,3 +1458,639 @@ for i in range(1, N + 1):
         print()
 ```
 
+
+
+## 2559_수열
+
+- 이건 시간초과가 남!!!ㅠㅠㅠㅠㅠㅠㅠ`sum(temp[i:i+K])`를 계속하는 건 시간이 많이 드나봥.....
+- 질문검색..힌트 봤당ㅜ
+
+```python
+'''
+온도가 정수의 수열로 주어짐, 연속적인 며칠 동안의 온도의 합이 가장 큰 값
+매일 측정한 온도가 정수의 수열로 주어짐
+연속적인 며칠 동안의 온도의 합이 가장 큰 값?
+N개 중에 처음부터 K개씩 잘라서 합을 구함,
+근데 그 K개의 합들 중 최대값!
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+
+#온도를 측정한 전체 날짜의 수 N, 합을 구하기 위한 연속적인 날짜의 수 K
+N, K = map(int,input().split())
+#매일 측정한 온도 N개
+temp = list(map(int,input().split()))
+
+#N개를 k개씩 잘라서 합을 구하는데 그것의 최댓값!
+MAX = 0#Max인 값을 넣음
+#아래 for문 시간초과남....
+for i in range(0,N-K):
+    SUM = sum(temp[i:i+K])
+    print(SUM)
+    if SUM > MAX:
+        MAX = SUM
+print(MAX)
+```
+
+- SUM을 구할 때 다음 SUM은 이전 SUM의 제일 처음 값을 빼고 그다음 수를 더한 값!! => 시간이 적게 듬!
+
+```python
+'''
+온도가 정수의 수열로 주어짐, 연속적인 며칠 동안의 온도의 합이 가장 큰 값
+매일 측정한 온도가 정수의 수열로 주어짐
+연속적인 며칠 동안의 온도의 합이 가장 큰 값?
+N개 중에 처음부터 K개씩 잘라서 합을 구함,
+근데 그 K개의 합들 중 최대값!
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+
+#온도를 측정한 전체 날짜의 수 N, 합을 구하기 위한 연속적인 날짜의 수 K
+N, K = map(int,input().split())
+#매일 측정한 온도 N개
+temp = list(map(int,input().split()))
+
+#N개를 k개씩 잘라서 합을 구하는데 그것의 최댓값!
+# 질문검색 힌트 -> 다음 수의 부분합을 구할 때 이전 부분합에서 젤 첨 수 빼고, 그다음 수 더하기
+SUM = sum(temp[:K])#처음 k개의 부분합
+MAX = SUM #일단 처음 SUM값을 넣어둠
+for i in range(K,N):
+    start = temp[i-K]
+    SUM = SUM - start + temp[i]
+    # print(start,SUM)
+    if SUM > MAX:
+        MAX = SUM
+print(MAX)
+```
+
+- 다른 풀이
+
+```python
+N, K = map(int, input().split())
+# 온도 입력
+temperature = list(map(int, input().split()))
+# 초기 값
+ans = sum(temperature[:K])
+day = ans
+for i in range(K, N):
+    day += temperature[i]
+    day -= temperature[i-K]
+    if ans < day:
+        ans = day
+
+print(ans)
+```
+
+
+
+
+
+## 2567_색종이2
+
+> 색종이...둘레구하는 문제인데 이거 너무 오래걸렸다 
+>
+> 나는 둘레만 표시해서 그 수를 세어주고 싶었는데 그렇게 하니까 겹치는 부분도 같이 사라져서 구하기가 힘들었따...결국 실패ㅠ 그래서 다른 사람들 코드 힌트 보고 그렇게 풀었다....ㅠ
+
+- 실패한 코드
+
+```python
+'''
+가로 세로 크기 100 정사각형
+가로 세로 크기 10인 정사각형 색종이 여러장 붙인 후
+색종이가 붙은 검은 영역의 둘레의 길이를 구하는 프로그램
+색종이가 놓이는 순서대로 테두리에 수를 메기고
+그다음 색종이가 놓일때 각 테두리 안에 자기 순서외의 숫자는 모두 0으로 바꿈!
+근데 겹친 부분도 없애야 되므로 순서를 바꿔서도 check함수를 돌림
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from pprint import pprint
+
+
+#자기 테두리 영역 안에 0이아닌 다른수가 있는지 확인하는 함수
+def check(X,Y,order):
+    for i in range(Y,Y+10):
+        for j in range(X,X+10):
+            if paper[i][j] != 0 and paper[i][j] != order:
+                paper[i][j] = 0
+
+    return
+
+#색종이 수
+N = int(input())
+#흰도화지
+paper = [[0 for j in range(100)] for i in range(100)]
+arr= []
+#0이 아닌 수 세기
+ans = 0
+cnt = 0 #맞닿은면의 개수 세기
+temp = []
+#색종이 위치
+#색종이의 왼쪽 변과 도화지의 왼쪽 변 사이의 거리 , 색종이의 아래쪽 변과 아래쪽 도화지의 아래쪽 변 사이의 거리
+for n in range(1,N+1):
+    #x(열),y(행)
+    x, y = map(int,input().split())
+    arr.append((x,y))
+    # print(x,y,n)
+    #색종이를 종이에 올림
+    for i in range(y,y+10):
+        for j in range(x,x+10):
+            #테두리에만 각 순서를 메김!
+            if i == y or i == y+9:
+                if paper[i][j]:
+                    cnt+= 1
+                    temp.append((i,j))
+                paper[i][j] = n
+
+            else:
+                if j == x or j == x+9:
+                    if paper[i][j]:
+                        cnt+= 1
+                        temp.append((i,j))
+                    paper[i][j] = n
+    #자기 테두리 안에 자기 순서 외의 다른 수가 있다면 숫자를 0으로 바꿈
+    check(x,y,n)
+# print(paper)
+print(cnt)
+print(temp)
+# 자기 테두리 안에 자기 순서 외의 다른 수가 있다면 숫자를 0으로 바꿈->순서를 반대로 해서 다른 영역안에 있는 테두리를 다 지움!
+# 여기서 문제가 생김! 겹치는 부분의 꼭지점이 세어지지 않는다...이걸 어떻게 해결하지?
+for i in range(len(arr)-1,-1,-1):
+    check(arr[i][0],arr[i][1],i+1)
+    # print(i+1)
+
+#또 문제가 있다 -> 겹치는 부분이 같이 사라지는 문제! -> 어떻게 해결하지..ㅠ
+
+for i in range(100):
+    for j in range(100):
+        if paper[i][j] != 0:
+            print('둘레',i,j,ans)
+            ans += 1
+print(ans)
+
+for i in range(26)[::-1]:
+    for j in range(26):
+        print(paper[i][j],end=' ')
+    print()
+
+'''
+4
+[(7, 5), (11, 12), (14, 15), (16, 22)]
+둘레 2 5 0
+둘레 2 6 1
+둘레 2 7 2
+둘레 2 8 3
+둘레 2 9 4
+둘레 2 10 5
+둘레 2 11 6
+둘레 2 12 7
+둘레 2 13 8
+둘레 2 14 9
+둘레 3 5 10
+둘레 3 14 11
+둘레 4 5 12
+둘레 4 14 13
+둘레 5 5 14
+둘레 5 14 15
+둘레 6 5 16
+둘레 6 14 17
+둘레 7 3 18
+둘레 7 4 19
+둘레 7 14 20
+둘레 7 15 21
+둘레 7 16 22
+둘레 7 17 23
+둘레 7 18 24
+둘레 7 19 25
+둘레 7 20 26
+둘레 7 21 27
+둘레 7 22 28
+둘레 7 23 29
+둘레 7 24 30
+둘레 8 3 31
+둘레 8 14 32
+둘레 8 15 33
+둘레 8 24 34
+둘레 9 3 35
+둘레 9 14 36
+둘레 9 15 37
+둘레 9 24 38
+둘레 10 3 39
+둘레 10 14 40
+둘레 10 15 41
+둘레 10 24 42
+둘레 11 3 43
+둘레 11 13 44
+둘레 11 14 45
+둘레 11 15 46
+둘레 11 24 47
+둘레 12 3 48
+둘레 12 12 49
+둘레 12 15 50
+둘레 12 24 51
+둘레 13 3 52
+둘레 13 12 53
+둘레 13 15 54
+둘레 13 24 55
+둘레 14 3 56
+둘레 14 12 57
+둘레 14 13 58
+둘레 14 14 59
+둘레 14 24 60
+둘레 15 3 61
+둘레 15 12 62
+둘레 15 13 63
+둘레 15 24 64
+둘레 16 3 65
+둘레 16 4 66
+둘레 16 5 67
+둘레 16 6 68
+둘레 16 7 69
+둘레 16 8 70
+둘레 16 9 71
+둘레 16 10 72
+둘레 16 11 73
+둘레 16 12 74
+둘레 16 13 75
+둘레 16 23 76
+둘레 16 24 77
+둘레 17 13 78
+둘레 17 22 79
+둘레 18 13 80
+둘레 18 22 81
+둘레 19 13 82
+둘레 19 22 83
+둘레 20 13 84
+둘레 20 22 85
+둘레 21 13 86
+둘레 21 22 87
+둘레 22 13 88
+둘레 22 22 89
+둘레 23 13 90
+둘레 23 14 91
+둘레 23 15 92
+둘레 23 16 93
+둘레 23 17 94
+둘레 23 18 95
+둘레 23 19 96
+둘레 23 20 97
+둘레 23 21 98
+둘레 23 22 99
+100
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 4 4 4 4 4 4 4 4 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0 4 0 0 0 
+0 0 0 1 1 1 1 1 1 1 1 1 1 4 0 0 0 0 0 0 0 0 0 3 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 4 0 0 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 4 4 0 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 0 2 2 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 0 0 2 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 0 0 2 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 0 0 0 0 0 0 0 0 0 0 2 3 0 0 0 0 0 0 0 0 3 0 
+0 0 0 1 1 0 0 0 0 0 0 0 0 0 2 3 3 3 3 3 3 3 3 3 3 0 
+0 0 0 0 0 2 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 2 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 2 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 2 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 2 2 2 2 2 2 2 2 2 2 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+'''
+```
+
+- Hint 보고 푼 코드
+
+```python
+#다시풀기 -> 방문, 델타 이용
+'''
+색종이가 놓이는 자리를 전부 True로 바꿈
+델타 이용해서 True에서 이동한 위치가 False면 그 값을 세어주기!
+만약 넘어간 곳이 범위 밖이라면 그래도 세어주기!
+범위밖을 벗어나는 색종이는 없기 때문에 현재 위치가 끝이라 둘레를 세어줘야됨!
+'''
+
+#색종이 둘레 구하기
+#델타
+di = [0,0,1,-1] #우좌하상
+dj = [1,-1,0,0]
+def check(i,j):
+    global width
+    for d in range(4):
+        ni = i + di[d]
+        nj = j + dj[d]
+        #범위를 벗어난다면 테두리니까 +1해줌
+        if ni < 0 or ni > 99 or nj < 0 or nj > 99:
+            width += 1
+            #벗어났으니 다음 for문으로 넘어감
+            continue
+        #다음 위치가 False라면 cnt를 해줌
+        if paper[ni][nj] == False:
+            width += 1
+
+
+#색종이 수
+N = int(input())
+#색종이를 받을 배열
+paper = [[False for j in range(100)] for i in range(100)]
+
+#색종이 입력받음
+for n in range(N):
+    #x열, y행
+    x,y = map(int,input().split())
+    for i in range(y,y+10):
+        for j in range(x,x+10):
+            paper[i][j] = True
+width = 0 #둘레
+for i in range(100):
+    for j in range(100):
+        #True이면 델타를 돌림
+        if paper[i][j]:
+            check(i,j)
+for i in range(26)[::-1]:
+    for j in range(26):
+        print(paper[i][j],end=' ')
+    print()
+
+print(width)
+
+for i in range(26)[::-1]:
+    for j in range(26):
+        print(paper[i][j],end=' ')
+    print()
+'''
+False False False False False False False False False False False False False False False False False False False False False False False False False False 
+False False False False False False False False False False False False False False False False False False False False False False False False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False False False False False False False False False False False True True True True True True True True True True False False False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True False False True True True True True True True True True True False 
+False False False True True True True True True True True True True False False True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False True True True True True True True True True True True True True True True True True True True True True True False 
+False False False False False True True True True True True True True True True False False False False False False False False False False False 
+False False False False False True True True True True True True True True True False False False False False False False False False False False 
+False False False False False True True True True True True True True True True False False False False False False False False False False False 
+False False False False False True True True True True True True True True True False False False False False False False False False False False 
+False False False False False True True True True True True True True True True False False False False False False False False False False False 
+False False False False False False False False False False False False False False False False False False False False False False False False False False 
+False False False False False False False False False False False False False False False False False False False False False False False False False False 
+96
+
+Process finished with exit code 0
+'''
+```
+
+
+
+- 승범's code
+
+```python
+import sys
+sys.stdin = open("input.txt", "r")
+
+white = [[False] * 100 for _ in range(100)]
+visited = []
+colored_papers = int(input())
+cnt = 0
+dr = [-1, 1, 0, 0]
+dc = [0, 0, 1, -1]
+for _ in range(colored_papers):
+    h, v = map(int, input().split())
+    for hh in range(h-1, h+9):
+        for vv in range(v-1, v+9):
+            #종이에 색종이가 올려지면 그부분 방문표시
+            white[hh][vv] = True
+for i in range(100):
+    for j in range(100):
+        #방문한 곳이라면 델타로 False인 곳을 찾고 cnt+1해줌
+        if white[i][j] == True:
+            for k in range(4):
+                rr = i + dr[k]
+                cc = j + dc[k]
+                #범위를 벗어났다면 그래도 그 둘레를 세어줘야되기 때문에 cnt+1을 해주고 continue(다음 반복문으로 넘어감)
+                if rr < 0 or rr > 99 or cc < 0 or cc > 99:
+                    cnt += 1
+                    continue
+        		#why? 바로 옆이 False면 그 개수를 세면 둘레와 같기 때문
+                elif white[rr][cc] == False:
+                    cnt += 1
+print(cnt)
+```
+
+
+
+## 2477_참외밭
+
+> 큰 사각형은 구할수 있는데 작은 사각형을 어떤 규칙으로 구해야될지 몰라서 hint를 봤다......큰사각형이 시작되는 그 idx부터 3개 뒤에 무조건 작은사각형이 시작됨.....ㅠㅠㅠㅠㅠㅠㅠ
+
+```python
+'''
+1m^2의 참외 개수를 육각형 전체 넓이에서 비율로 전체 수확할 수 있는 참외 수를 구함
+둘레를 각 방향에 리스트로 담는다.
+각 방향 리스트에 담긴 길이가 하나인 것이 가장 긴 사각형의 가로, 세로-> 전체 사각형 넓이 구함
+
+'''
+import sys
+sys.stdin = open('input.txt','r')
+#1m^2 넓이에 자라는 참외의 개수
+K = int(input())
+#임의의 한꼭지점에서 반시게방향 둘레 변의 방향과 길이
+dist = [[] for _ in range(5)]
+order=[]
+for k in range(6):
+    #1 동 2 서 3 남 4 북
+    dir,width = map(int,input().split())
+    dist[dir].append(width)
+    order.append(width)
+# print(dist)
+# print(order)
+#큰 사각형 넓이
+BIG = 1
+#긴사각형 시작되는 idx에서 3번째가 작은 사각형 idx
+idx = []
+for d in dist:
+    if len(d) == 1:
+        BIG *= d[0]
+        idx.append(order.index(d[0]))
+# print(idx)
+#작은 사각형 넓이
+small = order[(idx[0]+3)%6]*order[(idx[1]+3)%6]            
+# print(BIG,small)
+print((BIG-small)*K)
+```
+
+- 승범's code
+
+```python
+import sys
+sys.stdin = open("input.txt", "r")
+
+#소요시간 : 30m
+#푼 날짜 : 20.10.18
+N = int(input())
+all_size = []
+only_dir = []
+big = 1
+small = 1
+for _ in range(6):
+    info = list(map(int ,input().split()))
+    only_dir.append(info[0])
+    all_size.append(info)
+for d in range(6):
+    if only_dir.count(only_dir[d]) == 1:
+        big *= all_size[d][1]
+        small *= all_size[(d+3)%6][1]
+print(N * (big - small))
+```
+
+- 다른 코드
+
+```python
+K = int(input())
+
+pos = []
+for i in range(6):
+    dir, length = map(int, input().split())
+    pos.append(length)
+
+big = 0
+small = 0
+for i in range(6):
+    tmp = pos[i] * pos[(i + 1) % 6]
+    if big < tmp:
+        big = tmp
+        idx = i
+small = pos[(idx + 3) % 6] * pos[(idx + 4) % 6]
+print(K * (big - small))
+```
+
+
+
+
+
+## 2567_직사각형
+
+- 이건 어렵다기보다...조건을 주는게 까다로웠따ㅠ
+
+```python
+'''
+시간:2020/10/18/19:34
+직사각형 왼쪽 아래 좌표, 오른쪽 위 좌표가 두개 주어짐
+겹치는 부분이 직사각형(a)인지 선분(b)인지 점(c)인지 겹치는 부분이 없(d)는지 판단
+'''
+
+import sys
+sys.stdin = open('input.txt','r')
+
+def check(x1,y1,p1,q1,x2,y2,p2,q2):
+    ans = 'a'
+    #d
+    if x2 > p1 or y2 >q1 or x1 >p2 or y1>q2:
+        ans = 'd'
+    #c
+    elif (x2==p1 or x1==p2) and (y1==q2 or y2==q1):
+        ans = 'c'
+    #b
+    elif (p1==x2 or x1==p2) or (y2==q1 or y1==q2):
+        ans ='b'
+    #그외는 a
+    return ans
+
+#4개의 줄
+for _ in range(4):
+    #x,y,p,q가 두개 입력됨
+    x1,y1,p1,q1,x2,y2,p2,q2 = map(int,input().split())
+    print(check(x1,y1,p1,q1,x2,y2,p2,q2))
+
+```
+
+- 승범's code
+
+```python
+import sys
+sys.stdin = open("input.txt", "r")
+
+# 소요시간 : 25m
+# 푼 날짜 : 20.10.18
+
+for _ in range(4):
+    rectangle = list(map(int, input().split()))
+    # computation_result : 0 = 논외, 1 = 같다,  2 = 안쪽
+    # x축 연산
+    if rectangle[0] < rectangle[4]:
+        x1 = [rectangle[0], rectangle[2]]
+        x2 = [rectangle[4], rectangle[6]]
+    else:
+        x1 = [rectangle[4], rectangle[6]]
+        x2 = [rectangle[0], rectangle[2]]
+    if x1[0] <= x2[0] < x1[1]:
+        result_x = 2
+    elif x1[1] == x2[0]:
+        result_x = 1
+    else:
+        result_x = 0
+    # y축 연산
+    if rectangle[1] < rectangle[5]:
+        y1 = [rectangle[1], rectangle[3]]
+        y2 = [rectangle[5], rectangle[7]]
+    else:
+        y1 = [rectangle[5], rectangle[7]]
+        y2 = [rectangle[1], rectangle[3]]
+    if y1[0] <= y2[0] < y1[1]:
+        result_y = 2
+    elif y1[1] == y2[0]:
+        result_y = 1
+    else:
+        result_y = 0
+    # rsult : 0 = d, 1 = c, 2 = b, 4 = a
+    if result_x * result_y == 0:
+        print('d')
+    elif result_x * result_y == 1:
+        print('c')
+    elif result_x * result_y == 2:
+        print('b')
+    elif result_x * result_y == 4:
+        print('a')
+
+```
+
+- 다른 코드
+
+```python
+# 백준에서 제일 잘푼 code
+def square(n):
+    x1, y1, x2, y2, x3, y3, x4, y4 = n[0], n[1], n[2], n[3], n[4], n[5], n[6], n[7]
+   if x2 < x3 or x4 < x1 or y2 < y3 or y4 < y1:
+       return 'd'
+    elif (x2 == x3 and y2 == y3) or (x3 == x2 and y1 == y4) or (x4 == x1 and y3 == y2) or (x4 == x1 and y4 == y1):
+        return 'c'
+    elif ((x3 == x2 or x4 == x1) and y3 < y2 and y4 > y1) or ((y2 == y3 or y4 == y1) and x4 > x1 and x3 < x2):
+        return 'b'
+    else:
+        return 'a'
+    
+for _ in range(4):
+    s_list = list(map(int, input().split()))
+    print(square(s_list))
+```
+
