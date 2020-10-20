@@ -2297,3 +2297,140 @@ for i in range(1000, max_idx, -1):
 print(ans)
 ```
 
+
+
+
+
+## 10157_자리배정
+
+> DFS로 풀려고 했는데 이거는 모든 자리마다 우,하,좌,상의 방향을 모두 보기 때문에 내가 원하는대로 한 방향으로만 흘러가지 않는다
+>
+> 그래서 나머지를 이용해 방향을 지정해줘야됨
+
+- 실패코드
+
+```python
+'''
+대기번호가 달팽이 채우기 처럼 상, 우, 하,좌 순서로 번호가 매겨진다
+여기서 좌표 x,y 는 열,행값이다!
+1,1부터 방문하면서 좌표모습으로 봤을 때 우, 하, 좌 상으로 이동!
+방문하지 않았으면서 배열내에서 우, 하 , 좌, 상 순으로 번호를 매기며 그 방문배열에 번호를 매기며
+K번째가 됐을 때 (x,y)를 출력
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from pprint import pprint
+
+#델타, 우하좌상
+di = [0,1,0,-1]
+dj = [1,0,-1,0]
+def check(i,j):
+    global num,result
+    #방문했으니 방문표시
+    num += 1
+    visited[i][j] = num
+    #종료조건
+    if num == K:
+        # print('들어왓따')
+        result=[i,j]
+        # return result
+    print(num,i,j)
+    #델타이동
+    for d in range(4):
+        ni = i + di[d]
+        nj = j + dj[d]
+        # #K가 num으로 나눴을 때 1이하가 아니면 건너뜀
+        # if K // num >1:
+        #     continue
+        #범위밖이라면 건너뜀
+        if ni < 1 or ni > C or nj <1 or nj > R:
+            continue
+        #방문한 곳이라면 지나감
+        if visited[ni][nj]:
+            continue
+        check(ni,nj)
+
+#공연장 격자 크기 C,R
+C,R = map(int,input().split())
+#방문배열
+visited = [[False for j in range(R+1)] for i in range(C+1)]
+#관객 대기번호
+K = int(input())
+num = 0
+result = [0]
+# 번호를 매김
+#관객에게 좌석을 배정할 수 없는 경우 0 출력
+if K >C*R:
+    print(0)
+    # exit()
+else:
+    for i in range(1,C+1):
+        for j in range(1,R+1):
+            # 런타임에러 나서 (C*R >= K) 이거 추가해주니까 33%까지는 정답 올라감
+            if visited[i][j] == False:
+                check(i,j)
+                # result = [i,j]
+    pprint(visited)
+    print(result[0],result[1])
+```
+
+- 나머지 이용해서 다시풀기
+
+> 여기서 `if  (ni < 0 or ni >= C or nj < 0 or nj >= R) and (visited[ni][nj] != False):` 이거는 `list out of range`가 뜸! 그 이유는 예를 들어 ni가 0보다 작은데 방문을 하지 않았다면(False)라면 둘다 참이어야 continue로 들어가게 된 격! 그래서 예외의 경우가 다음 숫자로 넘어감
+
+```python
+'''
+대기번호가 달팽이 채우기 처럼 상, 우, 하,좌 순서로 번호가 매겨진다
+여기서 좌표 x,y 는 열,행값이다!
+1,1부터 방문하면서 좌표모습으로 봤을 때 우, 하, 좌 상으로 이동!
+방문하지 않았으면서 배열내에서 우, 하 , 좌, 상 순으로 번호를 매기며 그 방문배열에 번호를 매기며
+K번째가 됐을 때 (x,y)를 출력
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from pprint import pprint
+
+
+#공연장 격자 크기 C,R
+C,R = map(int,input().split())
+#방문배열
+visited =[[False for j in range(R)] for i in range(C)]
+#관객 대기번호
+K = int(input())
+num = 1
+
+# 번호를 매김
+#관객에게 좌석을 배정할 수 없는 경우 0 출력
+if K >C*R:
+    print(0)
+    # exit()
+else:
+    #델타, 우하좌상
+    di = [0,1,0,-1]
+    dj = [1,0,-1,0]
+    i,j,d = 0,0,0
+
+    while True:
+        visited[i][j] = num
+        if num == K:
+            print(i+1,j+1)
+            break
+        num += 1
+        ni = i + di[d]
+        nj = j + dj[d]
+
+        if 0 <= ni < C and 0 <= nj < R and visited[ni][nj] == False:
+            i,j = ni,nj
+
+        else:
+            d = (d+1) % 4
+            i += di[d]
+            j += dj[d]
+
+
+
+
+    pprint(visited)
+
+```
+
