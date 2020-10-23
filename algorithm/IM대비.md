@@ -2434,3 +2434,186 @@ else:
 
 ```
 
+
+
+
+
+## 10158_개미
+
+> 처음엔 위에서 푼것처럼 달팽이처럼 델타를 이용해서 풀었다! 제대로 잘 돌아갔지만 시간초과가 떴다!ㅠㅠ
+>
+> [다른 사람 풀이](https://beyond1.tistory.com/60)에서 힌트를 얻었다.
+
+```python
+'''
+p,q가 주어지면 +1,+1로 좌표가 커지고 벽을 만나면 다음 방향중 갈수있는 방향으로 방향전환
+di = [1,1,-1,-1]
+dj = [1,-1,-1,1]
+범위가 벗어나면 ni = i+di[d], nj=j+dj[d]에서 d=(d+1)%4로 방향을 바꿈
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from pprint import pprint
+
+#w: 가로, 열, h : 세로, 행
+w,h = map(int,input().split())
+#배열
+arr = [[0 for j in range(w)] for i in range(h)]
+# pprint(arr)
+#개미 초기 위치값 p, q
+p,q = map(int,input().split())
+
+#개미가 움직일 시간t
+t = int(input())
+
+di = [1,1,-1,-1]
+dj = [1,-1,-1,1]
+i,j,d = q,p,0
+#이전방향
+bi,bj = i,j
+#벽을 만나면 방향전환
+while t>1:
+    ni = i + di[d]
+    nj = j + dj[d]
+    if ni < 0 or ni > h or nj < 0 or nj > w:
+        d = (d+1) % 4
+        continue
+    if ni == bi and nj == bj:
+        d = (d+1) % 4
+        continue
+
+    t-=1
+    bi,bj = i,j
+    i,j = ni,nj
+    # print('t',t,'d',d,'i',i,'j',j)
+print(i,j)
+```
+
+- 명균썜 풀이
+
+![image-20201022220451252](IM대비.assets/image-20201022220451252.png)
+
+- 여기서 point!
+
+1. 이동할 때 중복된 값을 빼줌!!!
+2. 행과 열을 따로 지정해줘라!!
+
+```python
+#다른방법 ->수학을 이용해서 품(명균쌤힌트)
+#1.중복을 제외시켜줘라
+#2.행과 열을 따로지줭해줘라
+# 행,열 따로 생각 둘다 처음 주어진 q,p값에서 시간을 더한 뒤
+# 행과 열의 길이를 나눈 몫이 짝수면 + 홀수면 -방향
+#그리고 나머지는 이동할 값
+def ant(idx,length):
+    dir = (idx+t) // length
+    dist = (idx+t) % length
+    #dir 홀수면 해당 length에서 나머지만큼 빼줌
+    if dir % 2:
+        return length-dist
+    #dir가 짝수면 방향 그대로에서 나머지만큼 더해줌
+    else:
+        return dist
+
+
+
+#w: 가로, 열, h : 세로, 행
+w,h = map(int,input().split())
+#개미 초기 위치값 p, q
+p,q = map(int,input().split())
+
+#개미가 움직일 시간t
+t = int(input())
+
+print(ant(p,w),ant(q,h))
+```
+
+
+
+## 2635_수이어가기
+
+> 처음에는 규칙을 만들어 봤다.
+>
+> 1. 첫번째 수 양의 정수 주어짐
+> 2. 두번째 수 양의 정수 중에서 하나를 선택
+> 3. 세번째 이후에 나오는 모든 수 앞의 두 수를 순서대로 빼서 만듦 3=1-2, 4=2-3
+> 4. 음의 정수가 만들어지면, 이 음의 정수를 버리고 더이상 수 만들지 않음
+> 길이가 긴 것 중 하나만 출력
+> 첫번째 부터 수를 a,b,c,d,e라고 했을 때
+> a-b = c, b-c=d c-d=e, 수를 가장 길게 이어지는 b의 범위를 구해보도록 하자
+> c>d 이어야 더 길게 이어지므로 a-b>b-c => a-b>b-(a-b)=>2a/3 > b
+> d>e 이어야 더 길게 이어지므로 b-c > c-d => b-(a-b) > (a-b)-(b-(a-b)) =>2b-a >2a-3b =>b>3a/5
+> 그러므로 두번째 수인 b의 범위는 2a/3 > b > 3a/5이다.
+
+```python
+import sys
+sys.stdin = open('input.txt','r')
+
+#첫번째 수
+F = int(input())
+#두번째 수의 범위를 list에 담고 큰 순서대로 돌려서 다음 순서들을 stack에 넣고 가장 긴 것을 출력
+second=[]
+for s in range(2*F//3,3*F//5,-1):
+    second.append(s)
+#print(second)
+#while 문을 돌면서 stack에 수들을 넣을 건데 제일 긴것을 출력
+idx,i = 0,0#넘어갈 second의 idx
+#어떤 수든지 MAX_nums와 같이 4개까지는 나오기 떄문에 초기값으로 줌
+MAX=4#길이 최댓값
+MAX_nums=[F,F,0,F]
+if second:
+    stack=[F,second[0]]
+while idx<len(second):
+    #다음 수는 앞의 두 수를 뺀 것
+    num = stack[i]-stack[i+1]
+    if num >0:
+        stack.append(num)
+        i+=1
+        continue
+    else:
+        if len(stack) > MAX:
+            MAX = len(stack)
+            MAX_nums = [*stack]
+        idx += 1
+        # print(stack,i,idx)
+        if idx == len(second):
+            break
+        stack = [F,second[idx]]
+        i=0
+print(MAX)
+print(*MAX_nums)
+```
+
+> 내가 생각한 규칙이 틀린 것 같다.
+> 완전탐색으로 다시 풀자
+> 두번째 수는 첫번째수보다 작거나 같다
+>
+> 정답!!
+
+```python
+#다시풀기.......
+#첫번째 수
+F = int(input())
+second = F
+MAX_list = []
+MAX = 0
+stack = [F,second]
+i=0
+while second >= 0:
+    num = stack[i] - stack[i+1]
+    if num >=0:
+        stack.append(num)
+        i+=1
+        continue
+    else:
+        if len(stack) > MAX:
+            MAX = len(stack)
+            MAX_list = stack
+        #다음 second로 넘어가고 초기화
+        i = 0
+        second -= 1
+        stack = [F,second]
+print(MAX)
+print(*MAX_list)
+```
+
