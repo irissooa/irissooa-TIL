@@ -251,9 +251,98 @@ for r in range(5):
 
 ```
 
+> 위처럼 풀었다가 가로, 세로, 대각선을 분리하지 않으면 중복돼서 원하는 답이 나오지 않았다.
+>
+> 그래서 빙고인지를 체크하는 함수를 만든 뒤,
+>
+>  호출한 것을 지우고 빙고가 됐는지 체크하는 함수를 여기서 돌린 뒤
+>
+> return값으로  사회자 호출(nums)의 idx를 반환하게 했다. 
 
+```python
+'''
+25개 칸 빙고
+사회자가 부르는 수 차례로 지워감
+만약 가로,세로, 대각선 줄이 다 지워진 것이 3개이상 있다면 빙고!
+사회자가 몇번쨰수를 부른 후 빙고를 외치는가
+사회자가 부른 수를 0으로 바꿈!
+for문을 돌면서 i가 같은데 다 0 이거나, j가 같은데 전부 0이거나, i==j인데 전부 0이거나, i==4-j 인데 전부0인것이
+3개이상 있다면 빙고!
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from pprint import pprint
 
-- 
+def check(arr):
+    cnt = 0
+    #가로
+    for i in range(5):
+        garo = 0
+        for j in range(5):
+            if arr[i][j] == 0:
+                garo+=1
+            else:
+                break
+        if garo == 5:
+            cnt+=1
+
+    #세로
+    for j in range(5):
+        sero = 0
+        for i in range(5):
+            if arr[i][j] == 0:
+                sero += 1
+            else:
+                break
+        if sero == 5:
+            cnt += 1
+
+    #대각선
+    r_line = 0
+    l_line = 0
+    for i in range(5):
+        for j in range(5):
+            if i == j:
+                if arr[i][j] == 0:
+                    r_line += 1
+            if i == 4-j:
+                if arr[i][j]==0:
+                    l_line += 1
+
+    if r_line == 5:
+        cnt += 1
+    if l_line == 5:
+        cnt += 1
+    if cnt >=3:
+        return True
+    else:
+        return False
+
+def BINGO(bingo):
+    idx= 0
+    while idx < 25:
+        for i in range(5):
+            for j in range(5):
+                if bingo[i][j] == nums[idx]:
+                    bingo[i][j] = 0
+                    # print(i,j)
+                    if check(bingo):
+                        return idx
+                    idx += 1
+                    # print('idx',idx)
+
+bingo = [list(map(int,input().split())) for _ in range(5)]
+nums = []
+for _ in range(5):
+    nums.extend(list(map(int,input().split())))
+
+# pprint(bingo)
+print(BINGO(bingo)+1)
+```
+
+> 선생님 풀이를 보면 가로세로 중복되는 코드는 하나로 줄이고
+>
+> 빙고 해당 수의 위치에 빙고의 좌표를 넣고 
 
 ```python
 #선생님 풀이
@@ -2616,4 +2705,8 @@ while second >= 0:
 print(MAX)
 print(*MAX_list)
 ```
+
+
+
+
 
