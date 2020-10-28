@@ -325,7 +325,7 @@ print(ans)
 
 
 
-### 11727_2xn타일링2
+### BOJ_s11727_2xn타일링2
 
 > [11727_2xn타일링2](https://www.acmicpc.net/problem/11727)
 
@@ -379,13 +379,143 @@ print(ans)
 
 
 
+### BOJ_9095_1,2,3더하기
+
+>[BOJ_9095_1,2,3더하기](https://www.acmicpc.net/problem/9095)
+
+``` python
+'''
+규칙을 살펴보자.
+1 = (1)
+2 = (1 + 1), (2)
+3 = (1 + 1 + 1), (1 + 2), (2 + 1), (3)
+4 = (1 + 1 + 1 + 1), (1 + 1 + 2), (1 + 2 + 1), (1 + 3), (2 + 1 + 1), (2 + 2), (3 + 1)
+4에서 맨처음 더해지는 숫자들 4개를 보자.
+1에 위의 3에서 더해졌던 숫자들이 더해지는것을 볼 수 있다.
+그 다음 2에 2에서 더해졌던 숫자들이 더해진다.
+3은 1에서 더해졌던 숫자들이 더해진다.
+4는
+1 + 3
+2 + 2
+3 + 1로 나타낼 수 있는데, 3의 개수, 2의 개수, 1의 개수를 다 더해주면 4의 개수가 된다.
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+#N이 1일때 1가지, 2일때 2가지 3일때 4가지, 점화식은 N >3일떄부터!
+dp = [1,2,4]
+for n in range(3,12):
+    dp.append(dp[n-1] + dp[n-2] + dp[n-3])
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    print(dp[N-1])
+
+```
 
 
 
+### BOJ_10610_30
+
+> [10610_30](https://www.acmicpc.net/problem/10610)
+
+```python
+'''
+30의 배수가 되는 가장 큰 수 조합
+1. 0을 포함해야됨
+2. 다 더했을 때 3의 배수
+3. 내림차순 정렬! 가장 큰수
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+#문자열로 받아야 따로 분리가능
+# N = sorted(input(),reverse=True)
+N = input()
+numbers = sorted(N,reverse=True)
+LEN = len(N)
+#0을 포함해야됨
+if '0' in numbers:
+    total = 0
+    result = ''
+    for i in range(LEN):
+        total += int(numbers[i])
+        # result += numbers[i]
+    if total %3 ==0:
+        # print(*numbers,sep='')
+        # print(result)
+        ans = ''.join(numbers)
+        print(ans)
+    #여기에 else를 안적어줘서 답이 계속 틀렸다고 나옴!!! 3의배수가 아닐때 값을 지정해주지 않음..
+    else:
+        print(-1)
+else:
+    print(-1)
+```
+
+- 아래와 같이 줄일수도 있음
+
+```python
+'''
+30의 배수가 되는 가장 큰 수 조합
+1. 0을 포함해야됨
+2. 다 더했을 때 3의 배수
+3. 내림차순 정렬! 가장 큰수
+'''
+
+
+#문자열로 받아야 따로 분리가능
+N = sorted(input(),reverse=True)
+LEN = len(N)
+#0을 포함해야됨
+if '0' in N:
+    total = 0
+    
+    for i in range(LEN):
+        total += int(N[i])
+    if total %3 ==0:
+        print(*N,sep='')
+    else:
+        print(-1)
+else:
+    print(-1)
+```
 
 
 
+### BOJ_11729_하노이 탑 이동순서
 
+> [BOJ_11729_하노이 탑 이동순서](https://www.acmicpc.net/problem/11729)
+
+```python
+'''
+모르겠어서 보고 풀었다ㅠㅠㅠ
+#1. n개의 원판이 있을 때, n-1개의 원판 즉, 맨 밑의 원판을 제외하고 나머지 원판을 1->2번으로 옮긴뒤
+맨 밑의 원판을 1번에서 3번으로 옮김
+#2. n-1개의 원판들을 다시 2번에서 3번으로 옮김
+
+이해는 하겠는데...넘 어렵....ㅠㅠㅠㅠㅠㅠ다시짤수있을까아아ㅏ...헣....
+'''
+def move(n,one,two,three):
+    #종료 n이 1이되면 맨 밑의 원판을 1번에서 3번으로 옮기니 one,three출력
+    if n == 1:
+        # print(n,'11',one,three,two)
+        print(one,three)
+    else:
+        #n-1(맨밑원판 제외)의 원판을 1번에서 2번으로 옮김
+        move(n-1,one,three,two)
+        print(one,three)
+        # print(n,'22',one,three,two)
+        move(n-1,two,one,three)
+
+N = int(input())
+one = [i for i in range(1,N+1)[::-1]]
+SUM = 1
+for i in range(N-1):
+    SUM = SUM*2 + 1
+print(SUM)
+move(N,1,2,3)
+```
 
 
 

@@ -35,6 +35,31 @@ for start in range(n):
 print(count) # 3
 ```
 
+- 투포인터는 시간을 줄이기 위해 하는건데 위에 풀이는 심하면 n^2이 됨! 그래서 아래와 같이 풀어야됨
+
+```python
+N, M = map(int,input().split())
+arr = list(map(int,input().split()))
+start = end = hab = ans = 0
+while True:
+    if hab == M:
+        #print(start,end)
+        ans += 1
+        
+    #end가 N에 가서도 hab이
+    if hab >= M:
+        hab -= arr[start]
+        start += 1
+    elif end == N:
+        break
+    elif hab < M:
+        hab += arr[end]
+        end += 1
+print(ans)
+```
+
+
+
 
 
 #### 2. 부분집합의 합 다른 풀이
@@ -96,7 +121,7 @@ while(True):
         break
     # 규칙 3.
     else:
-        tot += arr[startPointer ]
+        tot += arr[startPointer]
         startPointer += 1
     
     # 규칙 2)
@@ -105,6 +130,8 @@ while(True):
  
 print(ans)  # 출력결과 : 2
  ```
+
+
 
 
 
