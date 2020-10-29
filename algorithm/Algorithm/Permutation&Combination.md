@@ -24,38 +24,30 @@ print(b)
 
 ## 2. 재귀 함수
 
-### 2.1
+### 2.1 방문체크
 
 ```python
-def comb(lst,n):
-	ret = []
-	if n > len(lst): return ret
-	
-	if n == 1:
-		for i in lst:
-			ret.append([i])
-	elif n>1:
-		for i in range(len(lst)-n+1):
-			for temp in comb(lst[i+1:],n-1):
-				ret.append([lst[i]]+temp)
+arr = [1,2,3]
+N = 3
 
-	return ret
+sel = [0] * N
+visited = [0] * N
 
-def perm(lst,n):
-	ret = []
-	if n > len(lst): return ret
+def perm(idx):
+    if idx == N:
+        print(sel)
+        return
 
-	if n==1:
-		for i in lst:
-			ret.append([i])
-	elif n>1:
-		for i in range(len(lst)):
-			temp = [i for i in lst]
-			temp.remove(lst[i])
-			for p in perm(temp,n-1):
-				ret.append([lst[i]]+p)
+    for i in range(N):
+        # if visited[i]:
+        #     continue
+        if not visited[i]:
+            sel[idx] = arr[i]
+            visited[i] = 1
+            perm(idx+1)
+            visited[i] = 0
 
-	return ret
+perm(0)
 ```
 
 
@@ -249,7 +241,50 @@ for i in range(0,(1<<n)): # 1<<n : 부분집합의 개수
 
 
 
-### 
+### 순열 비트마스크
+
+```python
+arr = [1, 2, 3]
+N = 3
+
+sel = [0] * N
+
+
+def perm(idx, check):
+    if idx == N:
+        print(sel)
+        return
+
+    for i in range(N):
+        if (check & (1 << i)) != 0:
+            continue
+
+        sel[idx] = arr[i]
+        perm(idx + 1, check | (1 << i))
+
+
+perm(0, 0)
+```
+
+
+
+```python
+#순열을 비트마스크로 풀어보쟈...
+def perm(idx,check):
+    global idx_list
+    if idx == N:
+        #idx담아주기, 그냥 p를 넣으면 얕은복사로 이전에 들어있던 원소들도 모두 바뀌기 때문에 깊은복사인 인덱싱으로 넣어줌
+        ans = p[:]
+        idx_list.append(ans)
+        return
+    for i in range(N-1):
+        if check & (1<<i) != 0:
+            continue
+        p[idx] = cost_idx[i]
+        perm(idx+1,check|(1<<i))
+```
+
+
 
 
 
@@ -299,6 +334,30 @@ def dfs_perm(lst,n):
 					ret.append(element)
 				else:
 					stack.append(temp)
+```
+
+
+
+## 5. swap
+
+### 순열 swap
+
+```python
+arr = [1,2,3]
+N = 3
+
+def perm(idx):
+
+    if idx == N:
+        print(arr)
+        return
+
+    for i in range(idx, N):
+        arr[idx], arr[i] = arr[i], arr[idx]
+        perm(idx+1)
+        arr[idx], arr[i] = arr[i], arr[idx]
+
+perm(0)
 ```
 
 
