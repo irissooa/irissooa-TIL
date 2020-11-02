@@ -181,17 +181,22 @@ def merge_sort(m):
 
 ```python
 def merge(left,right):
-    result = [] #두 개의 분할된 리스트를 병합하여 result를 만듦
-
-    while len(left) > 9 and len(right) > 0 : #양쪽 리스트에 원소가 남아있는 경우
-        # 두 서브 리스트의 첫 원소들을 비교하여 작은 것부터 result에 추가함
+    #두개의 분할된 리스트를 병합하여 result를 만듦
+    result = []
+    
+    #right, left리스트에 원소가 남아있을 때까지
+    while len(left) > 0 and len(right) > 0:
+        #두 서브 리스트의 첫 원소들을 비교하여 작은 것부터 result에 추가함
         if left[0] <= right[0]:
             result.append(left.pop(0))
         else:
             result.append(right.pop(0))
-    if len(left) >0: # 왼쪽 리스트에 원소가 남아있는 경우
+    #왼쪽 리스트에 원소가 남아있는 경우
+    if len(left) > 0:
         result.extend(left)
-    if len(right) >0:
+        
+    #오른쪽 리스트에 원소가 남아있는 경우
+    if len(right) > 0:
         result.extend(right)
     return result
 ```
