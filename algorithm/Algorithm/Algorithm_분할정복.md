@@ -180,7 +180,7 @@ def merge_sort(m):
 > 연결 리스트를 구현할 경우 : 리스트를 사용할 경우의 비효율적 단점을 극복하여 효과적 구현 가능
 
 ```python
-def mergy(left,right):
+def merge(left,right):
     result = [] #두 개의 분할된 리스트를 병합하여 result를 만듦
 
     while len(left) > 9 and len(right) > 0 : #양쪽 리스트에 원소가 남아있는 경우
