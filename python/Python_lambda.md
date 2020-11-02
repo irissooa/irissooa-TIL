@@ -58,6 +58,10 @@ list(map(lambda x,y:x+y, in1, in2))
 p=[[*map(lambda x:x*.01,map(int,input().split()))]for _ in range(n)]
 ```
 
+```python
+p=[list(map(lambda x:int(x)/100,input().split())) for _ in range(N)]
+```
+
 
 
 
