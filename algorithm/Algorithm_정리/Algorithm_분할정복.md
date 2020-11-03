@@ -779,6 +779,339 @@ def binarySearch2(a,low,high,key):
 
 
 
+### 7. 최근접 점의 쌍 구하기(Closest Fair)
+
+>2차원 평면상의 n개의 점이 입력으로 주어질 때, 거리가 가장 가까운 한 쌍의 점을 찾는 문제
+
+```sh
+ClosestPair(S)
+입력: x-좌표의 오름차순으로 정렬된 배열 S에는 i개의 점 (단, 각 점은 (x,y)로
+표현된다.)
+출력: S에 있는 점들 중 최근접 점의 쌍의 거리
+1. if (i ≤ 3) return (2 또는 3개의 점들 사이의 최근접 쌍)
+2. 정렬된 S를 같은 크기의 SL과 SR로 분할한다. |S|가 홀수이면, |SL| = |SR|+1이 되도록 분할한다.
+3. CPL = ClosestPair(SL) // CPL은 SL에서의 최근접 점의 쌍
+4. CPR = ClosestPair(SR) // CPR은 SR에서의 최근접 점의 쌍
+5. d = min{dist(CPL), dist(CPR)}일 때, 중간 영역에 속하는 점들 중에서 최근접 점의 쌍을 찾아서 이를 CPC라고 하자. 단, dist()는 두 점 사이의 거리
+이다.
+6. return (CPL, CPC, CPR) 중에서 거리가 가장 짧은 쌍
+```
+
+**#1.**
+
+S에 있는 점의 수가 3개 이하이면 더 이상 분할하지 않는다. S에 2개의 점이 있으면 S를 그대로 리턴하고, 3개의 점이 있으면 3개의 쌍에 대하여 최근접 점 의 쌍을 리턴한다. 
+
+**#2.**
+
+x-좌표로 정렬된 S를 왼쪽과 오른쪽에 같은 개수의 점을 가지는 SL과 SR로 분할한다. 만일 S의 점의 수가 홀수이면 SL쪽에 1개 많게 분할
+
+![image-20201103231551015](Algorithm_분할정복.assets/image-20201103231551015.png)
+
+**#3~4.**
+
+분할된 SL과 SR에 대해서 재귀적으로 최근접 점의 쌍을 찾아서 각각을 CPL과 CPR이라고 놓는다
+
+**#5.**
+
+d를 이용하여 중간 영역에 속하는 점들을 찾고, 이 점들 중에서 최근접 점의 쌍을 찾아서 이를 CPC라 고 놓는다. 
+
+![image-20201103231215453](Algorithm_분할정복.assets/image-20201103231215453.png)
+
+**#6.**
+
+**#3~4.**에서 찾은 최근접 점의 쌍 CPL과 CPR과 **#5.**에서 찾은 CPC 중에서 가장 짧은 거리를 가진 쌍을 해로서 리턴
+
+#### 시간복잡도
+
+O(nlog2n)
+
+![image-20201103231940897](Algorithm_분할정복.assets/image-20201103231940897.png)
+
+#### Closet Pair algorithm
+
+**1)** 정렬 된 배열에서 중간 지점을 찾는다. *P [n / 2]* 를 중간 지점으로 사용할 수 있다.
+
+**2)** 주어진 배열을 두 개의 반으로 나눈다. 첫 번째 부분 배열은 P [0]에서 P [n / 2]까지의 점을 포함한다. 두 번째 부분 배열은 P [n / 2 + 1]에서 P [n-1]까지의 점을 포함한다.
+
+**3)** 두 하위 배열에서 가장 작은 거리를 재귀적으로 찾는다. 거리를 dl과 dr로 표시하고. dl과 dr의 최소값을 찾는다. 최소값 d
+
+![image-20201103232558257](Algorithm_분할정복.assets/image-20201103232558257.png)
+
+**4)** 위의 3 단계에서 최소 거리의 상한 d가 있다. 쌍의 한 점이 왼쪽 절반에 있고 다른 점이 오른쪽 절반에 있도록 쌍을 고려해야한다. P [n / 2]를 통과하는 수직선을 고려하고 x 좌표가 중간 수직선에 d보다 가까운 모든 점을 찾는다. 이러한 모든 지점의 배열 strip []을 만든다.
+
+![image-20201103232615022](Algorithm_분할정복.assets/image-20201103232615022.png)
+
+**5)** y 좌표에 따라 배열 strip []을 정렬한다. 이 단계는 `O (nLogn)`다. 재귀적으로 정렬하고 병합하여 O (n)에 최적화 할 수 있다.
+
+**6)** strip []에서 가장 작은 거리를 찾는다. 처음 보면 `O (n ^ 2)` 단계 인 것 같지만 실제로는` O (n)`다. 스트립의 모든 지점에 대해 최대 7 개 지점만 확인하면된다는 기하학적으로 증명할 수 있다 (스트립은 Y 좌표에 따라 정렬된다).
+
+**7)** 마지막으로 위 단계에서 계산 된 d와 거리의 최소값을 반환한다 (6 단계).
+
+
+
+```python
+import math 
+import copy 
+# A class to represent a Point in 2D plane 
+#좌표를 나타냄
+class Point(): 
+    def __init__(self, x, y): 
+        self.x = x 
+        self.y = y 
+  
+# A utility function to find the  
+# distance between two points  
+#두점에서 거리를 구하는 함수
+def dist(p1, p2): 
+    return math.sqrt((p1.x - p2.x) * 
+                     (p1.x - p2.x) +
+                     (p1.y - p2.y) * 
+                     (p1.y - p2.y))  
+  
+# A Brute Force method to return the  
+# smallest distance between two points  
+# in P[] of size n 
+#두 포인트 사이의 가장 짧은 지점을 보여줌
+def bruteForce(P, n): 
+    #min초기값으로 최대값으로 줌
+    min_val = float('inf')  
+    for i in range(n): 
+        for j in range(i + 1, n): 
+            #P[i]와 P[j]사이 거리가 최소보다 작다면 갱신!
+            if dist(P[i], P[j]) < min_val: 
+                min_val = dist(P[i], P[j]) 
+  
+    return min_val 
+  
+# A utility function to find the  
+# distance beween the closest points of  
+# strip of given size. All points in  
+# strip[] are sorted accordint to  
+# y coordinate. They all have an upper  
+# bound on minimum distance as d.  
+# Note that this method seems to be  
+# a O(n^2) method, but it's a O(n)  
+# method as the inner loop runs at most 6 times 
+'''
+주어진 크기의 스트립에서 가장 가까운 지점 사이의 거리를 찾는 함수. strip []의 모든 점은 y 좌표에 따라 정렬. 모두 최소 거리에 대한 상한을 d로 가지고 있다. 이 메서드는 O (n ^ 2) 메서드처럼 보이지만 내부 루프가 최대 6 번 실행되므로 O (n) 메서드다.
+'''
+def stripClosest(strip, size, d): 
+      
+    # Initialize the minimum distance as d  
+    #초기 최소거리
+    min_val = d  
+  
+     
+    # Pick all points one by one and  
+    # try the next points till the difference  
+    # between y coordinates is smaller than d.  
+    # This is a proven fact that this loop 
+    # runs at most 6 times  
+    '''
+    모든 점을 하나씩 선택하고 y 좌표의 차이가 d보다 작을 때까지!
+    '''
+    for i in range(size): 
+        j = i + 1
+        while j < size and (strip[j].y - 
+                            strip[i].y) < min_val: 
+            min_val = dist(strip[i], strip[j]) 
+            j += 1
+  
+    return min_val  
+  
+# A recursive function to find the  
+# smallest distance. The array P contains  
+# all points sorted according to x coordinate 
+'''
+가장짧은 거리를 찾기위한 재귀함수
+배열 P는 x 좌표에 따라 정렬 된 모든 점을 포함
+'''
+def closestUtil(P, Q, n): 
+      
+    # If there are 2 or 3 points,  
+    # then use brute force  
+    #n이 3이하면 bruteForce
+    if n <= 3:  
+        return bruteForce(P, n)  
+  
+    # Find the middle point  
+    #중간지점찾기
+    mid = n // 2
+    midPoint = P[mid] 
+  
+    # Consider the vertical line passing  
+    # through the middle point calculate  
+    # the smallest distance dl on left  
+    # of middle point and dr on right side  
+    '''
+    중간 지점을 통과하는 수직선을 고려하여 중간 지점의 왼쪽에서 가장 작은 거리 dl을 계산하고
+    오른쪽에서 dr을 계산
+    '''
+    dl = closestUtil(P[:mid], Q, mid) 
+    dr = closestUtil(P[mid:], Q, n - mid)  
+  
+    # Find the smaller of two distances  
+    #dl과 dr중 작은 값 찾기
+    d = min(dl, dr) 
+  
+    # Build an array strip[] that contains  
+    # points close (closer than d)  
+    # to the line passing through the middle point 
+    '''
+    중간 지점을 통과하는 선에 가까운 (d보다 더 가까운) 지점을 포함하는 배열 스트립 []을 만듦
+    '''
+    strip = []  
+    for i in range(n):  
+        if abs(Q[i].x - midPoint.x) < d:  
+            strip.append(Q[i]) 
+  
+    # Find the closest points in strip.  
+    # Return the minimum of d and closest  
+    # distance is strip[]  
+    '''
+    스트립에서 가장 가까운 지점을 찾음. d의 최소값을 반환하고 가장 가까운 거리는 strip []
+    '''
+    return min(d, stripClosest(strip, len(strip), d)) 
+  
+# The main function that finds 
+# the smallest distance.  
+# This method mainly uses closestUtil() 
+def closest(P, n): 
+    P.sort(key = lambda point: point.x) 
+    Q = copy.deepcopy(P) 
+    Q.sort(key = lambda point: point.y)     
+  
+    # Use recursive function closestUtil()  
+    # to find the smallest distance  
+    #가장짧은 거리를 찾기위해 재귀함수 사용
+    return closestUtil(P, Q, n) 
+  
+# Driver code 
+P = [Point(2, 3), Point(12, 30), 
+     Point(40, 50), Point(5, 1),  
+     Point(12, 10), Point(3, 4)] 
+n = len(P)  
+print("The smallest distance is",  
+                   closest(P, n)) 
+ 
+```
+
+
+
+- 다른 방법
+
+```python
+def find_closest_brute_force(array):
+    
+    result = {}
+    result["p1"] = array[0]
+    result["p2"] = array[1]
+    result["distance"] = np.sqrt((array[0][0]-array[1][0])**2
+                                +(array[0][1]-array[1][1])**2)
+    
+    for i in range(len(array)-1):
+        for j in range(i+1, len(array)):
+            distance = np.sqrt((array[i][0]-array[j][0])**2
+                              +(array[i][1]-array[j][1])**2)
+            if distance < result["distance"]:
+                result["p1"] = array[i]
+                result["p2"] = array[j]
+                result["distance"] = distance
+    return result
+return result
+
+
+def merge_sort(array, coordinate=0):
+    
+    length = len(array)
+    if length == 1:
+        return array
+    if length == 2:
+        if array[0][coordinate] > array[1][coordinate]:
+            return np.array([array[1], array[0]])
+        else:
+            return array
+    
+    elif length > 2:
+        array_l = array[:length//2]
+        array_r = array[length//2:]
+        array_l_sorted = merge_sort(array_l, coordinate)
+        array_r_sorted = merge_sort(array_r, coordinate)
+        
+        l_length = len(array_l)
+        r_length = len(array_r)
+        l = 0
+        r = 0
+        
+        sorted_list = []
+        
+        for i in range(length):
+            if r == r_length:
+                sorted_list.append(array_l_sorted[l])
+                l += 1
+            elif l == l_length:
+                sorted_list.append(array_r_sorted[r])
+                r += 1             
+                
+            elif array_l_sorted[l][coordinate] > array_r_sorted[r][coordinate]:
+                sorted_list.append(array_r_sorted[r])
+                r += 1
+                
+            elif array_l_sorted[l][coordinate] < array_r_sorted[r][coordinate]:
+                sorted_list.append(array_l_sorted[l])
+                l += 1
+        
+        return np.array(sorted_list)
+    
+    
+def find_closest_nest(array):
+    X = merge_sort(array, 0)
+    length = len(X)
+    if length < 4:
+        return find_closest_brute_force(array)
+    
+    else:
+        array_l = X[:length//2]
+        array_r = X[length//2:]
+        dict_l = find_closest_nest(array_l)
+        dict_r = find_closest_nest(array_r)
+                    
+        if dict_l["distance"] > dict_r["distance"]:
+            dict_both = dict_r
+        else:
+            dict_both = dict_l
+          
+        Y_list = []
+        for i in range(length):
+            if X[length//2-1][0]-dict_both["distance"] < array[i][0] < X[length//2-1][0]+dict_both["distance"]:
+                Y_list.append(array[i])
+        Y = merge_sort(np.array(Y_list), 1)
+      
+        
+        if len(Y) == 1:
+            dict_final = dict_both
+        elif len(Y) < 8:
+            dict_y = find_closest_brute_force(Y)
+            if dict_both["distance"] > dict_y["distance"]:
+                dict_final = dict_y
+            else:
+                dict_final = dict_both            
+        else:
+            for i in range(len(Y)-7):
+                dict_y = find_closest_brute_force(Y[i:i+7])        
+                
+                if dict_both["distance"] > dict_y["distance"]:
+                    dict_final = dict_y
+                else:
+                    dict_final = dict_both
+    
+        return dict_final
+```
+
+
+
+
+
 
 
 

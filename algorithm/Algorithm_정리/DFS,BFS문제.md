@@ -934,3 +934,52 @@ for i in sorted(result):
 
 ```
 
+
+
+## SWEA_5208_전기버스2
+
+> [SWEA_5208_전기버스2](https://swexpertacademy.com/main/learn/course/lectureProblemViewer.do#none)
+
+```python
+'''
+출발지에서의 배터리 장착은 교환횟수에서 제외
+앞에서부터 보면서 bfs돌림?
+battery에서 해당 idx에 idx값만큼 갈수 있는 곳을 인접리스트에 담음
+그리고 bfs돌리며 dist최솟값....ㅎ
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def BFS(node):
+    q = [node]
+
+    while q:
+        p = q.pop(0)
+        for i in linked[p]:
+            if i == N:
+                return
+            if dist[i]:
+                continue
+            dist[i] = dist[p] +1
+            q.append(i)
+
+
+
+T = int(input())
+for tc in range(1,T+1):
+    #정류장 수 N,N-1개의 정류장 별 배터리 용량
+    info = list(map(int,input().split()))
+    N = info[0]
+    #종점은 배터리가 없음
+    battery = info[1:]+[0]
+    # print('b',battery)
+    linked = [[] for _ in range(N)]
+    for i in range(N):
+        linked[i].extend(list(x for x in range(i+1,i+battery[i]+1)))
+    # print(linked)
+    dist = [0 for _ in range(N)]
+    BFS(0)
+    #출발점은 cnt안세줄것이기 때문
+    print('#{} {}'.format(tc,dist[N-1]-1))
+```
+
