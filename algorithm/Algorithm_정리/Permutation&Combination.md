@@ -362,6 +362,64 @@ perm(0)
 
 
 
+## 관련문제
+
+### SWEA_1865_동철이의일분배
+
+> 1. 재귀를 이용해서 순열 만듦
+> 2. 비트마스크를 이용해서 순열 만듦
+>
+> -> 가지치기 필요!! 퍼센트는 곱하면 작아지기만 하기때문에 지금까지의 percent값이 MAX보다 작으면 더 커질수가 없음
+
+```python
+import sys
+sys.stdin = open('input.txt','r')
+#재귀이용한 순열 구하기
+def perm(idx,percent):
+    global MAX
+    if percent <= MAX:
+        return
+    if idx == N:
+        # print(sel,percent)
+        if MAX < percent:
+            MAX = percent
+        return
+    for i in range(N):
+        if not sel[i]:
+            sel[i] = 1
+            perm(idx+1,percent*works[idx][i])
+            sel[i] = 0
+
+#비트마스크를 이용한 순열구하기
+def perm_bit(idx,check,percent):
+    global MAX
+    if percent <= MAX:
+        return
+
+    if idx == N:
+        if percent > MAX:
+            MAX = percent
+
+        return
+    for i in range(N):
+        if (check & (1<<i))!= 0:
+            continue
+        sel[idx] = True
+        perm_bit(idx+1,check|(1<<i),percent*works[idx][i])
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    works = [list(map(lambda x:int(x)/100,input().split())) for _ in range(N)]
+    sel = [0]*N
+    MAX = -1
+    # perm(0,1)
+    perm_bit(0,0,1)
+    result = MAX*100
+    print('#{}'.format(tc),end=' ')
+    print('{0:0.6f}'.format(result))
+```
+
 
 
 ## Reference

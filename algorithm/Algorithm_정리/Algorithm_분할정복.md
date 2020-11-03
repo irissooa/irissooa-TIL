@@ -451,12 +451,13 @@ Fn = Fn-1 + Fn-2(n>1)
 #### 퀵소트 알고리즘
 
 ```python
-# A : 리스트 left : 시작 인덱스, right : 끝 인덱스
-def quickSort(A,left,right):
-    if left<right:
-        s=partition(A,left,right) # quickSort 함수는 partition 함수를 호출한다
-        quickSort(A,left,s-1) #피봇보다 작은 그룹
-        quickSorkt(A,s+1,right) #피봇보다 큰 그룹
+#list, 시작idx,끝idx
+def quicksort(A,left,right):
+    if left < right:
+        pivot = hoare_partition(A,left,right)
+        #pivot = lomuto_partition(A,left,right)
+        quicksort(A,left,pivot-1)
+        quicksort(A,pivot+1,right)
 ```
 
 
@@ -482,30 +483,66 @@ def quickSort(A,left,right):
 - Hoare-Partition 알고리즘
 
 ```python
-def partition(A,l,r):
-    p = A[l]
-    i = l+1
-    j =r
-    while i<=j:
-        while(i<=j and A[i]<= p): i+=1
-        while(i<=j and A[j]>=p): j-=1
-        if i<=j:
-            A[i],A[j] = A[j],A[i]
-    A[l],A[j] = A[j],A[l]
+def hoare_partition(A,left,right):
+    pivot = A[left]
+    #여기서 i = left+1를 했더니 틀렸다! 왜지?????
+    i = left
+    j = right
+
+    while i <= j:
+        #피봇보다 큰게 나올때까지
+        while (i <= j and A[i] <= pivot):
+            i += 1
+
+        #피봇보다 작은게 나올때까지
+        while (i <= j and A[j] >= pivot):
+            j -= 1
+
+        #i,j가 역전되지 않았으면, 피봇보다 큰값이랑 작은값 swap(뒤에 있는 작은값이앞으로옴)
+        
+        if i < j:
+            A[i], A[j] = A[j],A[i]
+
+    #i,j가 역전됐으면 피봇이랑 j(피봇보다 작은값) 바꿔주기(피봇은 값이니까 배열인 A[left]라고 씀)
+    A[left],A[j] = A[j],A[left]
     return j
 ```
 
-1. 배열 A와 왼쪽끝인 l 오른쪽 끝인 r을 인수로 받는다.
+```python
+def quick_sort(l,r):
+    pivot = nums[l]
+    i = l+1
+    j = r
 
+    while i<=j:
+        while i <= j and nums[i] <= pivot: i+=1
+        while i <= j and nums[j] >= pivot: j-=1
+        if i < j: nums[i],nums[j] = nums[j],nums[i]
+    nums[l],nums[j] = nums[j],nums[l]
+
+    if l < j-1:quick_sort(l,j-1)
+    if j+1 < r:quick_sort(j+1,r)
+
+
+for t in range(1,int(input())+1):
+    N = int(input())
+    nums = list(map(int,input().split()))
+    quick_sort(0,len(nums)-1)
+    print("#{} {}".format(t,nums[len(nums)//2]))
+```
+
+
+
+1. 배열 A와 왼쪽끝인 l 오른쪽 끝인 r을 인수로 받는다.
 2. 배열 피봇 p를 배열 A의 맨앞 인덱스로 둔다
 
 ![image-20201102201204645](Algorithm_분할정복.assets/image-20201102201204645.png)
 
 3. i는 왼쪽부터 피봇과 비교해서 크기를 확인하는 화살표의 위치이고 
 
-4. j는 오른쪽 끝부터 피봇과 비교해서 크가를 확인하는 화살표의 위치이다
+4. j는 오른쪽 끝부터 피봇과 비교해서 크기를 확인하는 화살표의 위치이다
 
-5. i=피봇이 l이니 그 다음인 l+1 저장 j는 오른쪽 끝을 저장한다.
+5. i=피봇이 l이니 l 저장 j는 오른쪽 끝을 저장한다.
 
 6. 만약 i에 있는 값이 j보단 작고 피봇보다 작으면 화살표를 오른쪽으로 옮긴다. ( 피봇왼쪽에 있는게 피봇보다 작으니 옮길 필요가 없음)
 
@@ -526,7 +563,7 @@ def partition(A,l,r):
 
 
 
-#### 로무토 파티션
+#### Lomuto 파티션
 
 >  Hoare 방식과 가장 큰 차이점은 i와 j가 모두 증가하는 방식이라는 것이다.
 >
@@ -535,22 +572,25 @@ def partition(A,l,r):
 > '2)' 과정을 거친 피봇 값은 다음 정렬 과정에서 제외되며, 피봇 값이 위치한 곳은 정렬된 상태일 때 자기가 있어야 할 위치에 놓임
 
 ```python
-def partition(A, l, r):
-    x = A[r]
-    i = l - 1
-    for j in range(l, r):
-        if A[j] <= x:
+def lomuto_partition(A,left,right):
+    pivot = A[right]
+    i = left-1
+    for j in range(left,right):
+        #A[j]보다 pivot이 작을때 i값 +1을 늘려주고
+        if A[j] <= pivot:
             i += 1
-            A[i], A[j] = A[j], A[i]
-    A[i+1], A[r] = A[r], A[i+1]
-    return i + 1
+            #피봇보다 작은값들이 있는곳으로 옮김
+            A[i],A[j] = A[j],A[i]
+    #j가 피봇 전까지 다 돌고난 뒤, 피봇보다 큰값이 있는곳과 피봇을 바꿈
+    A[i+1],A[right] = A[right],A[i+1]
+    return i+1
 ```
 
 - i와 j 두개의 변수를 사용하며 i와 j가 모두 증가하면서 작업 수행한다.
 
 ![image-20201102202545532](Algorithm_분할정복.assets/image-20201102202545532.png)![image-20201102202554067](Algorithm_분할정복.assets/image-20201102202554067.png)
 
-
+![image-20201103143751107](Algorithm_분할정복.assets/image-20201103143751107.png)
 
 #### Hoare vs Lomuto 비교
 
@@ -660,6 +700,8 @@ k 번째 작은 수가 Large group에 속한 경 우이므로 Selection(A, p+1, 
 
 ### 6. 이진검색
 
+> **정렬한 리스트!!를 검색해야됨**
+
 #### 이진 검색의 검색 과정
 
 1. 자료의 중앙에 있는 원소를 고른다.
@@ -683,14 +725,14 @@ k 번째 작은 수가 Large group에 속한 경 우이므로 Selection(A, p+1, 
 #### 이진검색 알고리즘
 
 ```python
-# a : 검색할 리스트
+# a : 검색할 리스트(오름차순 정렬된 리스트!!!!)
 # key : 검색하고자 하는 값
 
 def binarySearch(a,key):
     start = 0
     end = len(a)-1
     while start <=end:
-        middle = start + (end-start)//2
+        middle = (start + end) // 2
         if key== a[middle]: # 검색 성공
             return middle
         elif key < a[middle]:
