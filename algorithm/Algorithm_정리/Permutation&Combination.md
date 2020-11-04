@@ -291,49 +291,39 @@ def perm(idx,check):
 ## 4. DFS/BFS
 
 ```python
-def dfs_comb(lst,n):
-	ret = []
-	idx = [i for i in range(len(lst))]
+def combination(idx,sidx):
+    if sidx == 7:
+        if sum(R) == 100:
+            for i in sorted(R):
+                print(i)
+            #exit()
+            return
+        return
+    if idx == N:
+        return
+    R[sidx] = height[idx]
+    combination(idx+1,sidx+1)
+    combination(idx+1,sidx)
 
-	stack  = []
-	for i in idx[:len(lst)-n+1]:
-		stack.append([i])
-	
-	while len(stack)!=0:
-		cur = stack.pop()
+height = []
+for t in range(9):
+    height.append(int(input()))
+# print(height)
+N = 9
+R = [0]*7
+combination(0,0)
 
-		for i in range(cur[-1]+1,len(lst)-n+1+len(cur)):
-			temp=cur+[i]
-			if len(temp)==n:
-				element = []
-				for i in temp:
-					element.append(lst[i])
-				ret.append(element)
-			else:
-				stack.append(temp)
-	return ret
-
-def dfs_perm(lst,n):
-	ret = []
-	idx = [i for i in range(len(lst))]
-
-	stack  = []
-	for i in idx:
-		stack.append([i])
-	
-	while len(stack)!=0:
-		cur = stack.pop()
-
-		for i in idx:
-			if i not in cur:
-				temp=cur+[i]
-				if len(temp)==n: 
-					element = []
-					for i in temp:
-						element.append(lst[i])
-					ret.append(element)
-				else:
-					stack.append(temp)
+###################################################
+def perm(idx):
+    if idx == N:
+        print(sel)
+        return
+    for i in range(N):
+        if check[i]:
+            continue
+        check[i] = 1
+        perm(idx+1)
+        check[i]=0
 ```
 
 
@@ -419,6 +409,64 @@ for tc in range(1,T+1):
     print('#{}'.format(tc),end=' ')
     print('{0:0.6f}'.format(result))
 ```
+
+
+
+### SWEA_1247_최적경로
+
+```python
+import sys
+sys.stdin = open('input.txt','r')
+
+
+#좌표를 나타냄
+class Point():
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+#두 점에서 거리를 구하는 함수
+def dist(p1,p2):
+    return abs(p1.x - p2.x)+abs(p1.y-p2.y)
+
+def perm(idx,total,postposition):
+    global MIN
+    if total > MIN:
+        return
+    if idx == N:
+        # print(check)
+        total += dist(postposition,home)
+        if total < MIN:
+            MIN = total
+        return
+    for i in range(N):
+        if check[i]:
+            continue
+        check[i] = 1
+        perm(idx+1,total+dist(postposition,client[i]),client[i])
+        check[i]=0
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    #회사좌표, 집의 좌표, N명의 고객의 좌표
+    info = list(map(int,input().split()))
+    # print(info)
+    position = []
+    for i in range(0,len(info),2):
+        position.append(Point(info[i],info[i+1]))
+    start = position[0]
+    home = position[1]
+    client = position[2:]
+    check = [0] * N
+    MIN = 987654321
+    # for i in range(N):
+    perm(0,0,start)
+        # print(MIN)
+    print('#{} {}'.format(tc,MIN))
+```
+
+
 
 
 
