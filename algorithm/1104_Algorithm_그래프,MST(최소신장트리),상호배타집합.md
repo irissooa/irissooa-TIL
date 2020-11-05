@@ -539,13 +539,168 @@ MST_PRIM(G,r) //G:그래프,r:시작정점
 - 주 반복문이 정점의 수 n만큼 반복하고, 내부 반복문이 n번 반복
 
   - Prim의 알고리즘의 시간 복잡도는 O(n^2)이 된다.
-
 - Kruskal 알고리즘의 시간복잡도는 O(elog2e)이므로
 
   - 그래프 내에 적은 숫자의 간선만을 가지는 'Sparse Graph'의 경우 Kruskal 알고리즘이 적합
   - 그래프에 간선이 많은 'Dense Graph'의 경우는 Prime 알고리즘이 적합
 
-  
+
+##### heapq라이프러리 활용을 통해 우선순위큐사용하기
+
+```python
+import heapq
+
+queue = []
+graph_data = [[2,'A'],[5,'B'],[3,'C']]
+
+for edge in graph_data:
+    heapq.heappush(queue,edge)
+
+for index in range(len(queue)):
+    print(heapq.heappop(queue))
+    
+print(queue)
+
+'''
+[2,'A']
+[3,'C']
+[5,'B']
+'''
+```
+
+##### collections라이브러리의 defaultdict함수 활용
+
+> defaultdict함수를 사용해서 key에 대한 value를 지정하지 않았을 시, 빈 리스트로 초기화
+
+```python
+from collections import defaultdict
+
+list_dict = defaultdict(list)
+print(list_dict)
+print(['key1'])
+
+'''
+defaultdict(<class 'list'>, {})
+[]
+'''
+```
+
+##### prim 알고리즘 코드
+
+1. 모든 간선 정보를 저장(adjacent_edges)
+2. 임의의 정점을 선택, '연결된 노드 집합(connected_nodes)'에 삽입
+3. 선택된 정점에 연결된 간선들을 간선 리스트(candidate_edge_list)에 삽입
+4. 간선 리스트에서 최소 가중치를 가지는 간선부터 추출해서,
+   - 해당 간선에 연결된 인접 정점이 '연결된 노드 집합'에 이미 들어있다면, 스킵함(cycle발생을 막기 위함)
+   - 해당 간선에 연결된 인접 정점이 '연결된 노드 집합'에 들어 있지 않으면, 해당 간선을 선택하고, 해당 간선 정보를 '최소신장트리(MST)'에 삽입
+     - 해당 간선에 연결된 인접 정점의 간선들 중, '연결된 노드 집합'에 없는 노드와 연결된 간선리스트에 삽입
+       - '연결된 노드 집합'에 있는 노드와 연결된 간선들을 간선 리스트에 삽입해도, 해당 간선은 스킵될 것이기 때문
+       - 어차피 스킵될 간선을 간선리스트에 넣지 않아서, 간선 리스트에서 최소 가중치를 가지는 간선부터 추출하기 위한 자료 구조 유지를 위한 effort를 줄일 수 있음
+5.  선택된 간선은 간선 리스트에서 제거
+6. 간선 리스트에 더 이상의 간선이 없을때까지 3~4번을 반복
+
+```python
+from collections import defaultdict
+from heapq import *
+
+
+def prim(start_node, edges):
+    mst = list()
+    adjacent_edges = defaultdict(list)
+    for weight, n1, n2 in edges:
+        adjacent_edges[n1].append((weight, n1, n2))
+        adjacent_edges[n2].append((weight, n2, n1))
+
+    connected_nodes = set(start_node)
+    candidate_edge_list = adjacent_edges[start_node]
+    heapify(candidate_edge_list)
+
+    while candidate_edge_list:
+        weight, n1, n2 = heappop(candidate_edge_list)
+        if n2 not in connected_nodes:
+            connected_nodes.add(n2)
+            mst.append((weight, n1, n2))
+
+            for edge in adjacent_edges[n2]:
+                if edge[2] not in connected_nodes:
+                    heappush(candidate_edge_list, edge)
+    return mst
+
+
+myedges = [
+    (7, 'A', 'B'), (5, 'A', 'D'),
+    (8, 'B', 'C'), (9, 'B', 'D'), (7, 'B', 'E'),
+    (5, 'C', 'E'),
+    (7, 'D', 'E'), (6, 'D', 'F'),
+    (8, 'E', 'F'), (9, 'E', 'G'),
+    (11, 'F', 'G')
+]
+
+print(prim('A',myedges))
+
+'''
+[(5, 'A', 'D'), (6, 'D', 'F'), (7, 'A', 'B'), (7, 'B', 'E'), (5, 'E', 'C'), (9, 'E', 'G')]
+'''
+```
+
+##### 개선된 프림 알고리즘
+
+> 근데 이건 heapdict깔아야돼서.....안됨...ㅎ
+
+- 간선이 아닌 노드를 중심으로 우선순위 큐를 적용하는 방식
+  - 초기화-정점:key 구조를 만들어놓고, 특정 정점의 key값은 0, 이외의 정점들의 key값은 무한대로 놓음. 모든 정점:key 값은 우선순위 큐에 넣음
+  - 가장 key값이 적은 정점:key를 추출한 후(pop하므로 해당 정점:key 정보는 우선순위 큐에서 삭제됨),(extract min 로직이라고 부름)
+  - 해당 정점의 인접한 정점들에 대해 key값과 연결된 가중치 값을 비교하여 key값이 작으면 해당 정점:key값을 갱신
+    - 정점:key값 갱신시, 우선순위 큐는 최소 key값을 가지는 정점:key를 루트노드로 올려놓도록 재구성함(decrease key로직이라고 부름)
+- 개선된 프림 알고리즘 구현시 고려 사항
+  - 우선순위 큐(최소힙)구조에서, 이미 들어가 있는 데이터의 값 변경시, 최소값을 가지는 데이터를 루트노드로 올려놓도록 재구성하는 기능이 필요함
+  - 구현 복잡도를 줄이기 위해, heapdict 라이브러리를 통해, 해당 기능을 간단히 구현
+
+```python
+from heapdict import heapdict
+
+
+def prim(graph,start):
+    mst,keys,pi,total_weight = list(),heapdict(),dict(),0
+    
+    for node in graph.keys():
+        keys[node] = float('inf')
+        pi[node] = None
+    keys[start],pi[start] = 0,start
+    
+    while keys:
+        current_node,current_key = keys.popitem()
+        mst.append([pi[current_node],current_node,current_key])
+        total_weight += current_key
+        for adjacent,weight in mygraph[current_node].items():
+            if adjacent in keys and weight < keys[adjacent]:
+                keys[adjacent] = weight
+                pi[adjacent] = current_node
+    return mst,total_weight
+    
+
+
+myedges = {
+    'A' : {'B':7,'D':5},
+    'B' : {'A':7,'D':9,'C':8,'E':7},
+    'C':{'B':8,'E':5},
+    'D' : {'A':5,'B':9,'E':7,'F':6},
+    'E':{'B':7,'C':5,'D':7,'F':8,'G':9},
+    'F':{'D':6,'E':8,'G':11},
+    'G':{'E':9,'F':11}
+}
+mst,total_weight = prim(mygraph,'A')
+print('MST:',mst)
+print('Total Weight:',total_weight)
+    
+
+'''
+MST: [['A', 'A', 0], ['A', 'D', 5], ['D', 'F', 6], ['A', 'B', 7], ['D', 'E', 7], ['E', 'C', 5], ['E', 'G', 9]]
+Total Weight: 39
+'''
+```
+
+
 
 #### KRUSKAL 알고리즘
 
@@ -608,6 +763,88 @@ MST-KRUSKAL(G,w)
         	A <- A U {(u,v)}
             Union(u,v)
     RETURN A
+```
+
+
+
+##### kruskal's algorithm
+
+```python
+#path compression기법
+def find(node):
+    if parent[node] != node:
+        parent[node] = find(parent[node])
+    return parent[node]
+
+def union(node_v,node_u):
+    root1 = find(node_v)
+    root2 = find(node_u)
+
+    #union-by-rank기법
+    if rank[root1] > rank[root2]:
+        parent[root2] = root1
+    else:
+        parent[root1] = root2
+        if rank[root1] == rank[root2]:
+            rank[root2] += 1
+
+def make_set(node):
+    parent[node] = node
+    rank[node] = 0
+
+def kruskal(graph):
+    mst = list()
+    #1.초기화
+    for node in graph['vertices']:
+        make_set(node)
+
+    #2.간선 weight 기반 sorting
+    edges = graph['edges']
+    edges.sort()
+
+    #3. 간선 연결(사이클 없는)
+    for edge in edges:
+        weight,node_v,node_u = edge
+        if find(node_v) != find(node_u):
+            union(node_v,node_u)
+            mst.append(edge)
+    return mst
+
+mygraph = {
+    'vertices':['A','B','C','D','E','F','G'],
+    'edges': [
+        (7,'A','B'),
+        (5,'A','D'),
+        (7,'B','A'),
+        (8,'B','C'),
+        (9,'B','D'),
+        (7,'B','E'),
+        (8,'C','B'),
+        (5,'C','E'),
+        (5,'D','A'),
+        (9,'D','B'),
+        (7,'D','E'),
+        (6,'D','F'),
+        (7,'E','B'),
+        (5,'E','C'),
+        (7,'E','D'),
+        (8,'E','F'),
+        (9,'E','G'),
+        (6,'F','D'),
+        (8,'F','E'),
+        (11,'F','G'),
+        (9,'G','E'),
+        (11,'G','F'),
+    ]
+}
+parent = dict()
+rank = dict()
+
+print(kruskal(mygraph))
+
+'''
+[(5, 'A', 'D'), (5, 'C', 'E'), (6, 'D', 'F'), (7, 'A', 'B'), (7, 'B', 'E'), (9, 'E', 'G')]
+'''
 ```
 
 
@@ -848,7 +1085,7 @@ def dijkstra(graph,start):
     queue = []
     #그래프의 시작 정점과 시작 정점의 거리(0)을 최소힙에 넣어줌
     heapq.heappush(queue,[distances[start],start])
-    
+   
     while queue:
         #큐에서 정점을 하나씩 꺼내 인접한 정점들의 가중치를 모두 확인하여 업데이트
         current_distance,current_node = heapq.heappop(queue)
@@ -949,3 +1186,5 @@ https://gmlwjd9405.github.io/2018/08/29/algorithm-kruskal-mst.html
 https://mattlee.tistory.com/50
 
 https://www.fun-coding.org/Chapter20-shortest-live.html
+
+https://www.fun-coding.org/Chapter20-prim-live.html
