@@ -197,6 +197,109 @@ for tc in range(1, T + 1):
 
 
 
+## BOJ_1753_최단경로
+
+> [BOJ_1753_최단경로](https://www.acmicpc.net/problem/1753)
+>
+> python으로 제출하면 시간초과!! pypy3는 통과..!
+
+```python
+import sys
+sys.stdin = open('input.txt','r')
+
+import heapq
+
+def dijkstra(x):
+    #dist배열을 매우큰값으로 초기화
+    dist = [987654321]*(V+1)
+    heap = []
+    #start 거리표시
+    dist[x] = 0
+    #heap에다가 (0(처음거리),출발점)넣는다.
+    heapq.heappush(heap,(dist[x],x))
+    #heap이 다 빌 때까지 반복
+    while heap:
+        #현재위치까지의 거리와 현 위치
+        w,p = heapq.heappop(heap)
+        
+        #현재값의 dist에 저장돼있는 값이 지금 거리보다 작다면 continue -> 시간줄이기위해
+        if dist[p] < w:
+            continue
+        #nw,nx는 x에서 nx까지 거리, x와 연결된 애
+        for nw,nx in adj[p]:
+            #nw에 w를 더해줌 :  출발점에서 nx까지 거리
+            nw += w
+            #이게 기존에 기록해둔 값보다 작으면 갱신
+            if nw < dist[nx]:
+                dist[nx] = nw
+                heapq.heappush(heap,[nw,nx])
+    return dist
+
+#정점개수,간선개수
+V,E = map(int,input().split())
+#시작정점번호
+start = int(input())
+#u -> v , w가중치
+#1부터 V까지
+adj = [[]*(V+1) for _ in range(V+1)]
+for _ in range(E):
+    u,e,w = map(int,input().split())
+    adj[u].append([w,e])
+ans = dijkstra(start)
+# print(ans)
+for i in range(1,V+1):
+    if ans[i] != 987654321:
+        print(ans[i])
+    else:
+        print('INF')
+```
+
+
+
+## BOJ_1916_최소비용구하기
+
+> [BOJ_1916_최소비용구하기](https://www.acmicpc.net/problem/1916)
+
+```python
+import sys
+sys.stdin = open('input.txt', 'r')
+import heapq
+
+def dijkstra(st):
+    dist = [987654321]*(N+1)
+    heap = []
+    dist[st] = 0
+    heapq.heappush(heap,(dist[st],start_city))
+    while heap:
+        w,v = heapq.heappop(heap)
+        if dist[v] < w:
+            continue
+        for nw,nv in adj[v]:
+            nw += w
+            if nw < dist[nv]:
+                dist[nv] = nw
+                heapq.heappush(heap,(nw,nv))
+    return dist[end_city]
+
+N = int(input())
+M = int(input())
+adj = [[] for _ in range(N+1)]
+for _ in range(M):
+    start,end,cost = map(int,input().split())
+    adj[start].append([cost,end])
+start_city,end_city = map(int,input().split())
+# print(adj)
+# print(start_city,end_city)
+print(dijkstra(start_city))
+# print(dist)
+```
+
+
+
+
+
+
+
 ## Reference
 
 http://www.secmem.org/blog/2019/01/09/wrong-dijkstra/
