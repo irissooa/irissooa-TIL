@@ -34,43 +34,56 @@ if distances[current_node] < current_distance:
 
 
 
-## python code
+## SWEA_5251_최소이동거리
 
-### 
+### 배열이용
 
 ```python
-def dijstra():
-    # p = [None] * (V+1)
-    dist = [987654321] * (V + 1)
-    visited = [False] * (V + 1)
+'''
+다익스트라 이용
+1. 인접행렬을 만드는데 초기값으로 값으로 올수 없는 큰값으로 초기화
+2. 인접행렬에 s행 e열에(유향그래프) 가중치(w) 입력
+3. dist와 visited 배열을 node수만큼 만듦
+4. MIN값 갱신과 MIN방문표시
+5. 갱신된 MIN값에서 모든 노드들을 둘러보면서 최소값으로 dist를 갱신
+'''
+import sys
+sys.stdin = open('input.txt','r')
 
+#다익스트라로 풀기
+def dijkstra():
+    dist = [987654321]*(N+1)
+    visited = [False] * (N+1)
+    #시작 node 거리표시
     dist[0] = 0
 
-    for _ in range(V):
+    for _ in range(N):
         minIdx = -1
-        min = 987654321
-        for i in range(V + 1):
-            if not visited[i] and min > dist[i]:
-                min = dist[i]
+        MIN = 987654321
+        #방문표시와 MIN값 갱신
+        for i in range(N+1):
+            #방문하지 않았고, MIN보다 더 짧다면 MIN값 갱신
+            if not visited[i] and MIN > dist[i]:
+                MIN = dist[i]
                 minIdx = i
+        #min값 방문표시
         visited[minIdx] = True
-        for j in range(V + 1):
+        
+        #갱신한 MIN에서 j로 향할때 더 작은 값이 있으면 dist를 더 작은값으로 바꿔줌
+        for j in range(N+1):
+            #방문하지 않았고, min에서 j로 향하는 값이 더 작은게 있다면 dist[j] 갱신
             if not visited[j] and dist[j] > adj[minIdx][j] + dist[minIdx]:
                 dist[j] = adj[minIdx][j] + dist[minIdx]
-                # p[j] = minIdx
-    return dist[V]
-
+    return dist[N]
 
 T = int(input())
-for tc in range(1, T + 1):
-    V, E = map(int, input().split())
-
-    adj = [[987654321] * (V + 1) for _ in range(V + 1)]
-    for i in range(E):
-        st, ed, w = map(int, input().split())
-        adj[st][ed] = w
-
-    print("#{} {}".format(tc, dijstra()))
+for tc in range(1,T+1):
+    N,E = map(int,input().split())
+    adj = [[987654321] * (N+1) for _ in range(N+1)]
+    for _ in range(E):
+        s,e,w = map(int,input().split())
+        adj[s][e] = w
+    print('#{} {}'.format(tc,dijkstra()))
 ```
 
 
@@ -90,6 +103,7 @@ def dijstra():
     dist[0] = 0
 
     while heap:
+        #우선순위(w로 정렬됨)에 따라 제일 작은값이 pop돼서 나옴
         w, v = heapq.heappop(heap)
 
         if not visited[v]:
@@ -112,6 +126,72 @@ for tc in range(1, T + 1):
         adj[st][ed] = w
 
     print("#{} {}".format(tc, dijstra()))
+
+```
+
+
+
+### heapq와 딕셔너리 이용
+
+```python
+'''
+다익스트라 이용(heapq이용)
+
+'''
+import sys
+sys.stdin = open('input.txt', 'r')
+import heapq
+from collections import defaultdict
+
+# 다익스트라로 풀기
+# 탐색할 그래프와 시작 정점을 인자로 전달받음
+def dijkstra(graph, start):
+    # 시작 정점에서 각 정점까지의 거리를 저장할 딕셔너리를 생성, 큰값(987654321)으로 초기화
+    # distances = {node: 987654321 for node in range(N+1)}
+    distances = [987654321]*(N+1)
+    # print(distances)
+    # 그래프의 시작 정점의 거리는 0으로 초기화해줌
+    distances[start] = 0
+    # 모든 정점이 저장될 큐(힙)를 생성
+    queue = []
+    # 그래프의 시작 정점의 거리(0)와 시작 정점을 최소힙에 넣어줌
+    heapq.heappush(queue, [distances[start],start])
+    # print(queue)
+
+    while queue:
+        # 큐에서 가장 작은 원소를 삭제 후에 그 값을 리턴, 하나씩 꺼내 인접한 정점들의 가중치를 모두 확인하여 업데이트
+        #현위치까지의 거리,현위치
+        current_distance,current_node = heapq.heappop(queue)
+        # print('aa',current_node,current_distance)
+        #
+        if distances[current_node] < current_distance:
+            continue
+
+        for weight,adjacent in graph[current_node]:
+            # print('dd',graph[current_node],adjacent,weight)
+            distance = current_distance + weight
+            # 만약 시작 정점에서 인접 정점으로 바로 가는 것보다 현재 정점을 통해 가는 것이 더 가까울 경우
+            # print(distance,adjacent)
+            if distance < distances[adjacent]:
+                # 거리를 업데이트
+                distances[adjacent] = distance
+                heapq.heappush(queue, [distance,adjacent])
+    return distances[N]
+
+T = int(input())
+for tc in range(1, T + 1):
+    N, E = map(int, input().split())
+    # print(N,'node')
+    #딕셔너리에 값이 없을떄 빈 배열을 초기값으로 설정
+    adj = defaultdict(list)
+    for _ in range(E):
+        s,e,w = map(int,input().split())
+        #start노드를 키값으로 가지고, 가중치(w)와 end를 튜플로 담아줌
+        adj[s].append((w,e))
+    # print(adj)
+    ans = dijkstra(adj, 0)
+    # print(ans[N])
+    print('#{} {}'.format(tc,ans))
 
 ```
 
