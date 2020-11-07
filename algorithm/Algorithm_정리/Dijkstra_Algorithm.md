@@ -142,13 +142,14 @@ import sys
 sys.stdin = open('input.txt', 'r')
 import heapq
 from collections import defaultdict
+INF = sys.maxsize
 
 # 다익스트라로 풀기
 # 탐색할 그래프와 시작 정점을 인자로 전달받음
 def dijkstra(graph, start):
     # 시작 정점에서 각 정점까지의 거리를 저장할 딕셔너리를 생성, 큰값(987654321)으로 초기화
     # distances = {node: 987654321 for node in range(N+1)}
-    distances = [987654321]*(N+1)
+    distances = [INF]*(N+1)
     # print(distances)
     # 그래프의 시작 정점의 거리는 0으로 초기화해줌
     distances[start] = 0
@@ -202,13 +203,17 @@ for tc in range(1, T + 1):
 > [BOJ_1753_최단경로](https://www.acmicpc.net/problem/1753)
 >
 > python으로 제출하면 시간초과!! pypy3는 통과..!
+>
+> WHY?? input 받을때 sys.stdin.readline()으로 받으면 된다!! => 입력이 너무 커서 시간초과가남
 
 ```python
 import sys
 sys.stdin = open('input.txt','r')
-
 import heapq
 
+#추가하면 input()이 모두 sys.stin.readline()으로됨
+input = sys.stdin.readline
+INF = sys.maxsize
 def dijkstra(x):
     #dist배열을 매우큰값으로 초기화
     dist = [987654321]*(V+1)
@@ -220,8 +225,7 @@ def dijkstra(x):
     #heap이 다 빌 때까지 반복
     while heap:
         #현재위치까지의 거리와 현 위치
-        w,p = heapq.heappop(heap)
-        
+        w,p = heapq.heappop(heap)  
         #현재값의 dist에 저장돼있는 값이 지금 거리보다 작다면 continue -> 시간줄이기위해
         if dist[p] < w:
             continue
@@ -254,16 +258,63 @@ for i in range(1,V+1):
         print('INF')
 ```
 
+- 현우's code
+
+> 딕셔너리 이용
+
+```python
+import sys,heapq
+INF = sys.maxsize
+input = sys.stdin.readline
+
+V,E = map(int,input().split())
+K = int(input())
+#정점별로 딕셔너리만듦
+adj = [dict() for _ in range(V+1)]
+for _ in range(E):
+    u,v,w = map(int,input().split())
+    #adj u정점에 v 키값이 있으면 그 value값과 w(현재입력받은 가중치)를 비교해서 더 작은값을 받음
+    if v in adj[u]:
+        adj[u][v] = min(adj[u][v],w)
+    #v 키값이 없으면 v키에 w value값을 담음
+    else:
+        adj[u][v] = w
+
+d = [INF for _ in range(V+1)]
+d[K] = 0
+pq = [[d[K],K]]
+
+while pq:
+    cur_w,cur_v = heapq.heappop(pq)
+    if cur_w > d[cur_v]:
+        continue
+    for next_v,next_w in adj[cur_v].items():
+        if d[next_v] > cur_w + next_w:
+            d[next_v] = cur_w + next_w
+            heapq.heappush(pq, [d[next_v],next_v])
+
+for i in range(1,V+1):
+    if d[i] == INF:
+        print('INF')
+    else:
+        print(d[i])
+```
+
 
 
 ## BOJ_1916_최소비용구하기
 
 > [BOJ_1916_최소비용구하기](https://www.acmicpc.net/problem/1916)
+>
+> WHY?? input 받을때 sys.stdin.readline()으로 받으면 된다!! => 입력이 너무 커서 시간초과가남
 
 ```python
 import sys
 sys.stdin = open('input.txt', 'r')
 import heapq
+
+#추가하면 input()이 모두 sys.stin.readline()으로됨
+input = sys.stdin.readline
 
 def dijkstra(st):
     dist = [987654321]*(N+1)
@@ -295,6 +346,55 @@ print(dijkstra(start_city))
 ```
 
 
+
+## BOJ_1238_파티
+
+> [BOJ_1238_파티](https://www.acmicpc.net/problem/1238)
+
+```python
+import sys, heapq
+sys.stdin = open('input.txt','r')
+
+input = sys.stdin.readline
+INF = sys.maxsize
+
+def dijkstra(start):
+    dist = [INF]*(N+1)
+    heap = []
+    dist[start] = 0
+    heapq.heappush(heap,[dist[start],start])
+    while heap:
+        w,v = heapq.heappop(heap)
+        if dist[v] < w:
+            continue
+        for nv,nw in adj[v].items():
+            nw += w
+            if dist[nv] > nw:
+                dist[nv] = nw
+                heapq.heappush(heap,[nw,nv])
+    return dist
+
+
+
+
+N,M,X = map(int,input().split())
+adj = [dict() for _ in range(N+1)]
+for _ in range(M):
+    #i번째 도로의 시작점, 끝점,소요시간
+    u,v,t = map(int,input().split())
+    if v in adj[u]:
+        adj[u][v] = min(adj[u][v],t)
+    else:
+        adj[u][v] = t
+# print(adj)
+MAX = -INF
+for s in range(1,N+1):
+    ans = dijkstra(s)[X]
+    back = dijkstra(X)[s]
+    if MAX < ans+back:
+        MAX = ans+back
+print(MAX)
+```
 
 
 
