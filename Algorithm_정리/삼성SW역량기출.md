@@ -541,3 +541,112 @@ else:
 
 ```
 
+
+
+## BOJ_14503_로봇청소기
+
+> 힌트봄...ㅠ
+>
+> 복잡할때는 나눠서 해보자!
+>
+> 가지 못하는 경우 후진을 해야될때와 아닐때로 나눠서 작성하자
+>
+> 한번에 처리하려고 하면 꼬이게 됨.......ㅠ
+
+```python
+'''
+22:15
+청소기 방향 있음 동(우)서(좌)남(하)북(상)
+지도 각 칸 (r(행),c(열))
+1:벽 0:빈칸
+로봇청소기 작동
+1. 현재 위치 청소
+2. 현재 위치에서 현재 방향을 기준으로 왼쪽방향부터 차례대로 탐색
+2-1. 왼쪽 방향에 아직 청소하지 않은 곳 있으면 그 방향으로 회전, 한칸 전진, 1번 진행
+2-2. 왼쪽 청소 공간 없으면 그방향 회전 후 2번
+2-3. 네방향 모두 청소 돼있거나 벽, 바라보는 방향 유지, 한칸 후진, 2번 돌아감
+2-4. 네방향 모두 청소, 벽, 뒤도 벽, 작동 멈춤
+
+#그래도 이건 내가 생각했당....ㅠ
+DFS(r,c,dir)로 돌리는데  (dir+3)%4의 순서로 본다! 상(0) -> 좌(3), 우(1) -> 상(0), 하(2)->우(1), 좌(3)->하(2)
+현재 방향에 아직 청소하지 않은 곳이 있으면 (dir+3)%4로 방향전환, 1칸 가고, 그 방향의 또 (dir+3)%4로 이동(갈수있다면)
+청소할 공간 없다! -> (dir+3)%4회전 후 다시 (dir+3)%4로 넘어감!
+네방향 모두 청소할 공간이 없다! 현재 방향에서 뒤로 한칸! (dir+2)%4로 방향 전환!
+네방향 모두 청소, 벽, 뒤도 벽, 작동 멈춤
+'''
+import sys
+sys.stdin = open('input.txt','r')
+sys.setrecursionlimit(10**8)
+input = sys.stdin.readline
+
+di = [-1,0,1,0]#상우하좌
+dj = [0,1,0,-1]
+def DFS(i,j,dir,cnt):
+    visited[i][j] = True
+	#갈 곳이 없을 때 후진!
+    if cnt == 4:
+        #후진할 방향
+        d = (dir+2)%4
+        ni = i + di[d]
+        nj = j + dj[d]
+        #벽이면 못감
+        if arr[ni][nj]:
+            return
+       	#벽이 아니라면 원래의 방향을 가지고 보냄
+        else:
+            DFS(ni, nj, dir,0)
+    else:
+        #현재 방향의 왼쪽먼저 살핌
+        d = (dir + 3)%4
+        ni = i + di[d]
+        nj = j + dj[d]
+        #앞으로 갈 곳이 갈수 있는 곳이라면 보냄
+        if arr[ni][nj] == 0 and not visited[ni][nj]:
+            DFS(ni,nj,d,0)
+        #아니라면 cnt+1
+        else:
+            DFS(i,j,d,cnt+1)
+
+
+
+#세로,가로
+N,M = map(int,input().split())
+#r,c좌표, 바라보는 방향 0:북(상), 1:동(우),2:남(하),3:서(좌)
+r,c,d = map(int,input().split())
+arr = [list(map(int,input().split())) for _ in range(N)]
+# print(r,c,d)
+# for x in arr:
+#     print(x)
+visited = [[False for j in range(M)] for i in range(N)]
+DFS(r,c,d,0)
+ans = 0
+# for x in visited:
+#     print(x)
+for i in range(N):
+    for j in range(M):
+        if visited[i][j]:
+            ans +=1
+print(ans)
+```
+
+- 아래처럼 room(arr) 배열 자체에 방문처리를 하면 방문배열 안만들어도 됨!!!
+
+```python
+def DFS(R, C, D, fail):
+    room[R][C] = '2'
+    if fail == 4:
+        nr = R + dr[(D+2)%4]
+        nc = C + dc[(D+2)%4]
+        if room[nr][nc] == 1:
+            return
+        else:
+            DFS(nr, nc, D, 0)
+    else:
+        nr = R + dr[(D+3)%4]
+        nc = C + dc[(D+3)%4]
+        if room[nr][nc] == 0:
+            DFS(nr, nc, (D+3)%4, 0)
+        else:
+            DFS(R, C, (D+3)%4, fail + 1)
+```
+
