@@ -1,4 +1,4 @@
-# Dijkstra_Algorithm
+# Dijkstra_Algorithm(최단경로찾기)
 
 [toc]
 
