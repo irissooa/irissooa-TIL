@@ -1010,6 +1010,8 @@ position(fireball)
 print(ans)
 ```
 
+- 반복문으로 풀어보기
+
 - 현우's code
 
 ```python
@@ -1067,5 +1069,320 @@ for i in range(N):
             for each in board[i][j]:
                 ans += each[0]
 print(ans)
+```
+
+
+
+
+
+## BOJ_14888_연산자끼워넣기
+
+```python
+'''
+N개의 수 N-1연산자 더하기 빼기 곱하기 나누기로 주어짐
+순서대로 수를 계산하고, 음수나누기는 양수로 바꾼 뒤 몫을 취하고 그 몫을 음수로 바꿈
+나올수 있는 수들의 최대 최소 값을 구함
+
+1. 연산자들을 보면서 0이 아닌 수 들 중 빼면서 순열!을 구함
+2. 계산하는 함수를 만들어서 계산한 뒤, 최대 최소 값을 구함
+'''
+import sys
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+INF = sys.maxsize
+
+#계산하는 함수
+def calc(opr):
+    ans = numbers[0]
+    # print(opr,'연산자')
+    for s in range(N-1):
+        o_idx = opr[s]
+        if o_idx == 0:
+            ans += numbers[s+1]
+        elif o_idx == 1:
+            ans -= numbers[s+1]
+        elif o_idx== 2:
+            ans *= numbers[s+1]
+        else:
+            if ans >= 0:
+                ans //= numbers[s+1]
+            else:
+                ans = -(abs(ans)//numbers[s+1])
+        # print(numbers[s],ans)
+    return ans
+
+#순열
+def perm(idx):
+    global MAX,MIN
+    if idx == N-1:
+        ans = calc(sel)
+        if MAX < ans:
+            MAX = ans
+        if MIN > ans:
+            MIN = ans
+        return
+    for o in range(4):
+        if operators[o]:
+            sel[idx] = o
+            operators[o] -= 1
+            perm(idx+1)
+            operators[o] += 1
+            sel[idx] =0
+
+
+
+
+N = int(input())
+numbers = list(map(int,input().split()))
+# + - * //
+operators = list(map(int,input().split()))
+# print('연산자',operators)
+sel = [0]*(N-1)
+MAX,MIN = -INF,INF
+perm(0)
+print(MAX)
+print(MIN)
+```
+
+
+
+## BOJ_14502_연구소
+
+```python
+'''
+NxM연구소 바이러스 상하좌우로 퍼져나감, 새로 세울수 있는 벽 3개!
+0은 빈칸, 1은 벽, 2는 바이러스
+바이러스가 퍼질 수 없는 곳, 안전영역! 그 크기가 최대인 것을 구해라
+완전탐색...0인것들 중 3곳씩만 1로 바꾼뒤 바이러스가 얼마나 퍼지는지 bfs돌리고, 0인곳 세기! 최댓값 갱신
+'''
+import sys
+from collections import deque
+import copy
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+
+#조합!
+def comb(idx,sidx):
+    if sidx == 3:
+        wall = []
+        for s in sel:
+            wall.append([bin[s][0],bin[s][1]])
+        temp = copy.deepcopy(start)
+        BFS(temp,wall)
+        return
+    if idx == len(bin):
+        return
+    sel[sidx] = idx
+    comb(idx+1,sidx+1)
+    sel[sidx] = 0
+    comb(idx+1,sidx)
+
+di = [-1,1,0,0]#상하좌우
+dj = [0,0,-1,1]
+def BFS(q,sel):
+    global MAX
+    visited = [[False for j in range(M)] for i in range(N)]
+    #처음시작점 방문처리
+    for v in q:
+        i,j = v
+        visited[i][j] = True
+    #조합으로 뽑은 수 방문 처리(벽이 됐기 때문)
+    for s in sel:
+        i,j = s
+        visited[i][j] = True
+    # print(sel,q)
+    cnt = zero
+    while q:
+        if cnt <=MAX:
+            break
+        pi,pj = q.popleft()
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= M:
+                continue
+            if visited[ni][nj]:
+                continue
+            if laboratory[ni][nj] == 1:
+                continue
+            if not visited[ni][nj] and not laboratory[ni][nj]:
+                cnt+=1
+            if cnt <= MAX:
+                break
+            # print(ni,nj)
+            visited[ni][nj] = True
+            q.append([ni,nj])
+    # print('여기안오니')
+    ans = 0
+    for i in range(N):
+        for j in range(M):
+            if not visited[i][j] and not laboratory[i][j]:
+                # print(ans,'여긴!!!!')
+                ans += 1
+    # for x in visited:
+    #     print(x)
+
+    if MAX < ans:
+        MAX = ans
+    return
+
+N,M = map(int,input().split())
+laboratory = [list(map(int,input().split())) for _ in range(N)]
+start = deque()
+bin = deque()
+MAX = 0
+#0인곳과, start(바이러스가 있는곳)위치 담기
+for i in range(N):
+    for j in range(M):
+        if laboratory[i][j] == 2:
+            start.append([i,j])
+        if laboratory[i][j] == 0:
+            bin.append([i,j])
+zero = len(bin)-3
+sel = [0]*3
+comb(0,0)
+print(MAX)
+```
+
+- 다른 사람 코드
+
+```python
+N,M = map(int,input().split())
+matrix = []
+#벽으로 둘러쌈
+for i in range(N+2):
+    if i == 0 or i == N+1:
+        a = []
+        for i in range(M+2):
+            a.append(1)
+        matrix.append(a)
+    else:
+        matrix.append([1]+list(map(int, input().split()))+[1])
+
+
+zero = []
+virus = []
+
+def build_wall(r1,r2,r3,c1,c2,c3,m): # 리스트는 call by reference
+    a = m[:]
+    a[r1],a[r2],a[r3] = a[r1][:],a[r2][:],a[r3][:]
+    a[r1][c1],a[r2][c2],a[r3][c3] = 1,1,1
+    return a
+
+#상하좌우로 바이러스로 전염됨
+def search(r, c, mat):
+    if r > N or c > M:
+        return
+    
+    if mat[r][c+1] == 0:
+        mat[r][c+1] = 2
+        search(r,c+1,mat)
+    
+    if mat[r+1][c] == 0:
+        mat[r+1][c] = 2
+        search(r+1,c,mat)
+        
+    if mat[r-1][c] == 0:
+        mat[r-1][c] = 2
+        search(r-1,c,mat)
+        
+    if mat[r][c-1] ==0:
+        mat[r][c-1] = 2
+        search(r,c-1,mat)
+
+
+# zero위치 및 virus위치탐지
+for i in range(N+1):
+    for j in range(M+1):
+        if matrix[i][j]==0:
+            zero.append((i,j))
+        if matrix[i][j]==2:
+            virus.append((i,j))
+
+count = []
+for i in range(len(zero)):
+    for j in range(len(zero)-1-i):
+        for k in range(len(zero)-2-j-i):
+            #zero를 전부 돌면서 3개만 벽으로 바꿈!
+            r1,c1 = zero[i][0],zero[i][1]
+            r2,c2 = zero[j+i+1][0],zero[j+i+1][1]
+            r3,c3 = zero[k+j+i+2][0],zero[k+j+i+2][1]
+            
+            a = build_wall(r1,r2,r3,c1,c2,c3,matrix)
+            
+            copy_a = a[:]
+            for row in range(len(copy_a)):
+                copy_a[row] = copy_a[row][:]
+
+            for l in range(len(virus)): # 바이러스 위치
+                r, c = virus[l][0],virus[l][1]                
+                search(r,c,copy_a)
+            count_zero = 0
+            
+            for cnt in range(len(copy_a)):
+                count_zero += copy_a[cnt].count(0)
+            count.append(count_zero)
+print(max(count))
+```
+
+- 다른사람코드
+
+```python
+from collections import deque
+
+n, m = map(int, input().split())
+world = []
+virus = []
+safe_cnt = 0
+for i in range(n):
+    row = list(map(int, input().split()))
+    world.extend(row)
+    for j, v in enumerate(row):
+        if v == 2:
+            virus.append(i * m + j)
+        elif v == 0:
+            safe_cnt += 1
+
+
+def spread_cnt(world, n, m, virus, safe_cnt):
+    q = deque(virus)
+    while q:
+        now = q.popleft()
+        if now - m >= 0 and world[now - m] == 0:
+            world[now - m] = 2
+            q.append(now - m)
+            safe_cnt -= 1
+        if now + m < n * m and world[now + m] == 0:
+            world[now + m] = 2
+            q.append(now + m)
+            safe_cnt -= 1
+        if now % m != 0 and world[now - 1] == 0:
+            world[now - 1] = 2
+            q.append(now - 1)
+            safe_cnt -= 1
+        if now % m + 1 != m and world[now + 1] == 0:
+            world[now + 1] = 2
+            q.append(now + 1)
+            safe_cnt -= 1
+    return safe_cnt
+
+
+answer = 0
+
+for i1 in range(n * m):
+    if world[i1] == 0:
+        world[i1] = 1
+        for i2 in range(i1 + 1, n * m):
+            if world[i2] == 0:
+                world[i2] = 1
+                for i3 in range(i2 + 1, n * m):
+                    if world[i3] == 0:
+                        world[i3] = 1
+                        answer = max(answer, spread_cnt(world[:], n, m, virus, safe_cnt - 3))
+                        world[i3] = 0
+                world[i2] = 0
+        world[i1] = 0
+
+print(answer)
 ```
 
