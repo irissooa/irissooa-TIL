@@ -520,3 +520,232 @@ export default {
 }
 ```
 
+
+
+## 20201121
+
+### 1. Vuetify 이용
+
+> **Vue CLI 와 Vuetify.js 소개**
+>
+> Vue CLI 는 Vue.js 를 생성, 관리, 실행할 수 있는 Command Line Interface 이다.
+>
+> Vue CLI 를 사용하면 Webpack, Babel, Lint, TypeScript, Vue Router, Vuex 등의 다양한 피쳐들을 선택해서 프로젝트를 생성할 수 있다.
+>
+> 이번 프로젝트는 Vue CLI 를 사용해서 SPA(Single Page Application)을 생성하고 빌드하도록 한다.
+>
+> Vuetify는 Vue.js를 위한 개발된 디자인 프레임워크이다.
+>
+> Vue.js로 프로젝트를 진행할때 Vuetify 를 사용하면 손쉽게 아름다운 디자인을 적용할 수 있다.
+>
+> Vuetify는 머터리얼 디자인 스펙 (Material Design Spec) 을 준수한다.
+
+```sh
+vue add vuetify
+```
+
+**선택옵션에서는 “Default”를 선택하도록 한다**
+
+```sh
+? Choose a preset: (Use arrow keys)
+❯ Default (recommended) 
+Prototype (rapid development) 
+Configure (advanced) 
+```
+
+
+
+**[vuetify 홈페이지](https://vuetifyjs.com/ko/components/api-explorer)에서 추가하고 싶은 Component를 찾기**
+
+![image-20201121232530987](final_pjt.assets/image-20201121232530987.png)
+
+
+
+[출처](http://blog.weirdx.io/post/60376)
+
+**그리드시스템**
+
+`v-container`는 전체 너비를 기준으로 화면에 출력될 컨테이너를 중앙에 배치한다. `v-layout`은 섹션을 구분하는데 사용하고 `v-flex`를 포함한다. 대부분의 경우 `v-layout`의 `row`와 `column`을 주로 사용한다. `v-flex`의 내부에는 `div` 태그를 사용해서 필요한 내용을 추가한다.
+
+
+
+**Typography**
+
+일반적으로 가장 많이 사용하는 폰트 관련 내용이다. Vuetify는 Roboto Font를 사용한다. `.display-4`는 `h1` 태그에 적합하고, `.title`은 `h6`에 잘 어울린다. `.body-1`은 일반적인 본문에 어울리고, 중요한 본문 내용은 `.body-2`를 사용한다. `font-weight-{thin, light, regular, medium, bold, black}`등을 사용하여 폰트를 설정할 수 있다. 색상의 경우 `{배경 글자}`형태로 구성되며, `{배경색, 배경색 밝기, 글자, 글자색 밝기}` 형태로 구성된다. 좀 더 자세한 내용은 [Application typography — Vuetify.js](https://vuetifyjs.com/en/framework/typography)를 참고하자.
+
+```html
+<p class="red white--text">Eleates de ferox quadra, promissio onus!Cur elevatus studere?Cur abactus tolerare?Cum extum studere, omnes vitaes magicae pius, castus amores.Eheu, luna!</p>
+<p class="pink lighten-4 red--text text--darken-4">Audax agripetas ducunt ad poeta.Nunquam imitari fluctui.Cobaltums sunt armariums de placidus poeta.Ubi est pius olla?Lanista experimentums, tanquam lotus hibrida.</p>
+<h1 class="display-1">Brevis gallus hic imperiums racana est.</h1>
+<h4 class="display-4">Nunquam attrahendam bulla.Caesium de bi-color lumen, resuscitabo parma!</h4>
+<p class="headline">Fuga, axona, et mortem.Superbus mensa nunquam tractares tumultumque est.Heu.</p>
+<p class="subheading font-weight-bold">Sunt plasmatores transferre salvus, emeritis mensaes.</p>
+<p class="caption">Sunt rectores transferre castus, germanus fermiumes.</p>
+```
+
+
+
+**Button and Icon**
+
+`flat`은 그림자와 배경이 없는 버튼을 생성하고, `depressed`는 그림자가 없으며, `fab`는 동그란 형태의 버튼을 생성한다. 대부분의 경우 아래 예제에서 손쉽게 사용할 수 있었으며, 좀 더 자세한 사항은 [Button Component — Vuetify.js](https://vuetifyjs.com/en/components/buttons)을 참고하자.
+
+```html
+<v-btn class="pink white--text">Click ME</v-btn>
+<v-btn depressed color="pink">Click ME</v-btn>
+<v-btn flat color="blue">Click ME</v-btn>
+
+<v-btn depressed class="pink white--text">
+  <v-icon left>email</v-icon>
+  <span>E-mail me</span>
+</v-btn>
+
+<v-btn depressed small class="pink white--text">
+  <v-icon left small>email</v-icon>
+  <span>E-mail me</span>
+</v-btn>
+
+<v-btn depressed large class="pink white--text">
+  <span>E-mail me</span>
+  <v-icon right small>email</v-icon>
+</v-btn>
+
+<v-btn depressed small dark class="purple">
+  <v-icon>favorite</v-icon>
+</v-btn>
+
+<v-btn fab depressed small dark class="purple">
+  <v-icon>favorite</v-icon>
+</v-btn>
+```
+
+
+
+**Visibility**
+
+뷰포트에 따라서 해당 요소를 출력하거나 숨길 수 있는 요소이다. `only`, `and-down`,`and-up`등으로 뷰포트 범위를 지정한다. 자세한 사항은 [Display helpers — Vuetify.js](https://vuetifyjs.com/ko/framework/display)를 참고하자.
+
+```html
+<v-btn class="hidden-md-and-down">click me1</v-btn>
+<v-btn class="hidden-md-and-up">click me2</v-btn>
+<v-btn class="hidden-sm-only">click me3</v-btn>
+```
+
+
+
+
+
+**Toolbar and Drawer**
+
+일반적으로 사이트를 탐색하는 가장 중요한 방법 중 하나인 `Toolbar`와 `Drawer` 사용법은 아래와 같다. [Toolbars — Vuetify.js](https://vuetifyjs.com/en/components/toolbars#toolbar), [Navigation drawer — Vuetify.js](https://vuetifyjs.com/en/components/navigation-drawers#navigation-drawer)를 참고하자.
+
+```html
+<template>
+    <nav>
+        <v-toolbar flat app>
+            <v-toolbar-side-icon @click="drawer = !drawer" class="grey--text"></v-toolbar-side-icon>
+            <v-toolbar-title class="text-uppercase grey--text">
+                <span class="font-weight-light">Todo</span>
+                <span>Ninja</span>
+            </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn flat color="grey">
+                <span>Sign Out</span>
+                <v-icon right>exit_to_app</v-icon>
+            </v-btn>
+        </v-toolbar>
+
+        <v-navigation-drawer app v-model="drawer" class="indigo">
+            <p>test</p>
+        </v-navigation-drawer>
+    </nav>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                drawer: false
+            }
+        }
+    }
+</script>
+```
+
+
+
+
+
+**Theme**
+
+`theme`는 색상을 쉽게 변경하는 방법을 제공한다. 자세한 사항은 [Application theming — Vuetify.js](https://vuetifyjs.com/en/framework/theme#theme)를 참고하자.
+
+```html
+Vue.use(Vuetify, {
+  iconfont: 'md',
+  theme: {
+    primary: '#9652ff',
+    success: '#3cd1c2',
+    info: '#ffaa2c',
+    error: '#f83e70'
+  }
+})
+```
+
+
+
+
+
+**Lists**
+
+목차등의 정보를 표현하는데 사용한다. 리스트는 [List Component — Vuetify.js](https://vuetifyjs.com/en/components/lists#list)를 참고하자
+
+```html
+<v-list-tile v-for="link in links" :key="link.text" router :to="link.route">
+    <v-list-tile-action>
+        <v-icon class="white--text">{{ link.icon }}</v-icon>
+    </v-list-tile-action>
+    <v-list-tile-content>
+        <v-list-tile-title class="white--text">{{ link.text }}</v-list-tile-title>
+    </v-list-tile-content>
+</v-list-tile>
+```
+
+
+
+
+
+**Spacing**
+
+`m`은 margin, `p`는 padding을 뜻하며, `x`는 `*-left, *-right`이다. 아래 예제에서 `4`는 `$spacer * 1.5` 간격을 뜻 한다. 자세한 사항은 [Spacing helpers — Vuetify.js](https://vuetifyjs.com/en/framework/spacing)을 참고하자.
+
+```html
+<v-content class="mx-4 mb-4">
+    <router-view></router-view>
+</v-content>
+```
+
+
+
+
+
+**Card**
+
+card 요소는 다양한 구성를 조합해서 사용할 수 있다. 기본적으로 `v-card-media`, `v-card-title`, `v-card-text`, `v-card-actions`으로 구성된다. [Cards — Vuetify.js](https://vuetifyjs.com/en/components/cards#card) 링크에 있는 예제를 잘 활용하자.
+
+```html
+<v-card flat class="text-xs-center ma-3">
+    <v-responsive class="pt-4">
+        image here
+    </v-responsive>
+    <v-card-text>
+        <div class="subheading">{{ person.name }}</div>
+        <div class="grey--text">{{ person.role }}</div>
+    </v-card-text>
+    <v-card-actions>
+        <v-btn flat color="grey">
+            <v-icon small left>message</v-icon>
+            <span class="">Message</span>
+        </v-btn>
+    </v-card-actions>
+</v-card>
+```
