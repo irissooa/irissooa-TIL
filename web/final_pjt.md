@@ -749,3 +749,76 @@ card 요소는 다양한 구성를 조합해서 사용할 수 있다. 기본적�
     </v-card-actions>
 </v-card>
 ```
+
+
+
+✔️  **MovieGenre 선택**
+
+![image-20201122213535801](final_pjt.assets/image-20201122213535801.png)
+
+```vue
+ <v-card-title>Select Genre</v-card-title>
+        <v-divider></v-divider>
+        <v-card-text style="height: 300px;">
+          <v-radio-group
+            v-model="dialogm1"
+            column
+            multiple
+          >
+            <v-radio
+              label="Adventure"
+              value="adventure"
+            ></v-radio>
+            <v-radio
+              label="Fantasy"
+              value="fantasy"
+            ></v-radio>
+              
+              ...
+```
+
+
+
+## 20201122
+
+###  User오류 왜 자꾸 날까?
+
+> 로그인도 되고, User db에도 데이터가 있는데 CreateReview를 하려고 하면 자꾸 User가 Anonymous라고 뜬다....ㅠ
+
+![image-20201121000643977](final_pjt.assets/image-20201121000643977-1606063577469.png)
+
+![image-20201121000654375](final_pjt.assets/image-20201121000654375-1606063577470.png)
+
+![image-20201121000801548](final_pjt.assets/image-20201121000801548-1606063577470.png)
+
+
+
+&#9989; 고쳤다!!!! `ReviewCreate.vue`에서 data를 넘겨줄 때 배열에 담아서 넘겨줬는데  server에서도 serializer고침(user 뺌..) 
+
+원래는 headers를 config로 줬는데 일단 바로 주는 거로 바꾸고, serializer도 고치고 하니까 작성이 잘 됐다! 근데 문제가 작성이 되고 router로 id를 params로 전달해줘야되는데 전달이 잘 안되고 NAN으로 뜬다..그래서 그냥 ReviewList로 넘김
+
+```js
+addReview(event){
+      event.preventDefault()
+      // const config = this.setToken()
+      // console.log('컨피그다',config)
+      axios({
+        url:'http://127.0.0.1:8000/reviews/',
+        method:'POST',
+        data:{
+            title:this.title,
+            content : this.content,
+            category : this.category,
+        },
+        headers:{
+          Authorization:`JWT ${localStorage.getItem('jwt')}`
+        },
+      }).then((res)=>{
+        console.log('reviewCreatet성공?',res.data)
+        this.$router.push({name:'ReviewList'})
+
+      }).catch((err)=>{
+        console.error('에러라고오오',err)
+      })
+```
+
