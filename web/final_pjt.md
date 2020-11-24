@@ -2,7 +2,7 @@
 
 [toc]
 
-## 20201119
+
 
 > 온갖 에러를 다 본 날......ㅎ
 
@@ -45,11 +45,11 @@ new Vue({
 
 
 
-## 20201120
+
 
 ### User오류 왜 자꾸 날까?
 
-> 로그인도 되고, User db에도 데이터가 있는데 CreateReview를 하려고 하면 자꾸 User가 Anonymous라고 뜬다....ㅠ
+> 로그인도 되고, User db에도 데이터가 있는데 CreateReview를 하려고 하면 자꾸 User가 Anonymous라고 뜬다....ㅠ -> JWT토큰문제!!!
 
 ![image-20201121000643977](final_pjt.assets/image-20201121000643977.png)
 
@@ -522,9 +522,9 @@ export default {
 
 
 
-## 20201121
 
-### 1. Vuetify 이용
+
+###  Vuetify 이용
 
 > **Vue CLI 와 Vuetify.js 소개**
 >
@@ -779,7 +779,52 @@ card 요소는 다양한 구성를 조합해서 사용할 수 있다. 기본적�
 
 
 
-## 20201122
+✔️[Vuetify로 Markdown이용하기](https://github.com/miaolz123/vue-markdown)
+
+✔️[Vuetify로 Youtube이용하기](https://github.com/kaorun343/vue-youtube-embed)
+
+> https://github.com/anteriovieira/vue-youtube
+>
+> https://developers.google.com/youtube/iframe_api_reference
+>
+> https://github.com/andrewvasilchuk/vue-lazy-youtube-video
+
+- install
+
+```sh
+// NPM
+npm i -S vue-youtube-embed
+```
+
+```js
+import Vue from 'vue'
+import VueYouTubeEmbed from 'vue-youtube-embed'
+Vue.use(VueYouTubeEmbed)
+// if you don't want install the component globally
+Vue.use(VueYouTubeEmbed, { global: false })
+// if you want to install the component globally with a different name
+Vue.use(VueYouTubeEmbed, { global: true, componentId: "youtube-media" })
+```
+
+
+
+✔️ Vuetify로 별점 표시
+
+> ```vue
+> <v-rating
+>   empty-icon="$mdiStarOutline"
+>   full-icon="$mdiStar"
+>   half-icon="$mdiStarHalfFull"
+>   hover
+>   length="5"
+>   size="64"
+>   value="3"
+> ></v-rating>
+> ```
+>
+> 
+
+
 
 ###  User오류 왜 자꾸 날까?
 
@@ -821,4 +866,32 @@ addReview(event){
         console.error('에러라고오오',err)
       })
 ```
+
+
+
+&#9989; 여기서 아직도 review생성시 바로 해당 review의 id로 가는걸 못하겠따,,,
+
+
+
+### Uncaught SyntaxError:Unexpected token '<'
+
+![image-20201124121709277](final_pjt.assets/image-20201124121709277.png)
+
+이 에러가 자꾸나서 구글링 해보니까 `index.html` headers밑에 `<base href="/" /> `를 넣어주면 오류가 해결됨,,,
+
+
+
+### jwt_decode
+
+> 토큰안에 userid가 같이 들어있음
+
+```js
+import jwt_decode from "jwt-decode"
+...
+const token = localStorage.getItem('jwt')
+        // console.log(jwt_decode(token))
+        const user = jwt_decode(token).user_id
+```
+
+
 
