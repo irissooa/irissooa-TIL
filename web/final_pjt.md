@@ -937,3 +937,27 @@ const token = localStorage.getItem('jwt')
 
 그 뒤에 base.html `{% load static %}`을 한 뒤 `<link rel="stylesheet" type="text/css" href="{% static 'accounts/stylesheet/css/style.css' %}">` 폴더의 절대 경로만 잘 적어주면 적용이 된다!!!!
 
+### Bootstrap form error
+
+![image-20201125215909103](final_pjt.assets/image-20201125215909103.png)
+
+이건 또 무슨...색다른 에러일까...
+
+안되다가...갑자기 된다,,,ㅎ
+
+
+
+### QueryDict에서 값가져오기
+
+회원가입을 할때 user가 genre들을 여러개 선택한 뒤, 그 genre의 id값을 넣어주고 싶은데 form의 data인 reques.POST를 찍어보니 QueryDict다! 회원가입을 했을때 genre fields에 값은 들어있는데 그걸 가져오는걸 어떻게 할지 몰라 찾아보니 `querydict.getlist('필드명')`로 가져올수 있었다!
+
+
+
+![image-20201126032701863](final_pjt.assets/image-20201126032701863.png)
+
+
+
+### 마이그레이션 오류 해결법django.db.migrations.exceptions.NodeNotFoundError:
+
+1. 프로젝트 내 모든 마이그레이션 파일 제거
+2. 초기화 후 makemigrations, migrate다시하기
