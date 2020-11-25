@@ -522,6 +522,40 @@ export default {
 
 
 
+✔️ **프로그래밍 방식 네비게이션 **
+
+>`router.push(location, onComplete?, onAbort?)`
+>
+>**Vue 인스턴스 내부에서 라우터 인스턴스에 `$router`로 액세스 할 수 있다. **
+>
+>**그러므로`this.$router.push`를 사용 할 수 있다**
+
+다른 URL로 이동하려면 `router.push`를 사용해라
+
+| 선언적 방식               | 프로그래밍 방식    |
+| ------------------------- | ------------------ |
+| `<router-link :to="...">` | `router.push(...)` |
+
+전달인자는 문자열 경로 또는 로케이션 디스크립터 객체가 될 수 있다.
+
+```js
+// 리터럴 string
+router.push('home')
+
+// object
+router.push({ path: 'home' })
+
+// 이름을 가지는 라우트
+router.push({ name: 'user', params: { userId: 123 }})
+
+// 쿼리와 함께 사용, 결과는 /register?plan=private 입니다.
+router.push({ path: 'register', query: { plan: 'private' }})
+```
+
+
+
+
+
 
 
 ###  Vuetify 이용
@@ -894,4 +928,12 @@ const token = localStorage.getItem('jwt')
 ```
 
 
+
+## Django로 바꿈,,,,
+
+### static
+
+무료템플릿을 쓰기 위해 accounts앱에 static폴더를 만들어서 해당 무료 템플릿에서 만든 css, js,등 파일들을 넣어준다.
+
+그 뒤에 base.html `{% load static %}`을 한 뒤 `<link rel="stylesheet" type="text/css" href="{% static 'accounts/stylesheet/css/style.css' %}">` 폴더의 절대 경로만 잘 적어주면 적용이 된다!!!!
 
