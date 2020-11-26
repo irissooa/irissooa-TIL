@@ -961,3 +961,22 @@ const token = localStorage.getItem('jwt')
 
 1. 프로젝트 내 모든 마이그레이션 파일 제거
 2. 초기화 후 makemigrations, migrate다시하기
+
+
+
+
+
+### 404 Error page 꾸미기
+
+1. `settings.py`
+
+```python
+# True -> False
+DEBUG = False
+#접속을 허용하는 주소
+ALLOWED_HOSTS = ['127.0.0.1']
+```
+
+2. 가장 최상위폴더에서 templates폴더안에 404.html 파일을 만듦
+3. 다시 settings를 가서 TEMPLATES부분에서 DIRS에 templates폴더를 입력함
+
