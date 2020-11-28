@@ -1485,7 +1485,9 @@ print(answer)
 
 ## BOJ_15686_치킨배달
 
-> 푸는중....ㅎ...
+> 답은 맞다고 나오는데....시간초과...ㅠㅠ 시간을 어떻게 줄일까.......ㅎㅎ
+>
+> 근데...반례도 틀림,,,,,,뭐가 틀렸지,,,ㅠ 다시 고민해보자....
 
 ```python
 '''
@@ -1496,9 +1498,9 @@ r행 c열 1부터 시작
 도시의 치킨거리는 모든 집의 치킨 거리의 합
 M개의 치킨집만 고르고 나머지 치킨집 없애야 됨
 어떻게 고르면 도시의 치킨 거리가 가장 작게 될까
-출발점인 2를 전부 start에 담고, bfs를 돌릴건데 nCm인 조합으로 뽑은
-점들만 빼고 나머지 치킨집은 0으로 바꿈, dist최소 값들 구한뒤 다시 원상복귀
-반복,,
+출발점인 2를 전부 start에 담는다,
+1인 점을 담고, 조합으로 3개의 좌표를 뽑는다
+start와 store의 조합을 구한뒤 각각의 거리들을 구하고, 최소값을 뽑자!!!
 '''
 import copy
 import sys
@@ -1510,20 +1512,25 @@ input = sys.stdin.readline
 def comb(idx):
     global cnt,MIN
     # print(cnt,sel)
+    temp = 0
     if cnt == M:
-        print(sel)
-        #치킨집 안뽑힌 곳 0으로 돌림
-        arr = copy.deepcopy(city)
-        q = copy.deepcopy(start)
-        for i in range(N):
-            for j in range(N):
-                if city[i][j] == 1 and [i,j] not in sel:
-                    # print(i,j,'이러면되나?')
-                    arr[i][j] = 0
-        ans = bfs(arr, q)
-        print('ans',ans)
-        if ans < MIN:
-            MIN = ans
+        # print(sel)
+        for s in range(len(start)):
+            # print('--MIN---',MIN)
+            minans = sys.maxsize
+            for e in range(len(store)):
+                if sel[e]:
+                    si,sj = start[s]
+                    ei,ej = store[e]
+                    ans = abs(si-ei) + abs(sj-ej)
+                    # print(s,e,ans)
+                    if minans > ans:
+                        minans = ans
+            temp += minans
+            if temp > MIN:
+                return
+        if MIN > temp:
+            MIN = temp
         return
     if idx == len(store):
         return
@@ -1533,39 +1540,6 @@ def comb(idx):
     sel[idx] = 0
     cnt -=1
     comb(idx+1)
-
-di = [-1,1,0,0]#상하좌우
-dj = [0,0,-1,1]
-def bfs(arr, q):
-    dist = [[0 for c in range(N)] for r in range(N)]
-    print('--CITY--',q)
-    for x in arr:
-        print(x)
-    while q:
-        pi,pj = q.popleft()
-        for d in range(4):
-            ni = pi + di[d]
-            nj = pj + dj[d]
-            if ni < 0 or ni >= N or nj < 0 or nj >= N:
-                continue
-            # if arr[ni][nj] == 1:
-            #     if dist[ni][nj] < dist[pi][pj]+1:
-            #         continue
-            if arr[ni][nj] == 2:
-                continue
-            if dist[ni][nj] and dist[ni][nj] < dist[pi][pj] + 1:
-                continue
-            dist[ni][nj] = dist[pi][pj] + 1
-            q.append([ni,nj])
-    print('--DIST--')
-    for x in dist:
-        print(x)
-    ans = 0
-    for x in range(N):
-        for y in range(N):
-            if arr[x][y] == 1:
-                ans += dist[x][y]
-    return ans
 
 
 N, M = map(int,input().split())
@@ -1579,8 +1553,8 @@ for i in range(N):
         #치킨집
         if city[i][j] == 1:
             store.append([i,j])
-print(start)
-print(N,M,store)
+# print(start)
+# print(N,M,store)
 sel = [0]*len(store)
 cnt = 0 #몇개뽑았는지 세어줌
 MIN = sys.maxsize
