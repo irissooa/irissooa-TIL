@@ -650,6 +650,41 @@ def DFS(R, C, D, fail):
             DFS(R, C, (D+3)%4, fail + 1)
 ```
 
+- 다른사람 코드
+
+```python
+def clean(r,c,d):
+    if visited[r][c] == 0:
+        visited[r][c] = 1
+    cnt = 1
+    while True:
+        for i in range(1,5):
+            tmp_d = (d-i) % 4
+            dr = r + d_row[tmp_d]
+            dc = c + d_col[tmp_d]
+            if visited[dr][dc]==0 and area[dr][dc] == 0:
+                visited[dr][dc] = 1
+                r = dr
+                c = dc
+                d = tmp_d
+                cnt += 1
+                break
+        else:
+            tmp_d = (d-2) % 4
+            r += d_row[tmp_d]
+            c += d_col[tmp_d]
+            if area[r][c] == 1:
+                return cnt
+
+d_row = [-1,0,1,0]
+d_col = [0,1,0,-1]
+N,M = map(int,input().split())
+r,c,d = map(int,input().split())
+area = [list(map(int,input().split())) for _ in range(N)]
+visited = [[0]*M for _ in range(N)]
+print(clean(r,c,d))
+```
+
 
 
 ## BOJ_17140_이차원배열과연산
@@ -1444,5 +1479,112 @@ for i1 in range(n * m):
         world[i1] = 0
 
 print(answer)
+```
+
+
+
+## BOJ_15686_치킨배달
+
+> 푸는중....ㅎ...
+
+```python
+'''
+2020-11-28 21:07
+NxN인 도시,각 칸 빈칸(0), 치킨집(1), 집(2) 중 하나
+r행 c열 1부터 시작
+치킨거리 = 집과 가장 가까운 치킨집 사이의 거리(|r1-r2|+|c1-c2|)
+도시의 치킨거리는 모든 집의 치킨 거리의 합
+M개의 치킨집만 고르고 나머지 치킨집 없애야 됨
+어떻게 고르면 도시의 치킨 거리가 가장 작게 될까
+출발점인 2를 전부 start에 담고, bfs를 돌릴건데 nCm인 조합으로 뽑은
+점들만 빼고 나머지 치킨집은 0으로 바꿈, dist최소 값들 구한뒤 다시 원상복귀
+반복,,
+'''
+import copy
+import sys
+from collections import deque
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+
+
+def comb(idx):
+    global cnt,MIN
+    # print(cnt,sel)
+    if cnt == M:
+        print(sel)
+        #치킨집 안뽑힌 곳 0으로 돌림
+        arr = copy.deepcopy(city)
+        q = copy.deepcopy(start)
+        for i in range(N):
+            for j in range(N):
+                if city[i][j] == 1 and [i,j] not in sel:
+                    # print(i,j,'이러면되나?')
+                    arr[i][j] = 0
+        ans = bfs(arr, q)
+        print('ans',ans)
+        if ans < MIN:
+            MIN = ans
+        return
+    if idx == len(store):
+        return
+    sel[idx] = store[idx]
+    cnt += 1
+    comb(idx+1)
+    sel[idx] = 0
+    cnt -=1
+    comb(idx+1)
+
+di = [-1,1,0,0]#상하좌우
+dj = [0,0,-1,1]
+def bfs(arr, q):
+    dist = [[0 for c in range(N)] for r in range(N)]
+    print('--CITY--',q)
+    for x in arr:
+        print(x)
+    while q:
+        pi,pj = q.popleft()
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= N:
+                continue
+            # if arr[ni][nj] == 1:
+            #     if dist[ni][nj] < dist[pi][pj]+1:
+            #         continue
+            if arr[ni][nj] == 2:
+                continue
+            if dist[ni][nj] and dist[ni][nj] < dist[pi][pj] + 1:
+                continue
+            dist[ni][nj] = dist[pi][pj] + 1
+            q.append([ni,nj])
+    print('--DIST--')
+    for x in dist:
+        print(x)
+    ans = 0
+    for x in range(N):
+        for y in range(N):
+            if arr[x][y] == 1:
+                ans += dist[x][y]
+    return ans
+
+
+N, M = map(int,input().split())
+city = [list(map(int,input().split())) for _ in range(N)]
+start,store = deque(),deque()
+for i in range(N):
+    for j in range(N):
+        #집
+        if city[i][j] == 2:
+            start.append([i,j])
+        #치킨집
+        if city[i][j] == 1:
+            store.append([i,j])
+print(start)
+print(N,M,store)
+sel = [0]*len(store)
+cnt = 0 #몇개뽑았는지 세어줌
+MIN = sys.maxsize
+comb(0)
+print(MIN)
 ```
 

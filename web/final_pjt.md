@@ -973,10 +973,37 @@ const token = localStorage.getItem('jwt')
 ```python
 # True -> False
 DEBUG = False
-#접속을 허용하는 주소
-ALLOWED_HOSTS = ['127.0.0.1']
+#접속을 허용하는 주소 -> 전부
+ALLOWED_HOSTS = ['*']
 ```
 
-2. 가장 최상위폴더에서 templates폴더안에 404.html 파일을 만듦
-3. 다시 settings를 가서 TEMPLATES부분에서 DIRS에 templates폴더를 입력함
+2. 프로젝트의 `urls.py`
+
+```python
+from movies import views
+from django.conf.urls import handler404, handler500, handler403, handler400
+
+#아래의 코드를 적음
+handler404 = views.handle_page_not_found
+handler500 = movieviews.handle_page_not_found500
+```
+
+3. `movies` > `views.py`
+
+```python
+def handle_page_not_found404(request,exception):
+    context = {}
+    return render(request,'movies/sorry.html',context)
+
+def handle_page_not_found500(request):
+    context = {}
+    return render(request,'movies/sorry.html',context)
+
+```
+
+4. `movies`>`sorry.html`
+
+```html
+
+```
 
