@@ -1662,3 +1662,631 @@ snake(1,1)
 print(time)
 ```
 
+
+
+## BOJ_15683_감시
+
+> 하나하나 완전탐색해야될거같은데......복잡하다...이따 다시풀어야지ㅠ
+
+```python
+'''
+2020-11-30 16:25
+CCTV종류
+1: 한 방향
+2: 서로 반대 두 방향(상하,좌우)
+3: 90도 두방향(우하,좌상,우상,좌하)
+4: 세방향(한개제외)
+5: 네 방향
+cctv는 회전가능(대각선만안되면 됨)
+벽(6)은 통과할수없지만 cctv는 통과가능
+감시할 수 없는 사각지대가 최소인 크기를 구해라
+dfs를 돌릴건데
+각 cctv좌표가 갈수 있는 범위 까지 cnt를 세고 상하좌우 모두 돌려서 cnt센뒤 list에 담아주고
+cctv번호에 따라 개수를 합해서 세어준뒤 제일 많은 cnt를 total에 더함
+이걸 반복해서 전체 0의 수에서 빼줌
+
+카메라가 큰번호부터 방문처리를 하는게 좋겠다
+딕셔너리? 카메라번호 key : [각 d별 [cnt,방문한좌표]]
+근데 딕셔너리로 했을 떄....중복되는 카메라 처리..해야돼서 다시 생각해보자
+'''
+import sys
+input = sys.stdin.readline
+
+di = [-1,1,0,0]#상하좌우
+dj = [0,0,-1,1]
+
+def cctv(i,j,num):
+    pi,pj,d = i,j,0
+    cnt = 0
+    cntList = []
+    visitList = [[] for _ in range(4)]
+    while d<4:
+        ni = pi + di[d]
+        nj = pj + dj[d]
+        # print(ni,nj)
+        if office[ni][nj] == 6:
+            cntList.append(cnt)
+            pi,pj = i,j
+            d+=1
+            cnt = 0
+            continue
+        if not visited[ni][nj] and not office[ni][nj]:
+            cnt += 1
+            visitList[d].append([ni,nj])
+        pi,pj = ni,nj
+    # 겹치는 곳..표시하기
+    # print(cntList)
+    # print(visitList)
+    if num == 1:
+        total = [cntList.index(max(cntList))]
+
+    elif num == 2:
+        ans1 = sum(cntList[:2])
+        ans2 = sum(cntList[2:])
+        if ans1 > ans2:
+            total = [0,1]
+        else:
+            total = [2,3]
+
+    elif num == 3:
+        total = []
+        if cntList[0] > cntList[2]:
+            total.append(0)
+            if cntList[1] > cntList[3]:
+                total.append(1)
+            else:
+                total.append(3)
+        else:
+            total.append(2)
+
+    elif num == 4:
+        total = []
+        for i in range(4):
+            if i != cntList.index(min(cntList)):
+                total.append(i)
+    else:
+        total = [0,1,2,3]
+    # print(cntList,num,total)
+    for i in range(len(total)):
+        for j in range(len(visitList[total[i]])):
+            vi, vj = visitList[total[i]][j]
+            visited[vi][vj] = True
+    return
+
+N,M = map(int,input().split())
+# 벽 만듦
+office = [[6]+list(map(int,input().split()))+[6] for _ in range(N)]
+office.insert(0,[6]*(M+2))
+office.insert(N+1,[6]*(M+2))
+
+zero = 0
+visited = [[False for j in range(M+2)] for i in range(N+2)]
+# for x in office:
+#     print(x)
+cctvList = []
+for i in range(1,N+1):
+    for j in range(1,M+1):
+        if office[i][j] == 0:
+            zero += 1
+        if office[i][j] != 0 and office[i][j] !=6:
+            cctvList.append([office[i][j],i,j])
+cctvList.sort(key=lambda x:-x[0])
+# print(cctvList)
+for x in cctvList:
+    cctv(x[1],x[2],x[0])
+# for x in visited:
+#     print(x)
+ans = 0
+for i in range(1,N+1):
+    for j in range(1,M+1):
+        if visited[i][j]:
+            ans += 1
+print(zero-ans)
+```
+
+
+
+- 다른사람 코드
+
+> **알고리즘 분류 : 브루트 포스** 
+>
+> 
+>
+> 5종류의 CCTV를 키고 끄면서, CCTV가 감시할 수 없는 영역인 사각지대의 최소 크기를 맞추는 문제다. 최대 8개의 CCTV가 주어지고, 각 CCTV는 일정한 방향성을 가지고 있다. CCTV는 90도로 회전하며 사용할 수 있고, 이에 따라서 감시 영역이 바뀐다. 이 문제는 N이 최대 8이기 때문에, 모든 경우의 수를 구해서 최소 크기를 구하면 된다.
+>
+> 
+>
+> ![img](삼성SW역량기출.assets/994E0D4E5C44AD6803)
+>
+> 
+>
+> - CCTV 1~5번에 해당하는 방향을 만든다. 아래 코드에서는 비트 연산을 통해 만들었다.
+> - 위쪽 방향 : 0001 == 1<<0 (인덱스 0)
+> - 오른쪽 방향 : 0010 == 1<<1 (인덱스 1)
+> - 아래쪽 방향 : 0100 == 1<<2 (인덱스 2)
+> - 왼쪽 방향 : 1000 == 1<<3 (인덱스 3)
+> - 위 4가지를 정하고, OR 연산을 통해 각 CCTV의 방향성을 정했다.
+> - DFS 방식으로 CCTV의 개수만큼 깊이 탐색을 시작한다.
+> - 각 CCTV를 키고 끄는 방식으로 모든 경우의 수를 구한다.
+> - CCTV를 키면 해당 CCTV에 대한 방향성을 토대로 감시 영역을 정해야 한다.
+> - 이 경우, a배열에 원래 맵 정보가 들어있고, b배열을 별도로 만들어서 CCTV의 감시 정보를 저장했다.
+> - CCTV는 벽(6)을 관통할 수 없다. 맵의 범위를 벗어나는 것을 처리하는 것은, 가장자리를 모두 벽(6)으로 만들면 편하다.
+>
+> 출처: https://rebas.kr/732 [PROJECT REBAS]
+
+```python
+from sys import stdin
+input = stdin.readline
+
+n, m = map(int, input().split())
+a = [[6]*(m+2)]
+b = [[0]*(m+2) for _ in range(n+2)]
+v = []
+ans = 1e9
+dx, dy = (-1, 0, 1, 0), (0, 1, 0, -1)
+U, R, D, L = 1, 2, 4, 8
+direct = [[0],
+         [U, R, D, L],
+         [U|D, R|L],
+         [U|R, R|D, D|L, L|U],
+         [L|U|R, U|R|D, R|D|L, D|L|U],
+         [U|R|D|L]]
+
+def init():
+    for _ in range(n):
+        a.append([6]+list(map(int, input().split()))+[6])
+    a.append(list([6]*(m+2)))
+    for i in range(n+2):
+        for j in range(m+2):
+            if a[i][j] == 6:
+                b[i][j] = 1
+            elif a[i][j]:
+                v.append((i, j, a[i][j]))
+
+def observe(x, y, i, d):
+    for k in range(4):
+        if i & (1<<k):
+            nx, ny = x, y
+            while a[nx][ny] != 6:
+                b[nx][ny] += d
+                nx, ny = nx+dx[k], ny+dy[k]
+
+def solve(index):
+    global ans
+    if index == len(v):
+        area = 0
+        for i in range(1, n+1):
+            area += b[i].count(0)
+        ans = min(ans, area)
+        return
+    x, y, ids = v[index]
+    for i in direct[ids]:
+        observe(x, y, i, 1)
+        solve(index+1)
+        observe(x, y, i, -1)
+
+init()
+solve(0)
+print(ans)
+
+
+출처: https://rebas.kr/732 [PROJECT REBAS]
+```
+
+
+
+## BOJ_16235_나무재테크
+
+> 시간초과가 계속 났는데, deque()로 고치니까 됐다!
+
+```python
+'''
+처음에는 NxN땅 모두 양분5씩
+M개의 나무를 심었다
+봄 -> 나무가 자신의 나이만큼 양분을 먹고, 나이가 1 증가
+각 나무는 자기칸의 양분만 먹고, 여러 나무가 있을 경우 나이가 어린 나무부터 양분을 먹음
+만약, 땅에 양분이 부족하다면 그 나무는 바로 죽고 여름에 죽은나무//2만큼 양분 추가
+가을 -> 나무 번식, 번식하는 나무는 나이가 5의배수여야함, 인접한 8개 칸에 나이가 1인 나무가 생김
+겨울 -> 땅을 돌아다니며 땅에 양분 추가, 각 칸에 추가되는 양분의 양은 A[r][c]이고, 입력으로 주어짐
+K년이 지난 후 살아있는 나무 개수?
+'''
+import sys
+sys.stdin= open('input.txt','r')
+input = sys.stdin.readline
+import heapq
+from collections import deque
+
+di = [-1,1,0,0,-1,1,-1,1]#상하좌우,우상대,우하대,좌상대,좌하대
+dj = [0,0,-1,1,1,1,-1,-1]
+
+def year():
+    # print('--봄--')
+    # for x in tree:
+    #     print(x)
+    for i in range(N):
+        for j in range(N):
+            food = land[i][j]
+            temp = deque()
+            if not tree[i][j]:
+                continue
+            while tree[i][j]:
+                # print(type(tree[i][j]),i,j)
+                t = tree[i][j].popleft()
+                # print(i,j,t)
+                ans = food-t
+                # 여름 만약 양분이 부족하면 그 t//2만큼 양분 추가
+                if ans < 0:
+                    # print('---여름--')
+                    land[i][j] += t//2
+                    # print(t,t//2,land[i][j])
+                # 봄 , 나이추가해서 다시 넣기
+                else:
+                    temp.append(t+1)
+                    # print('나이듦',temp,ans)
+                    land[i][j] = ans
+                    food = ans
+            # heapq.heapify(temp)
+            # print(temp)
+            tree[i][j].extend(temp)
+            # for t in temp:
+            #     heapq.heappush(tree[i][j],t)
+            # print(i,j,tree[i][j])
+    # for x in tree:
+    #     print(x)
+#     가을
+#     print('----가을----')
+    for i in range(N):
+        for j in range(N):
+            if not tree[i][j]:
+                continue
+            for t in tree[i][j]:
+                # 나무가 5의 배수라면
+                # print(t)
+                # print(t)
+                # print(tree[i][j])
+                if not t % 5:
+                    pi,pj = i,j
+                    for d in range(8):
+                        ni = pi + di[d]
+                        nj = pj + dj[d]
+                        if ni < 0 or ni >= N or nj < 0 or nj >= N:
+                            continue
+                        tree[ni][nj].insert(0,1)
+#    겨울
+#     print('---겨울----')
+    for i in range(N):
+        for j in range(N):
+            land[i][j] += A[i][j]
+    # for x in land:
+    #     print(x)
+
+N,M,K = map(int,input().split())
+tree = [[deque() for j in range(N)] for i in range(N)]
+land = [[5 for j in range(N)] for i in range(N)]
+# 각 칸에 추가되는 양분의 양
+A = deque()
+# print('----땅양분----')
+# for x in land:
+#     print(x)
+for _ in range(N):
+    A.append(list(map(int,input().split())))
+# print('----A-----')
+# for x in A:
+#     print(x)
+info = deque()
+for _ in range(M):
+    # 심은 나무 i,j,나이age
+    info.append(list(map(int,input().split())))
+for t in info:
+    i,j,age = t
+    tree[i-1][j-1].append(age)
+
+# print('----나무----')
+# for x in tree:
+#     print(x)
+for _ in range(K):
+    year()
+cnt = 0
+# for x in tree:
+#     print(x)
+for i in range(N):
+    for j in range(N):
+        if tree[i][j]:
+            for t in tree[i][j]:
+                cnt += 1
+print(cnt)
+```
+
+
+
+## BOJ_16234_인구이동
+
+> union이 여러개로 나눠져있다가 하나의 경계로 인해 합쳐지는 과정이 없는줄 몰라서 시간이 좀 걸렸다..ㅠ
+
+```python
+'''
+2020-12-01 16:45
+NxN 땅이 있음
+각 칸 A[r][c]명이 산다
+인구이동
+1. 국경선을 공유하는 두 나라의 인구 차이가 L명 이상,R명이하
+2. 국경선이 모두 열렸다면 인구이동시작
+3. 국경선이 열려있다면 인접한칸으로 연합이라고 하고,
+연합의 각 칸 인구수 = (연합의 인구수) // (연합을 이루고 있는 칸의 개수)
+4. 연합을 해체하고 모든 국경선을 닫음
+각 나라 인구수가 주어졌을때 인구 이동이 몇번 발생하나?
+각 칸(a)을 돌면서 인접한 칸(b)이 인구이동 조건 1에 맞다면 국경선이 열린 좌표를 set([i,j,인구수])에 b를 담아줄건데
+담아줄때 a가 이미 list안에 있으면 b만 넣어주면 되고, 만약에 없으면 새로운 연합! a와 b를 넣은 list을 list에 추가
+모든 국경선을 다 연뒤에 인구이동 시작!
+연합 list를 돌면서 조건에 맞게 인구이동시킨뒤 다시 값을 넣어줌
+그리고 반복
+'''
+import sys
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+
+di = [-1,1,0,0]#상하좌우
+dj = [0,0,-1,1]
+def checkunion(i,j,num):
+    # print('연합있니',unionlist,i,j,num)
+    for union in unionlist:
+        for u in union:
+            if [i,j,num] == u:
+                # print(u,union,'같냐?')
+                return union
+    return False
+
+def findunion(i,j,num):
+    # print('연합찾아라',i,j,num)
+    pi,pj = i,j
+    for d in range(4):
+        ni = pi + di[d]
+        nj = pj + dj[d]
+        if ni < 0 or ni >= N or nj < 0 or nj >= N:
+            continue
+        ans = abs(country[ni][nj] - num)
+        if ans < L or ans > R:
+            continue
+        # pi,pj가 연합에 있다면 다음 연합 추가
+        # print(pi,pj,num,'-->',ni,nj,country[ni][nj])
+        punion = checkunion(pi, pj, num)
+        nunion = checkunion(ni,nj,country[ni][nj])
+        if punion:
+            for u in punion:
+                if [ni,nj,country[ni][nj]] == u:
+                    break
+            else:
+                if nunion:
+                    punion.extend(nunion)
+                    unionlist.remove(nunion)
+                else:
+                    punion.append([ni,nj,country[ni][nj]])
+                # print('--punion연합추가요--')
+                # for x in unionlist:
+                #     print(x)
+            continue
+        if nunion:
+            for u in nunion:
+                if [pi, pj, num] == u:
+                    break
+            else:
+                if punion:
+                    nunion.extend(punion)
+                    unionlist.remove(punion)
+                else:
+                    nunion.append([pi, pj, num])
+                # print('--nunion연합추가요--')
+                # for x in unionlist:
+                #     print(x)
+            continue
+        #연합에 없다면 새로운 연합 list에 넣어줌
+        newunion = []
+        newunion.append([pi,pj,num])
+        newunion.append([ni,nj,country[ni][nj]])
+        unionlist.append(newunion)
+        # print('--연합추가요--')
+        # for x in unionlist:
+        #     print(x)
+
+
+def move(ulist):
+    global cnt
+    # print('인구이동')
+    cnt += 1
+    for union in ulist:
+        # print(union)
+        if not union:
+            continue
+        people = 0
+        for u in union:
+            people+=u[2]
+        ans = people //len(union)
+        for u in union:
+            i,j,num = u[0],u[1],u[2]
+            country[i][j] = ans
+    # for x in country:
+    #     print(x)
+    return
+
+N,L,R = map(int,input().split())
+country = [list(map(int,input().split())) for _ in range(N)]
+unionlist = []
+cnt =0
+while True:
+    # print(cnt+1,'여긴몇번')
+    # for x in country:
+    #     print(x)
+    if cnt > 2000:
+        break
+    for i in range(N):
+        for j in range(N):
+            findunion(i,j,country[i][j])
+    if unionlist:
+        move(unionlist)
+        unionlist=[]
+    else:
+        print(cnt)
+        break
+
+```
+
+
+
+- 다른사람코드
+
+```python
+import sys
+from collections import deque
+read = sys.stdin.readline
+
+N, L, R = map(int, read().split())
+matrix = []
+for _ in range(N):
+    matrix.append(list(map(int, read().split())))
+
+def BFS(memo, pos, matrix):
+
+    global N, L, R
+    i, j = pos
+    memo[i][j] = 1
+    nations = [(i, j)]
+    q = deque([(i, j)])
+    dx = [0, 0, 1, -1]
+    dy = [1, -1, 0, 0]
+
+    while q:
+        i, j = q.popleft()
+        for idx in range(4):
+            new_i = i + dx[idx]
+            new_j = j + dy[idx]
+            if new_i < 0 or new_j < 0 or  new_i >= N or new_j >= N:
+                continue
+            elif memo[new_i][new_j] == 0 and (L <= abs(matrix[i][j] - matrix[new_i][new_j]) <= R):
+                q.append((new_i, new_j))
+                nations.append((new_i, new_j))
+                memo[new_i][new_j] = 1
+
+    if len(nations) == 1:
+        return
+
+    sum_v = 0
+    for nation in nations:
+        sum_v += matrix[nation[0]][nation[1]]
+    avg = sum_v // len(nations)
+    for nation in nations:
+        matrix[nation[0]][nation[1]] = avg
+
+
+
+def divide(matrix):
+    dx = [0, 0, 1, -1]
+    dy = [1, -1, 0, 0]
+    global N
+    memo = [[0]*N for _ in range(N)]
+    k = 0
+    for i in range(N):
+        for j in range(N):
+            if memo[i][j] == 0:
+                k += 1
+                need_bfs = False
+
+                for idx in range(4):
+                    new_i = i + dx[idx]
+                    new_j = j + dy[idx]
+                    if new_i < 0 or new_j < 0 or  new_i >= N or new_j >= N:
+                        continue
+                    elif memo[new_i][new_j] == 0 and (L <= abs(matrix[i][j] - matrix[new_i][new_j]) <= R):
+                        need_bfs = True
+                        break
+
+                if need_bfs:
+                    BFS(memo, (i, j), matrix)
+                else:
+                    memo[i][j] = 1
+
+    return k
+
+
+
+cnt = 0
+while True:
+    nations_list = []
+    k = divide(matrix)
+    if k == N*N:
+        print(cnt)
+        sys.exit()
+    cnt += 1
+
+```
+
+- 다른사람코드
+
+```python
+'''
+1, dfs 를 돌려서 그룹화하자
+2, 그룹별로 이동을시키자
+이걸 반복하되 1,2에서 변화가 없으면 그만하자
+'''
+
+import sys, copy
+sys.setrecursionlimit(10**6)
+N, L, R = map(int, input().split())
+graph = [list(map(int, input().split())) for _ in range(N)]
+dx = [-1, 0, 0, 1]
+dy = [0, 1, -1, 0]
+ans = 0
+def print_board(board):
+    for i in range(N):
+        for j in range(N):
+            print(board[i][j], end=" ")
+        print("")
+
+def dfs(y, x):
+    global group, group_count_sum
+    graph_group[y][x] = group
+    # 그 그룹에 몇개가 있는지
+    group_count_sum[group][0] += 1
+    # 그 그룹에 인구가 얼마나 있는지
+    group_count_sum[group][1] += graph[y][x]
+
+    for i in range(4):
+        ny, nx = y+dy[i], x+dx[i]
+        if 0<=nx<N and 0<=ny<N and graph_group[ny][nx]==0:
+            if L<= abs(graph[y][x] -graph[ny][nx]) <=R:
+                graph_group[ny][nx] = group
+                dfs(ny, nx)
+
+def is_same(graph, graph_backup):
+    for i in range(N):
+        for j in range(N):
+            if graph[i][j] !=  graph_backup[i][j]:
+                return False
+    return True
+
+while True:
+    graph_group = [[0] * N for _ in range(N)]
+    # group_count_sum = [[0, 0]] * ((N**2)+1)
+    group_count_sum = [[0]*2 for _ in range(N*N +1)]
+    graph_backup = copy.deepcopy(graph)
+    group = 1
+    #그룹화하고 그룹별 갯수, 인구수 구하기
+    for i in range(N):
+        for j in range(N):
+            if graph_group[i][j]==0:
+                dfs(i, j)
+                group +=1
+
+    #인구 이동시키기
+    for i in range(N):
+        for j in range(N):
+            graph[i][j] = group_count_sum[graph_group[i][j]][1] // group_count_sum[graph_group[i][j]][0]
+
+    if is_same(graph, graph_backup):
+        break
+    else:
+        ans +=1
+
+print(ans)
+
+```
+
