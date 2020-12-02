@@ -2537,3 +2537,223 @@ dust[cleaner[0]][0], dust[cleaner[1]][0] = 0, 0
 print(sum(map(sum, dust)))
 ```
 
+
+
+## SWEA_1873_상호의 배틀필드
+
+```python
+'''
+2020-12-02 10:20-11:30
+문자	의미
+.	평지(전차가 들어갈 수 있다.)
+*	벽돌로 만들어진 벽
+#	강철로 만들어진 벽
+-	물(전차는 들어갈 수 없다.)
+^	위쪽을 바라보는 전차(아래는 평지이다.)
+v	아래쪽을 바라보는 전차(아래는 평지이다.)
+<	왼쪽을 바라보는 전차(아래는 평지이다.)
+>	오른쪽을 바라보는 전차(아래는 평지이다.)
+
+문자	동작(사용자가 넣을 수 있는 입력의 종류)
+U	Up : 전차가 바라보는 방향을 위쪽으로 바꾸고, 한 칸 위의 칸이 평지라면 위 그 칸으로 이동한다.
+D	Down : 전차가 바라보는 방향을 아래쪽으로 바꾸고, 한 칸 아래의 칸이 평지라면 그 칸으로 이동한다.
+L	Left : 전차가 바라보는 방향을 왼쪽으로 바꾸고, 한 칸 왼쪽의 칸이 평지라면 그 칸으로 이동한다.
+R	Right : 전차가 바라보는 방향을 오른쪽으로 바꾸고, 한 칸 오른쪽의 칸이 평지라면 그 칸으로 이동한다.
+S	Shoot : 전차가 현재 바라보고 있는 방향으로 포탄을 발사한다.
+
+전차가 만약 게임맵의 밖이라면 전차는 이동하지 않음
+전차가 포탄을 발사하면 포탄은 벽돌로 만들어진 벽 또는 강철로 만들어진 벽에 충돌하거나 게임 맵 밖으로 나갈때까지 직진
+만약 벽에 부딪히면 포탄 소멸, 벽이 벽돌로 만들어진 벽이라면 이벽은 파괴되고 평지가 됨
+강철로 만들어진 벽이라면 아무일도 일어나지 않음
+게임 밖으로 나가면 아무일도 일어나지 않음
+초기 게임 맴의 상태와 사용자가 넣을 입력이 순서대로 주어질때, 모든 입력을 처리하고 나면 게임 맴의 상태가 어떻게 되는가?
+
+for 문을 돌리면서 ^ v < >모양이  전차의 위치와 바라보는 모양
+그 방향대로 일단 움직이는데 앞에 .(평지)가 있을 때만 앞으로 갈 수 있다.
+그전에 사용자의 입력에 따라 움직여야됨
+포탄을 발사했을때 만나는게 벽돌로만들어진 벽이라면 그 벽은 평지가 됨
+방향을 바꿨을때 그 칸이 평지라면 그 칸으로 이동, 아니라면 이동하지 않고 다음 input으로 넘어감
+'''
+
+di = [-1,1,0,0] #상하좌우
+dj = [0,0,-1,1]
+def move(i,j,d):
+    pi,pj,pd = i,j,d
+    while userinput:
+        STR = userinput.pop(0)
+        # print(STR)
+        # for x in MAP:
+        #     print(x)
+        if STR =='S':
+            wi,wj = pi,pj
+            while True:
+                ni = wi + di[pd]
+                nj = wj + dj[pd]
+                if ni < 0  or ni >= H or nj < 0 or nj >= W:
+                    break
+                if MAP[ni][nj] == '*':
+                    MAP[ni][nj] = '.'
+                    break
+                if MAP[ni][nj] == '#':
+                    break
+                wi,wj = ni,nj
+            continue
+        if STR == 'U':
+            pd = 0
+            dir ='^'
+            MAP[pi][pj] = dir
+        if STR == 'D':
+            pd = 1
+            dir = 'v'
+            MAP[pi][pj] = dir
+        if STR == 'L':
+            pd = 2
+            dir = '<'
+            MAP[pi][pj] = dir
+        if STR == 'R':
+            pd = 3
+            dir = '>'
+            MAP[pi][pj] = dir
+        ni = pi + di[pd]
+        nj = pj + dj[pd]
+        if ni < 0 or ni >= H or nj < 0 or nj >= W:
+            continue
+        if MAP[ni][nj] != '.':
+            continue
+        MAP[pi][pj] = '.'
+        # print(MAP[pi][pj],pi,pj)
+        pi,pj = ni,nj
+        MAP[pi][pj] = dir
+        # print(MAP[pi][pj],pi,pj)
+
+
+
+T = int(input())
+for tc in range(1,T+1):
+    # 게임맵의 높이가 H, 너비가 W
+    H,W = map(int,input().split())
+    MAP = [list(input()) for _ in range(H)]
+    # 사용자 입력 개수
+    N = int(input())
+    userinput = list(input())
+    # print(userinput)
+    # for x in MAP:
+    #     print(x)
+    for i in range(H):
+        for j in range(W):
+            if MAP[i][j] == '^':
+                move(i,j,0)
+            if MAP[i][j] == 'v':
+                move(i,j,1)
+            if MAP[i][j] == '<':
+                move(i,j,2)
+            if MAP[i][j] == '>':
+                move(i,j,3)
+    # print('----전차이동----')
+    print('#{}'.format(tc),end=' ')
+    for x in MAP:
+        print(''.join(x))
+```
+
+
+
+
+
+## SWEA_1868_파핑파핑지뢰찾기
+
+> 한번에 하려고 하지말고 나눠서 차근차근 단계를 나눠서 하자....ㅠ
+
+```python
+'''
+2020-12-02 11:40
+표의 각 칸에는 지뢰가 있을 수도 있고, 없을 수도 있음
+각 칸을 클릭했을때 지뢰가 있다면 파핑 파핑! 소리와 함께 끝남
+지뢰가 없는 칸이라면 변이 맞닿아있거나 꼭지점이 맞닿아 있는 최대 8칸에 대해
+몇 개의 지뢰가 있는지 0~8사이의 숫자로 클릭한 칸에 표시됨
+만약 이 숫자가 0이라면 근처의 8방향에 지뢰가 없다는 것이 확장돼 그 방향의 칸도 자동으로 숫자를 표시해줌
+지뢰의 위치를 알 수 잇을때
+지뢰를 '*'로, 지뢰가 없는칸을 '.'로, 클릭한 지뢰가 없는 칸을 'C'로 나타냈을때
+표가 어떻게 변하나?
+파핑파핑 지뢰찾기를 할때 표의 크기와 표가 주어지고, 지뢰가 있는칸을 제외한
+다른 모든 칸의 숫자들이 표시되려면 최소 몇 번 클릭을 해야하는지 구해라
+
+8방향으로 보는데 주변에 지뢰의 개수를 세고 MAP에 입력해줌
+0인 것 먼저 클릭
+나머지 지뢰가 아닌것 클릭
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from collections import deque
+di = [-1,1,0,0,-1,1,-1,1] #상하좌우, 우상대 우하대 좌상대 좌하대
+dj = [0,0,-1,1,1,1,-1,-1]
+
+# 지뢰수 찾아 2차원리스트 갱신
+def find(i,j):
+    q = deque()
+    q.append([i,j])
+    while q:
+        pi,pj = q.popleft()
+        cnt = 0
+        for d in range(8):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= N:
+                continue
+            if MAP[ni][nj] == '*':
+                cnt += 1
+                continue
+        MAP[pi][pj] =cnt
+
+def click(i,j):
+    q = deque()
+    q.append([i,j])
+    visited[i][j] = True
+    while q:
+        pi,pj = q.popleft()
+        for d in range(8):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= N:
+                continue
+            if visited[ni][nj]:
+                continue
+            if MAP[ni][nj] == 0:
+                q.append([ni,nj])
+            visited[ni][nj] = True
+
+
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    MAP = [list(input()) for _ in range(N)]
+    visited = [[False for j in range(N)] for i in range(N)]
+    ans = 0
+    zeroList = deque()
+    for i in range(N):
+        for j in range(N):
+            if MAP[i][j] == '.':
+                find(i,j)
+            if MAP[i][j] == 0:
+                zeroList.append([i,j])
+    # print(zeroList)
+    for r,c in zeroList:
+        if not visited[r][c]:
+            click(r,c)
+            ans += 1
+    for i in range(N):
+        for j in range(N):
+            if not visited[i][j] and MAP[i][j] != '*':
+                ans+=1
+
+    # for x in MAP:
+    #     print(x)
+    print('#{} {}'.format(tc,ans))
+```
+
+
+
+
+
+## SWEA_1949_등산로조성
+
