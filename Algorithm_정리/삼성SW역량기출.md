@@ -3032,3 +3032,341 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,ans))
 ```
 
+
+
+## SWEA_5215_햄버거다이어트
+
+```python
+'''
+2020-12-03 11:05-11:13
+맛에대한 점수 조합중 칼로리를 넘지 않는 가장 높은 점수 구하기
+조합 함수 짜고 점수를 제한으로 걸자
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+def comb(idx,total):
+    global MAX
+    if total > L:
+        return
+    if idx == N:
+        if sum(sel) > MAX:
+            MAX = sum(sel)
+        return
+    sel[idx] = taste[idx][0]
+    comb(idx+1,total+taste[idx][1])
+    sel[idx] = 0
+    comb(idx+1, total)
+
+T = int(input())
+for tc in range(1,T+1):
+    #재료수, 제한칼로리
+    N,L = map(int,input().split())
+    # 재료에 대한 맛에 대한 점수와 칼로리
+    taste = [list(map(int,input().split())) for _ in range(N)]
+    sel = [0]*N
+    MAX = 0
+    comb(0,0)
+    print("#{} {}".format(tc,MAX))
+```
+
+- 가지치기를 더 할 수 도 있다
+
+```python
+'''
+2020-12-03 11:05-11:13
+맛에대한 점수 조합중 칼로리를 넘지 않는 가장 높은 점수 구하기
+조합 함수 짜고 점수를 제한으로 걸자
+'''
+
+def comb(idx,total,ans):
+    global MAX
+    if total > L:
+        return
+    if ans > MAX:
+        MAX = ans
+    if idx == N:
+        return
+    score,cal = taste[idx]
+    comb(idx+1,total+cal,ans+score)
+    comb(idx+1,total,ans)
+    
+T = int(input())
+for tc in range(1,T+1):
+    #재료수, 제한칼로리
+    N,L = map(int,input().split())
+    # 재료에 대한 맛에 대한 점수와 칼로리
+    taste = [list(map(int,input().split())) for _ in range(N)]
+    MAX = 0
+    comb(0,0,0)
+    print("#{} {}".format(tc,MAX))
+```
+
+
+
+
+
+
+
+## SWEA_2115_벌꿀채취
+
+> 시간이 넘 오래 걸렸다..ㅠ, 그리고 너무 복잡하게 풀었따,,,다시 풀어보쟈....
+>
+> 선생님 풀이팁
+>
+> 2개의 겹치지 않는 최고 값을 가지고 다니면 한번돌아볼때 두개의 값을 구할 수 있음!(중복을 줄여준다)
+
+```python
+'''
+2020-12-03 11:15-14:45
+NxN개의 벌통이 정사각형 모양으로 배치됨
+각칸 숫자 꿀의 양
+최대한 많은 수익을 내야한다
+1. 두명의 일꾼 꿀을 채취할 수 있는 벌통의 수 M 각각의 일꾼은 가로로 연속되도록 M개의 벌통을 선택하고, 선택한 벌통에서 꿀 채취 가능
+단, 두명의 일꾼이 선택한 벌통 겹칠수없다
+2.두 일 꾼 선택한 벌통에서 꿀 채취해 용기에 담음
+단, 서로 다른 벌통에서 채취한 꿀이 섞이면 안됨 하나씩!
+하나의 벌통에서 꿀을 채취할때 전부 채취해야됨
+두 일꾼이 채취할 수 있는 꿀의 양 C
+3.채취한 꿀은 시장에서 팔림, 하나의 용기에 있는 꿀의 양이 많을수록 상품가치 높아, 각 용기에 있는 꿀의 양의 제곱만큼 수익 생김
+두 일꾼이 꿀을 채취해서 얻을 수 있는 수익의 합이 최대가 되는 경우와 최대수익 출력
+
+1. 두개씩 고를때 방문처리해서 방문한 곳은 못고르게하고 일꾼이 연속된M개를 고름, 각자 sel을 만듦 -> 실패
+1. M개 뽑을 수 있는 경우의 수를 모두 뽑고([i,j,honey[i][j]]), 겹치지 않는 것 두개 뽑기
+2. 조합함수를 만들어서 그중에 각 합이 C를 넘지 않고 각 값을 제곱해서 더한 값이 최대가 되는 것을 고르기
+'''
+import sys
+sys.stdin=open('input.txt','r')
+from collections import deque
+
+# M개를 뽑는 모든 경우의 수 list에 담기
+def select(pi,pj,idx):
+    global sellist
+    for c in range(pj,N):
+        sel[idx] = [pi,c,honey[pi][c]]
+        # print(sel,idx,honey[pi][c])
+        idx += 1
+        if idx == M:
+            temp = sel[:]
+            sellist.append(temp)
+            return
+
+def comb(twolist,pidx,total,ans):
+    global resultlist
+    if total > C:
+        return
+    if pidx == M:
+        if total <= C:
+            resultlist.append(ans)
+        return
+    comb(twolist,pidx+1,total+twolist[pidx][2],ans+(twolist[pidx][2]**2))
+    comb(twolist,pidx+1,total,ans)
+
+
+# 두개를 뽑을건데 i,j가 겹치지 않는것 두개!
+def choose(selectlist):
+    global MAX,resultlist
+    for x in sellist:
+        # print('xxxxx',x)
+        if len(x) >1:
+            for s in x:
+                # print('ssss',s,selectlist)
+                if s in selectlist:
+                    # print('같니',s,selectlist)
+                    break
+            # 겹치는게 하나도 없으면 추가
+            else:
+                anslist.append(x)
+                result = 0
+                comb(anslist[0],0,0,0)
+                result += max(resultlist)
+                resultlist=deque()
+                comb(anslist[1],0,0,0)
+                result += max(resultlist)
+                # print(resultlist)
+                if result > MAX:
+                    MAX = result
+                    # print('결과야아',result)
+                resultlist=deque()
+                anslist.pop()
+        # 1개만 뽑은 거면
+        else:
+            if selectlist != x:
+                anslist.append(x)
+                result = 0
+                comb(anslist[0], 0, 0, 0)
+                result += max(resultlist)
+                resultlist = deque()
+                comb(anslist[1], 0, 0, 0)
+                result += max(resultlist)
+                # print(resultlist)
+                if result > MAX:
+                    MAX = result
+                    # print('결과야아',result)
+                resultlist = deque()
+                anslist.pop()
+
+
+
+T = int(input())
+for tc in range(1,T+1):
+    # 벌통의 크기, 선택 벌통 개수, 꿀최대양
+    N,M,C = map(int,input().split())
+    honey = [list(map(int,input().split())) for _ in range(N)]
+    # for x in honey:
+    #     print(x)
+    # print('----')
+    sellist = deque()
+    MAX = 0
+    resultlist = deque()
+    visited = [[False for j in range(N)] for i in range(N)]
+    for i in range(N):
+        for j in range(N-M+1):
+            sel = [0]*M
+            select(i,j,0)
+    # print(sellist)
+    # 겹치지 않는 두개를 뽑아서 각 C개 뽑은 뒤 수익계산
+    for x in sellist:
+        anslist = deque()
+        anslist.append(x)
+        # print('하나들어감',anslist)
+        choose(x)
+
+    print('#{} {}'.format(tc,MAX))
+
+```
+
+- 다른코드
+
+```python
+def DFS(idx, total, cost, honey):
+    global ans
+    if total > C: return
+    if ans < cost: ans = cost
+ 
+    for i in range(idx + 1, M):
+        if total + honey[i] <= C:
+            DFS(i, total + honey[i], cost + (honey[i] ** 2), honey)
+ 
+ 
+def choose(r, c):
+    global A, B
+    #c에서 M만큼 뽑은게 honey
+    honey = arr[r][c:c + M + 1]
+ 	
+    #한명이 C이하까지 채취한 벌꿀의 cost를 계산
+    for i in range(M):
+        DFS(i, honey[i], honey[i] ** 2, honey)
+ 	
+    #갱신된 ans가 A의 cost보다 작고 
+    if ans > A[2]:
+        #겹친다면 A갱신, r이 같고 c가 A[1]+M안에 들어온건 겹친다는 뜻!
+        if r == A[0] and c < A[1] + M:
+            A[2] = ans
+            A[0] = r
+            A[1] = c
+        #겹치지 않는다면 현재A는 두번째로 큰 B가 되고, A는 새로 갱신
+        else:
+            B = A[:]
+            A[2] = ans
+            A[0] = r
+            A[1] = c
+    #ans가 B의 cost보다 크다면
+    elif ans > B[2]:
+        #r이 A의 행이 아니거나 C가 A의 c+M보다 크지 않으면(A와 겹치지 않으면)
+        if r != A[0] or c >= A[1] + M:
+            #B값갱신
+            B[2] = ans
+            B[0] = r
+            B[1] = c
+ 
+ 
+for tc in range(1, int(input()) + 1):
+    N, M, C = map(int, input().split())
+ 
+    arr = [list(map(int, input().split())) for _ in range(N)]
+    ans = 0
+    A = [0, 0, 0]
+    B = [0, 0, 0]
+    for i in range(N):
+        for j in range(N - M + 1):
+            choose(i, j)
+            ans = 0
+ 
+    print("#{} {}".format(tc, A[2] + B[2]))
+```
+
+- 비트연산
+
+```python
+'''
+비트연산으로 풀어보기
+'''
+```
+
+![image-20201203154528540](삼성SW역량기출.assets/image-20201203154528540.png)
+
+
+
+
+
+## SWEA_4012_요리사
+
+```python
+'''
+2020-12-03 15:20 -16:30
+두명의 손님에게 음식 제공
+최대한 비슷한 맛의 음식 만들어야됨
+N개의 식재료, 식재료 각각 N//2로 나누어 두개의 요리 만듦 A,B
+A,B의 차이가 최소가 되도록 재료를 배분!
+각 음식의 맛은 Sij(식재료i,j)의 합
+A,B차 최솟값 구하기
+
+N//2개로 재료를 뽑고 합구함(A), 안뽑힌 것 합구함(B) -> 2중for문
+두개의 차 최소 갱신
+'''
+import sys
+sys.stdin = open('input.txt','r')
+
+#각 값들의 합 구하기
+def calc(select,opsselect):
+    global MIN
+    SUM,OSUM = 0,0
+    for i in range(N//2):
+        for j in range(i+1,N//2):
+            pi,pj = select[i],select[j]
+            SUM += food[pi][pj] + food[pj][pi]
+            oi,oj = opsselect[i],opsselect[j]
+            OSUM += food[oi][oj] + food[oj][oi]
+
+    if MIN > abs(SUM-OSUM):
+        MIN = abs(SUM-OSUM)
+    return
+
+
+def choose(idx,sidx):
+    if sidx == N//2:
+        opssel = []
+        for i in range(N):
+            if i not in sel:
+                opssel.append(i)
+        # print('결과',sel,opssel)
+        calc(sel,opssel)
+        return
+    if idx == N:
+        return
+    sel[sidx] = idx
+    choose(idx+1,sidx+1)
+    sel[sidx] = 0
+    choose(idx+1,sidx)
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    food = [list(map(int,input().split())) for _ in range(N)]
+    sel=[0]*(N//2)
+    MIN = 987654321
+    choose(0,0)
+    print('#{} {}'.format(tc,MIN))
+```
+
