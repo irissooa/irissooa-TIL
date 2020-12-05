@@ -3440,3 +3440,91 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,numlist[K-1][0]))
 ```
 
+
+
+## SWEA_6109_추억의2048게임
+
+푸는중..
+
+```python
+'''
+2020-12-03 19:20
+최종적으로 2048을 만들어내는것이 목표
+한번 타일을 밀때 상하좌우로 정해서 밀어야됨
+방향을 정하면 모든 타일이 그 방향으로 밀림
+밀리는 방향이 같고 겹칠때 두 타일에 적힌 숫자가 같다면 합쳐져 그 숫자 합의 타일이 새로됨(2개만)
+만약 같은 숫자가 적힌 타일이 3개 이상일 경우 빨리 벽에 닿게 될 타일을 먼저 민다고 생각하자
+격자에서 어떻게 타일을 이동시킬지 방향이 주어질때
+타일을 모두 이동시키고 나면 격자가 어떻게 바뀌는지 출력
+
+S를 입력받고 up,down,left, right에 따라 타일 이동 방향을 정함
+인자를 받을때 (i방향,j방향)을 정하면 방향에 따라 바꿀수있을것같다
+up-> (1,1),  down->(-1,1) left(1,1),right(1,-1)
+제일 위에있는 타일부터 이동, 같으면 합쳐지고 방문표시해서 더이상 못합쳐지게함
+위에서 부터 내려오면서 보면 다 이동시킴(범위벗어나거나,방문표시만날때까지)
+'''
+import sys
+sys.stdin = open('input.txt','r')
+di = [-1,1,0,0]#상하좌우
+dj = [0,0,-1,1]
+def move(d,si,sj,i_dir,j_dir):
+    for i in range(si,N,i_dir):
+        for j in range(sj,N,j_dir):
+            if arr[i][j] == 0:
+                continue
+            pi,pj = i,j
+            for x in arr:
+                print(x)
+            for x in visited:
+                print(x)
+            print('----')
+
+            while True:
+                ni = pi + di[d]
+                nj = pj + dj[d]
+                # 다음에 벽을 만나면 원래 내 좌표를 지금있는 위치로 옮긺
+                if ni < 0 or ni >= N or nj < 0 or nj >= N:
+                    arr[pi][pj] = arr[i][j]
+                    arr[i][j] = 0
+                    break
+                if visited[ni][nj]:
+                    arr[pi][pj] = arr[i][j]
+                    break
+                # 0을 만났다-> 지나감
+                if arr[ni][nj] == 0:
+                    pi,pj = ni,nj
+                    continue
+                # 같은걸 발견하면 합치고 그 자리 방문표시
+                if arr[ni][nj] == arr[i][j]:
+                    arr[ni][nj] += arr[i][j]
+                    arr[i][j] = 0
+                    visited[ni][nj] = True
+                    break
+                # 다른 수를 만나면 그건 벽이라는 표시를 함
+                if arr[ni][nj] != arr[i][j]:
+                    visited[ni][nj] = True
+                    break
+
+
+T = int(input())
+for tc in range(1,T+1):
+    N,S = list(input().split())
+    N = int(N)
+    arr = [list(map(int,input().split())) for _ in range(N)]
+    visited = [[False for j in range(N)] for i in range(N)]
+    for x in arr:
+        print(x)
+    print()
+    # print(S)
+    if S == 'up':
+        move(0,1,0,1,1)
+    elif S == 'down':
+        move(1,1,0,-1,1)
+    elif S == 'left':
+        move(2,0,1,1,1)
+    elif S == 'right':
+        move(3,0,1,1,-1)
+    for x in arr:
+        print(x)
+```
+
