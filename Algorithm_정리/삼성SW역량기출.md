@@ -3444,7 +3444,7 @@ for tc in range(1,T+1):
 
 ## SWEA_6109_추억의2048게임
 
-푸는중..
+> 힌트봤따,,,ㅠ q에 넣고 빼면서 확인하는방법이 확실히 편할듯...
 
 ```python
 '''
@@ -3458,73 +3458,106 @@ for tc in range(1,T+1):
 타일을 모두 이동시키고 나면 격자가 어떻게 바뀌는지 출력
 
 S를 입력받고 up,down,left, right에 따라 타일 이동 방향을 정함
-인자를 받을때 (i방향,j방향)을 정하면 방향에 따라 바꿀수있을것같다
-up-> (1,1),  down->(-1,1) left(1,1),right(1,-1)
-제일 위에있는 타일부터 이동, 같으면 합쳐지고 방문표시해서 더이상 못합쳐지게함
-위에서 부터 내려오면서 보면 다 이동시킴(범위벗어나거나,방문표시만날때까지)
+방향에 따라 값이 있으면 순서대로 q에 담고, pop해서 보면서 같으면 더해서 담아주고
+다르면 그냥 담아줌
 '''
 import sys
 sys.stdin = open('input.txt','r')
+from collections import deque
 di = [-1,1,0,0]#상하좌우
 dj = [0,0,-1,1]
-def move(d,si,sj,i_dir,j_dir):
-    for i in range(si,N,i_dir):
-        for j in range(sj,N,j_dir):
-            if arr[i][j] == 0:
-                continue
-            pi,pj = i,j
-            for x in arr:
-                print(x)
-            for x in visited:
-                print(x)
-            print('----')
+def move(S):
+    if S == 'up':
+        for i in range(N):
+            q = deque()
+            for j in range(N):
+                if arr[j][i]:
+                    q.append(arr[j][i])
+            idx = 0
+            while q:
+                if len(q)>1:
+                    a,b = q.popleft(),q.popleft()
+                    if a == b:
+                        temp[idx][i] = a+b
+                    else:
+                        temp[idx][i] = a
+                        # 제일앞에 다시 넣어줌->다음수와비교해야되니까
+                        q.appendleft(b)
+                    idx +=1
+                else:
+                    c=q.popleft()
+                    temp[idx][i] = c
 
-            while True:
-                ni = pi + di[d]
-                nj = pj + dj[d]
-                # 다음에 벽을 만나면 원래 내 좌표를 지금있는 위치로 옮긺
-                if ni < 0 or ni >= N or nj < 0 or nj >= N:
-                    arr[pi][pj] = arr[i][j]
-                    arr[i][j] = 0
-                    break
-                if visited[ni][nj]:
-                    arr[pi][pj] = arr[i][j]
-                    break
-                # 0을 만났다-> 지나감
-                if arr[ni][nj] == 0:
-                    pi,pj = ni,nj
-                    continue
-                # 같은걸 발견하면 합치고 그 자리 방문표시
-                if arr[ni][nj] == arr[i][j]:
-                    arr[ni][nj] += arr[i][j]
-                    arr[i][j] = 0
-                    visited[ni][nj] = True
-                    break
-                # 다른 수를 만나면 그건 벽이라는 표시를 함
-                if arr[ni][nj] != arr[i][j]:
-                    visited[ni][nj] = True
-                    break
+    if S == 'down':
+        for i in range(N):
+            q = deque()
+            for j in range(N-1,-1,-1):
+                if arr[j][i]:
+                    q.append(arr[j][i])
+            idx = N-1
+            while q:
+                if len(q)>1:
+                    a,b = q.popleft(),q.popleft()
+                    if a == b:
+                        temp[idx][i] = a+b
+                    else:
+                        temp[idx][i] = a
+                        q.appendleft(b)
+                    idx -=1
+                else:
+                    c=q.popleft()
+                    temp[idx][i] = c
 
+    if S == 'left':
+        for i in range(N):
+            q = deque()
+            for j in range(N):
+                if arr[i][j]:
+                    q.append(arr[i][j])
+            idx = 0
+            while q:
+                if len(q)>1:
+                    a,b = q.popleft(),q.popleft()
+                    if a == b:
+                        temp[i][idx] = a+b
+                    else:
+                        temp[i][idx] = a
+                        q.appendleft(b)
+                    idx +=1
+                else:
+                    c=q.popleft()
+                    temp[i][idx] = c
+
+    if S == 'right':
+        for i in range(N):
+            q = deque()
+            for j in range(N-1,-1,-1):
+                if arr[i][j]:
+                    q.append(arr[i][j])
+            idx = N-1
+            while q:
+                if len(q)>1:
+                    a,b = q.popleft(),q.popleft()
+                    if a == b:
+                        temp[i][idx] = a+b
+                    else:
+                        temp[i][idx] = a
+                        q.appendleft(b)
+                    idx -=1
+                else:
+                    c=q.popleft()
+                    temp[i][idx] = c
 
 T = int(input())
 for tc in range(1,T+1):
     N,S = list(input().split())
     N = int(N)
     arr = [list(map(int,input().split())) for _ in range(N)]
-    visited = [[False for j in range(N)] for i in range(N)]
-    for x in arr:
-        print(x)
-    print()
-    # print(S)
-    if S == 'up':
-        move(0,1,0,1,1)
-    elif S == 'down':
-        move(1,1,0,-1,1)
-    elif S == 'left':
-        move(2,0,1,1,1)
-    elif S == 'right':
-        move(3,0,1,1,-1)
-    for x in arr:
-        print(x)
+    temp = [[0 for j in range(N)] for i in range(N)]
+
+    move(S)
+    print('#{}'.format(tc))
+    for x in temp:
+        print(*x)
 ```
 
