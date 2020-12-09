@@ -1026,3 +1026,191 @@ for tc in range(1,T+1):
     print('#{} {}'.format(tc,dist[N-1]-1))
 ```
 
+
+
+## BOJ_2468_안전영역
+
+```python
+'''
+2020-12-09 19:30-19:50
+지역의 높이를 파악하고, 물에 잠기지 않는 안전한 영역이 몇개인지 조사
+위아래 오른쪽 왼쪽으로 인접해있는 안전영역 뭉치 개수가 최대가 되는 값
+
+상하좌우 dfs돌면서 뭉치의 개수 최대치 구하기
+배열을 받을 때 높이 최소, 최대값 기록해두기
+1. 높이 H(최소부터 시작) for문 돌면서 배열값이 높이 H 초과인 것의 뭉치 개수를 델타이용해서 찾기
+2. 개수 다 찾은 뒤 최대 갱신하고, H+1해서 다시 찾기
+'''
+import sys
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+INF = sys.maxsize
+sys.setrecursionlimit(10**8)
+
+di = [0,1,0,-1]#우하좌상
+dj = [1,0,-1,0]
+def DFS(i,j):
+    visited[i][j] = True
+    for d in range(4):
+        ni = i + di[d]
+        nj = j + dj[d]
+        if ni < 0 or ni >= N or nj < 0 or nj >= N:
+            continue
+        if visited[ni][nj]:
+            continue
+        if arr[ni][nj] <=H:
+            continue
+        DFS(ni,nj)
+
+
+N = int(input())
+arr = []
+maxnum,minnum=-INF,INF
+for _ in range(N):
+    temp = list(map(int,input().split()))
+    if max(temp) > maxnum:
+        maxnum = max(temp)
+    if min(temp) < minnum:
+        minnum = min(temp)
+    arr.append(temp)
+# for x in arr:
+#     print(x)
+# print(maxnum,minnum)
+
+MAX = 0
+H=minnum-1
+while H <= maxnum:
+    visited = [[False for j in range(N)] for i in range(N)]
+    cnt = 0
+    for i in range(N):
+        for j in range(N):
+            if arr[i][j] > H and not visited[i][j]:
+                cnt+=1
+                DFS(i,j)
+    if cnt > MAX:
+        MAX = cnt
+    H+=1
+print(MAX)
+```
+
+
+
+## BOJ_5014_스타트와링크
+
+> dist[next]가 있으면 지나가게 하니까 시간초과가 나오지 않았따....ㅠ 최소값이니까 당연히 그래야지..ㅠ
+
+```python
+'''
+2020-12-09 23:40-
+F층으로 이루어진 건물, G층으로 가야됨, 강호가 있는 곳은 S층
+엘베 버튼 2개밖에 없음 U버튼은 위로 U층을 가는 버튼, D버튼은 밑으로 D층을 가는 버튼, 갔는데 해당 층이 없으면 엘베 안움직임
+G층에 도착하려면 최소 몇번 버튼 눌러야 되나
+갈수없다면 use the stairs출력
+
+1. F까지의 1차원 dist배열을 만듦
+2. S에서 +U만큼, -D만큼 보냄
+3. 거기서 범위체크 계속하며 dist최소값 갱신, dist[G-1]-1을 뽑는다 없다면  use the stairs출력
+'''
+import sys
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+from collections import deque
+
+
+def BFS(node):
+    q = deque()
+    q.append(node)
+    dist[node] = 1
+    while q:
+        p = q.popleft()
+        if p == G:
+            return
+        for n in [U,-D]:
+            next = p + n
+            # print(next,p,n)
+            if next <= 0 or next > F:
+                continue
+            # if dist[next] and dist[next] < dist[p] + 1:
+            #     continue
+            if dist[next]:
+                continue
+            dist[next] = dist[p] + 1
+            if next == G:
+                return
+            q.append(next)
+
+
+# 가장높은층 F, 강호위치S층, G층이목표, U위로 올라감,D아래로 내려감
+F,S,G,U,D = map(int,input().split())
+dist = [0 for _ in range(F+1)]
+BFS(S)
+ans = dist[G]-1
+if S == G:
+    print(0)
+elif ans >0:
+    print(ans)
+else:
+    print('use the stairs')
+# print(dist)
+```
+
+
+
+
+
+- 다른사람코드
+
+```python
+from collections import deque
+
+
+def dfs(s,cnt):
+    global f,g,u,d,ans,visit
+
+    q = deque()
+    q.append([s,cnt])
+
+    ans = ans
+
+    while q:
+        s,cnt = q.popleft()
+        visit[s] = 1
+
+
+        if s == g:
+            if cnt < ans:
+                ans = cnt
+            break
+
+        if s<g:
+            if s+u<=g:
+                if visit[s+u] == 0:
+                    q.append([s+u,cnt+1])
+            elif s+u>g:
+                if visit[s-d] == 0:
+                    if 1<=s-d:
+                        q.append([s-d,cnt+1])
+        elif s>g:
+            if s-d>=g:
+                if visit[s-d] == 0:
+                    q.append([s-d,cnt+1])
+            elif s-d<g:
+                if visit[s+u] == 0:
+                    if s+u<=f:
+                        q.append([s+u,cnt+1])
+    
+f,s,g,u,d = map(int, input().split())
+
+visit = [0]*(f+1)
+visit.insert(0,0)
+
+ans = 1000000
+
+dfs(s,0)
+
+if ans == 1000000:
+    print('use the stairs')
+else:
+    print(ans)
+```
+
