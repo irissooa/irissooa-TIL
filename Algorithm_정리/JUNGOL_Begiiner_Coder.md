@@ -456,3 +456,194 @@ else:
             idx+=1
 ```
 
+
+
+### 1329_별삼각형3
+
+```python
+'''
+N을 입력받고
+별개수cnt 1, idx=0
+1. '*'*cnt출력
+2. 공백+1 cnt+2 idx+1
+3. idx == n//2가 되면 별-2,공백-1
+'''
+n = int(input())
+if not n%2 or n < 0 or n > 100:
+    print('INPUT ERROR!')
+else:
+    cnt = 1
+    idx = 0
+    blank = 0
+    while idx < n:
+        print(' '*blank+'*'*cnt)
+        idx+=1
+        if idx <=n//2:
+            cnt +=2
+            blank+=1
+        else:
+            cnt -=2
+            blank -=1
+```
+
+
+
+
+
+### 1641_숫자삼각형
+
+```python
+'''
+높이 n, 종류m
+n100이하 홀수 m은 1~3정수
+종류1
+i 0,1,2,3,4,5..n
+j 0,10,012,3210,01234
+i가 홀수일때 j는 역순
+j(0,i+1)
+
+종류2
+숫자는 idx번호 i
+개수는 2*n-1부터 2씩 줄어들고 공백은0부터 1씩 늘어남
+
+종류3
+숫자는 1부터 n//2+1까지 각 행이1부터 시작이라고 생각했을때 행만큼 출력 n//2+1부터 줄어듦
+'''
+n,m = map(int,input().split())
+if not n%2 or n<0 or n >100 or m <1 or m>3:
+    print('INPUT ERROR!')
+else:
+    if m==1:
+        num = 1
+        arr = [['' for j in range(n)] for i in range(n)]
+        for i in range(n):
+            if i%2:
+                for j in range(i+1)[::-1]:
+                    arr[i][j] = num
+                    num+=1
+            else:
+                for j in range(i+1):
+                    arr[i][j] = num
+                    num+=1
+        for x in range(n):
+            for y in range(x+1):
+                print(arr[x][y],end =' ')
+            print()
+    elif m == 2:
+        idx =0
+        blank =0
+        while idx <n:
+            print(' '*blank,end='')
+            for i in range(2*(n-idx)-1):
+                print(idx,end=' ')
+            print()
+            idx+=1
+            blank+=2
+    else:
+        for i in range(n):
+            if i <= n//2:
+                for j in range(1,i+2):
+                    print(j,end=' ')
+            else:
+                for j in range(1,n-i+1):
+                    print(j,end=' ')
+            print()
+```
+
+
+
+### J_1337_달팽이삼각형
+
+```python
+'''
+n높이
+숫자 0부터 9까지(반복) 삼각형으로 출력
+델타이동 [우하대,좌,상]
+범위를 벗어나지 않고 숫자가 없으면 적어주기
+범위 -> n범위밖 + j는 i까지만 갈수있다
+'''
+n = int(input())
+arr = [['' for j in range(n)] for i in range(n)]
+di = [1,0,-1]#우하대, 좌,상
+dj = [1,-1,0]
+num = 0
+cnt = 0
+for i in range(1,n+1):
+    cnt += i
+i,j,d=0,0,0
+arr[i][j] = num
+# print(cnt)
+num+=1
+while cnt >1:
+    ni = i + di[d]
+    nj = j + dj[d]
+    if 0 <= ni < n and 0 <= nj <= i+1 and arr[ni][nj] == '':
+        # print(i,j,ni,nj)
+        i,j = ni, nj
+        arr[ni][nj] = num
+        num += 1
+        cnt -= 1
+        if num > 9:
+            num = 0
+    else:
+        d = (d+1)%3
+for i in range(n):
+    for j in range(i+1):
+        print(arr[i][j],end = ' ')
+    print()
+```
+
+
+
+### J_2071_파스칼삼각형
+
+```python
+'''
+2020-12-10 17:40
+파스칼 삼각형 : 왼쪽 위와 오른쪽 위의 좌표 값을 더해서 값을 갱신해나가는 삼각형
+1. 0으로 만든 2*n-1의 2차원배열
+2.첫 행 n에 1넣음
+3. 1행부터 n-1행까지 보는데 오른쪽 위, 왼쪽위를 더 한값으로 갱신(범위벗어나지않게 0 으로 오,왼 둘러쌈)
+4. 출력은 종류에 따라 다름, 그전에 0이 아닌 것들만 따로 담아줌, 각행마다 0이아닌것만
+종류 1
+1.0이 아닌 그 리스트를 차례로 출력, 한칸 띄워서 출력하면 줄바꿈
+종류2
+1. 0이아닌 리스트 뒤에서부터 차례로 출력, blank도 1개씩 늘어남
+종류3
+1.0이아닌 리스트 뒤에서부터 새로운 배열을 만들어서 한 열씩 담아주고 출력
+'''
+n,m = map(int,input().split())
+arr = [[0 for j in range(2*n+1)] for i in range(n)]
+arr[0][n] = 1
+pascal = [[1]]
+for i in range(1,n):
+    temp=[]
+    for j in range(1,2*n):
+        if arr[i-1][j-1] + arr[i-1][j+1]:
+            temp.append(arr[i-1][j-1] + arr[i-1][j+1])
+            arr[i][j] = arr[i-1][j-1] + arr[i-1][j+1]
+    pascal.append(temp)
+if m ==1:
+    for i in pascal:
+        print(*i)
+elif m ==2:
+    blank = 0
+    for i in pascal[::-1]:
+        print(blank*' ',end='')
+        print(*i)
+        blank+=1
+else:
+    temp = [['' for j in range(n)] for i in range(n)]
+    idx= 0
+    for i in pascal[::-1]:
+        # print(i,len(i))
+        for j in range(len(i)):
+            temp[n-j-1][idx] = i[j]
+        idx+=1
+    for x in range(n):
+        for y in range(n):
+            if temp[x][y]:
+                print(temp[x][y],end=' ')
+        print()
+```
+

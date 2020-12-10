@@ -1093,6 +1093,125 @@ while H <= maxnum:
 print(MAX)
 ```
 
+- 다른코드
+
+```python
+import sys
+from collections import defaultdict as dd
+input = sys.stdin.readline
+
+def Repr(a):
+    if Set[a] == a:
+        return a
+    k = Repr(Set[a])
+    Set[a] = k
+    return k
+
+def Join(a,b):
+    Set[Repr(b)] = Repr(a)
+
+def adj(p):
+    yield p - w
+    yield p - 1
+    yield p + 1
+    yield p + w
+
+n = int(input())
+w = n + 2
+
+Set = {}
+
+contour = dd(list)
+for i in range(1, n+1):
+    new = list(map(int, input().split()))
+    for h, j in zip(new, range(i*w+1, (i+1)*w - 1)):
+        contour[h].append(j)
+heights = sorted(contour, reverse = True)
+heights.pop()
+fixed = []
+cnt = 1
+for h in heights:
+    for k in contour[h]:
+        Set[k]=k
+    for p in contour[h]: # Connection change is made from added points(to both new and old components)
+        for q in adj(p):
+            if q in Set: Join(p, q)
+    fixed = [p for p in fixed if Set[p] == p]
+    for p in contour[h]:
+        if Set[p] == p:
+            fixed.append(p)
+    cnt = max(cnt, len(fixed))
+
+print(cnt)
+
+```
+
+```python
+import sys
+sys.setrecursionlimit(20000)
+def f(a,v,x,y):
+    a[x][y]-=1;v[x][y]=0
+    if v[x-1][y]:f(a,v,x-1,y)
+    if v[x+1][y]:f(a,v,x+1,y)
+    if v[x][y-1]:f(a,v,x,y-1)
+    if v[x][y+1]:f(a,v,x,y+1)
+n=int(input())+2
+a=[[0]*n]+[[0]+[*map(int,i.split())]+[0]for i in sys.stdin]+[[0]*n]
+r=[]
+for l in range(max([max(i)for i in a])):
+    v=[[j for j in i]for i in a];c=0
+    for i in range(1,n-1):
+        x=v[i]
+        for j in range(1,n-1):
+            if x[j]:f(a,v,i,j);c+=1
+    r+=[c]
+print(max(r))
+```
+
+```python
+import sys
+sys.setrecursionlimit(10**6)
+a=int(input())
+c=[]
+c.append([0]*(a+2))
+for i in range(a):
+     b=list(map(int,input().split()))
+     b.insert(0,0)
+     b.append(0)
+     c.append(b)
+c.append([0]*(a+2))
+Ans=[]
+ans=0
+def dfs(x,y,z) :
+     global ans
+     c[x][y]=z
+     if c[x-1][y]>z:
+          dfs(x-1,y,z)
+     if c[x+1][y]>z:
+          dfs(x+1,y,z)
+     if c[x][y-1]>z:
+          dfs(x,y-1,z)
+     if c[x][y+1]>z:
+          dfs(x,y+1,z)  
+for i in range(101,-1,-1):
+     for j in range (1,a+1):
+          for k in range(1,a+1):
+               if c[j][k]>i :
+                    ans+=1
+                    dfs(j,k,i)
+     if ans==0 :
+          continue
+     else:
+          Ans.append(ans)
+          ans=0
+print(max(Ans))
+
+```
+
+
+
+
+
 
 
 ## BOJ_5014_스타트와링크
@@ -1156,61 +1275,686 @@ else:
 
 
 
+- 다른사람코드
 
+```python
+import sys
+from collections import deque
+
+#sys.stdin = open("input.txt","r")
+
+F, S, G, U, D = tuple(map(int, sys.stdin.readline().rstrip().split()))
+time = 0
+List = deque()
+
+if G > S and U != 0:
+    b = (G-S) // U
+    S += b*U
+    time = b
+elif G <= S and D != 0:
+    b = (S-G) // D
+    S -= b*D
+    time = b
+
+List.append((S,time))
+
+up_down = [U,-D]
+visited = [0 for i in range(F+1)]
+
+while List:
+    a = List.popleft()
+    current = a[0]
+    time = a[1]
+    if current == G:
+        print(time)
+        break
+    visited[current] = 1
+
+    for i in up_down:
+        nextPos = current + i
+        if nextPos > F or nextPos < 1:
+            continue
+        elif visited[nextPos] == 0:
+            List.append((nextPos,time+1))
+
+    if len(List) == 0:
+        print("use the stairs")
+        break
+
+```
+
+```python
+import sys
+from collections import deque
+
+input = sys.stdin
+sys.setrecursionlimit(5000)
+
+
+def bfs(s, g, f, u, d):
+    q = deque()
+    q.append((s, 0))
+    visited[s] = True
+    ans = int(1e9)
+    while q:
+        here, dist = q.popleft()
+        if here == g:
+            ans = dist
+            break
+        nx1 = here + u
+        nx2 = here - d
+        if nx1 <= f and not visited[nx1]:
+            visited[nx1] = True
+            q.append((nx1, dist + 1))
+
+        if nx2 >= 1 and not visited[nx2]:
+            visited[nx2] = True
+            q.append((nx2, dist + 1))
+
+    if ans == int(1e9):
+        print("use the stairs")
+    else:
+        print(ans)
+
+
+f, s, g, u, d = map(int, input.readline().split())
+visited = [False] * (f + 1)
+bfs(s, g, f, u, d)
+```
+
+
+
+## BOJ_9205_맥주마시면서걸어가기
+
+- 틀렸던코드
+
+```python
+'''
+2020-12-09 19:55-(20:08밥-20:35컴백)-
+출발 상근이네 -> 맥주한박스들고 출발(20개) 50미터에 한병씩 마심
+맥주를 더 구매해야할 수 도 있음
+편의점을 들렸을때 빈병은 버리고 새 맥주 병 살 수 있다(20개까지)
+상근이와 친구들 행복하게 페스티벌 도착해야됨
+
+송도는 직사각형 모양으로 생긴 도시
+두 좌표 사이의 거리는 (x좌표 차이 + y좌표의 차)
+행복하게 갈수있으면 happy, 아니면 sad출력
+
+너무 오래 걸렸다...ㅠ
+어려운 문제는 아닌데 설계를 잘못함
+1. start는 home!
+2. festival의 위치도 기록한 뒤, 편의점과 festival을 같은 infolist에 묶어서 home과의 거리가 짧은 순으로 정렬!
+# 여기서 2번이 문제였다...home과의 거리란,,, festival과 반대로 멀어질수도있다는걸 생각못함ㅠㅠ->플로이드 와샬..알고리즘..공부하자ㅠ
+3. info를 돌면서 festival에 도착하면 happy아니면 sad(거리비교 beer-dist/50>=0)
+
+# 다시생각
+집 -편의점 - Festival
+이렇게 위치해있고 집-편의점 : a // 편의점 -Festival :b // 집-festival :c라면
+a랑 b는 c보다 작아야된다! 그래야 집- 편의점-축제 순서가 됨!
+c가 바로갈수있는 거리가 아니고 a는 갈수있다면 a,b가 c보다 작다면 편의점으로 내 위치 갱신
+아니라면 다음 편의점과 반복
+이렇게...해서 찾아보자....!
+'''
+import sys
+# sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+
+T = int(input())
+for tc in range(1,T+1):
+    # 편의점 개수
+    n = int(input())
+    # 상근이네 집, 편의점,락페스티벌 좌표x,y
+    home = list(map(int,input().split()))
+    info = [list(map(int,input().split())) for _ in range(n)]
+    festival = list(map(int,input().split()))
+    # 거리순으로 일단 정렬은 했는데 만약에 c보다 b가 크다면 지나가게하자
+    info.sort(key = lambda x:(abs(x[0]-home[0])+abs(x[1]-home[1])))
+    # print(info)
+    # print(festival)
+    beer = 20
+    sx,sy = home
+    ex,ey = festival
+    flag = False
+    c = abs(sx-ex) + abs(sy-ey)
+    if beer - c/50 >= 0:
+        print('happy')
+        flag = True
+        continue
+    for i in info:
+        nx,ny = i
+        a = abs(sx-nx) + abs(sy-ny)
+        b = abs(nx-ex) + abs(ny-ey)
+        c = abs(sx-ex) + abs(sy-ey)
+        # 갈수 있다면
+        if c <= 1000:
+            print('happy')
+            flag = True
+            break
+        # 편의점이 출발점과 끝점 사이에 있다면 시작점 갱신
+        if a <= 1000 and a < c and b < c:
+            sx,sy = nx,ny
+        if a<=1000 and b <= 1000:
+            print('happy')
+            flag = True
+            break
+    if flag:
+        continue
+    if c <=1000 or b <=1000:
+        print('happy')
+    else:
+        print('sad')
+
+```
+
+- 다시품
+
+```python
+import sys
+# sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+from collections import deque
+
+def BFS(start):
+    global flag
+    visited = set()
+    q = deque()
+    q.append(start)
+    ex,ey = festival
+    while q:
+        px,py = q.popleft()
+        if abs(px-ex) + abs(py-ey) <= 1000:
+            flag = True
+            return
+        next_store = []
+        for idx in range(N):
+            nx,ny = store[idx]
+            if abs(px-nx) + abs(py-ny) <= 1000 and (idx not in visited):
+                visited.add(idx)
+                next_store.append([nx,ny])
+        q.extend(next_store)
+
+
+T = int(input())
+for tc in range(1,T+1):
+    N = int(input())
+    home = list(map(int,input().split()))
+    store = [list(map(int,input().split())) for _ in range(N)]
+    festival = list(map(int,input().split()))
+    flag = False
+    BFS(home)
+    if flag:
+        print('happy')
+    else:
+        print('sad')
+```
+
+
+
+- 승범코드
+
+```python
+def d():
+    for i in range(n + 2):
+        for j in range(n + 2):
+            if i == j: continue
+            if abs(s[i][0] - s[j][0]) + abs(s[i][1] - s[j][1]) <= 1000:
+                s_[i][j] = 1
+                s_[j][i] = 1
+def dfs(start):
+    visit[start] = 1
+    for i in range(n + 2):
+        if s_[start][i] == 1 and visit[i] == 0:
+            dfs(i)
+t = int(input())
+for i in range(t):
+    n = int(input())
+    s = [list(map(int, input().split())) for i in range(n + 2)]
+    s_ = [[0] * (n + 2) for i in range(n + 2)]
+    visit = [0 for i in range(n + 2)]
+    d()
+    dfs(0)
+    if visit[n + 1] == 1: print("happy")
+    else: print("sad")
+```
 
 - 다른사람코드
 
 ```python
+import sys
+input = sys.stdin.readline
+
+def bfs(arr, n):
+    visited = {0: True} #dict 형태
+    queue = [0]
+    while queue:
+        tmp = []
+        pos = queue.pop(0)
+        if pos == n - 1:
+            return 'happy'
+        for i, (x, y) in enumerate(arr): #좌표 enumerate
+            if i in visited:
+                continue
+            distance = abs(arr[pos][0] - x) + abs(arr[pos][1] - y)
+            if distance <= 1000: #맥주 20병 -> 1000으로 제한 
+                tmp.append(i)
+                visited[i] = True
+        queue.extend(tmp)
+    return 'sad'
+
+
+if __name__ == '__main__':
+    t = int(input())
+    for _ in range(t):
+        n = int(input())
+        arr = []
+        for _ in range(n + 2):
+            x,y = map(int,input().split())
+            arr.append((x,y))
+        print(bfs(arr, n + 2))
+```
+
+```python
+import sys
+input = sys.stdin.readline
+from _collections import deque
+
+
+def BFS(start, end, mart_list):
+    q = deque([(start)])
+    visited = {(start)}    # 사실 이것도 필요 없네. 코드를 간다하게 만들기 위해 넣자.
+    while q:
+        pos = q.popleft()
+        if abs(pos[0] - end[0]) + abs(pos[1] - end[1]) <= 1000:
+            return "happy"
+
+        new_append = []
+        for mart in mart_list:
+            if not mart in visited:
+                if abs(pos[0] - mart[0]) + abs(pos[1] - mart[1]) > 1000 :
+                    continue
+                visited.add(mart)
+                q.append(mart)
+                new_append.append(mart)
+
+        for mart in new_append:
+            mart_list.remove(mart)
+
+    return "sad"
+
+result = []
+for _ in range(int(input())):
+    n_mart = int(input())
+    start = tuple(map(int, input().split()))
+    mart_list = []
+    for _ in range(n_mart):
+        mart_list.append(tuple(map(int, input().split())))
+    end = tuple(map(int, input().split()))
+    result.append(BFS(start, end, mart_list))
+
+for x in result:
+    print(x)
+```
+
+```python
+import sys
+I = sys.stdin.readline
+def dfs(nowR, nowC):
+    global happyFlag
+    if happyFlag:
+        return
+    if abs(nowR -rock[0]) + abs(nowC-rock[1]) <= 1000:
+        happyFlag = True
+        return
+    for d in range(0,de):
+        if abs(nowR + - deList[d][0])+ abs(nowC -deList[d][1]) <= 1000 and not visit[d]:
+            visit[d] = True
+            dfs(deList[d][0], deList[d][1])
+
+
+test = int(I())
+for t in range(0,test):
+    de = int(I())
+    home = list(map(int,I().split()))
+    deList = []
+    for d in range(0,de):
+        deList.append(list(map(int,I().split())))
+    rock = list(map(int,I().split()))
+
+    visit = [False] * de
+    happyFlag = False
+
+    dfs(home[0], home[1])
+
+    if happyFlag:
+        print('happy')
+    else:
+        print('sad')
+```
+
+
+
+## BOJ_2573_빙산
+
+> pypy로 품 import해놓은것 떄문에 메모리 초과가 났다 앞으로 제출할때 필요없는거 다 지워주자
+
+```python
+'''
+2020-12-10 11-
+빙산이 주어짐, 0과 접한 개수만큼 빙산이 다 녹음 두덩어리 이상으로 분리되지 않으면 0출력
+분리된다면 최소 시간 구하기
+
+1. 빙산에 4방향으로 보면서 0개수만큼 빼고 temp배열에 담아주기
+2. 모두 봤다면 temp를 보면서 덩어리가 나뉘어졌는지 확인
+3. 다시 반복
+
+BFS,DFS는 시간초과, 메모리초과가 난다...
+시간초과를 어떻게 줄이지ㅠ
+#배열을 만들어서 하지말고 [i,j,zero]를 담아줘서 전부 확인 후에 arr에 직접 i,j -zero해보자
+'''
+import sys
+input = sys.stdin.readline
+from collections import deque
+
+di = [0,1,0,-1]#우하좌상
+dj = [1,0,-1,0]
+def DFS(i,j):
+    visited.add((i,j))
+    zero = 0
+    for d in range(4):
+        ni = i + di[d]
+        nj = j + dj[d]
+        if ni < 0 or ni >= N or nj < 0 or nj >= M:
+            continue
+        if (ni,nj) in visited:
+            continue
+        if not arr[ni][nj]:
+            zero+=1
+            continue
+        DFS(ni,nj)
+    change.append([i,j,zero])
+
+
+def BFS(i,j):
+    q = deque()
+    q.append([i,j])
+    visited.add((i,j))
+    while q:
+        pi,pj = q.popleft()
+        zero = 0
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= M:
+                continue
+            if (ni,nj) in visited:
+                continue
+            if not arr[ni][nj]:
+                zero+=1
+                continue
+            visited.add((ni,nj))
+            q.append([ni,nj])
+        change.append([pi,pj,zero])
+
+N,M = map(int,input().split())
+arr = [list(map(int,input().split())) for _ in range(N)]
+year = 0
+change = deque()
+while True:
+    cnt = 0
+    # temp = [[0 for j in range(M)] for i in range(N)]
+    visited = set()
+    # 처음, 마지막은 0이니까 안봐도됨
+    for i in range(1,N-1):
+        for j in range(1,M-1):
+            if arr[i][j] and ((i,j) not in visited) and cnt<2:
+                cnt +=1
+                # DFS(i,j)
+                BFS(i,j)
+    # print(change)
+    if cnt >=2:
+        print(year)
+        break
+    elif cnt == 0:
+        print(0)
+        break
+    year += 1
+    while change:
+        i,j,zero = change.popleft()
+        arr[i][j] -= zero
+        if arr[i][j] <0:
+            arr[i][j] = 0
+    # for x in arr:
+    #     print(x)
+```
+
+- 다른 코드 보고 ice만 따로 담아주고 갱신해주니까 시간초과안남!!!!!
+
+```python
+import sys
+input = sys.stdin.readline
+from collections import deque
+
+di = [0,1,0,-1]#우하좌상
+dj = [1,0,-1,0]
+def BFS(i,j):
+    q = deque()
+    q.append([i,j])
+    visited.add((i,j))
+    while q:
+        pi,pj = q.popleft()
+        zero = 0
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= N or nj < 0 or nj >= M:
+                continue
+            if (ni,nj) in visited:
+                continue
+            if not arr[ni][nj]:
+                zero+=1
+                continue
+            visited.add((ni,nj))
+            q.append([ni,nj])
+        change.append([pi,pj,zero])
+
+N,M = map(int,input().split())
+arr = [list(map(int,input().split())) for _ in range(N)]
+year = 0
+change = deque()
+ice = deque()
+for i in range(1,N-1):
+    for j in range(1,M-1):
+        if arr[i][j]:
+            ice.append((i,j))
+while True:
+    cnt = 0
+    # temp = [[0 for j in range(M)] for i in range(N)]
+    visited = set()
+    while ice:
+        i = ice.popleft()
+        if i not in visited:
+            cnt += 1
+            BFS(i[0],i[1])
+    if cnt >=2:
+        print(year)
+        break
+    elif cnt == 0:
+        print(0)
+        break
+    year += 1
+    ice =deque()
+    while change:
+        i,j,zero = change.popleft()
+        arr[i][j] -= zero
+        if arr[i][j] <=0:
+            arr[i][j] = 0
+        else:
+            ice.append((i,j))
+    # for x in arr:
+    #     print(x)
+```
+
+
+
+- 다른코드
+
+```python
+import sys
 from collections import deque
 
 
-def dfs(s,cnt):
-    global f,g,u,d,ans,visit
-
-    q = deque()
-    q.append([s,cnt])
-
-    ans = ans
-
+def bfs():
+    attached = 0
+    visited = [[False for _ in range(M)] for _ in range(N)]
+    q = deque([ice[0]])
+    visited[ice[0][0]][ice[0][1]] = True
     while q:
-        s,cnt = q.popleft()
-        visit[s] = 1
+        x, y = q.popleft()
+        zero_count = 0
+        attached += 1
+        for dx, dy in (1, 0), (0, 1), (-1, 0), (0, -1):
+            nx, ny = x + dx, y + dy
+            if visited[nx][ny]:
+                continue
+            if board[nx][ny] == 0:
+                zero_count += 1
+                continue
+            if board[nx][ny] > 0:
+                visited[nx][ny] = True
+                q.append((nx, ny))
+
+        if board[x][y] - zero_count != 0:
+            board[x][y] -= zero_count
+        else:
+            board[x][y] = -1
+
+    return attached
 
 
-        if s == g:
-            if cnt < ans:
-                ans = cnt
-            break
+N, M = map(int, sys.stdin.readline().split())
 
-        if s<g:
-            if s+u<=g:
-                if visit[s+u] == 0:
-                    q.append([s+u,cnt+1])
-            elif s+u>g:
-                if visit[s-d] == 0:
-                    if 1<=s-d:
-                        q.append([s-d,cnt+1])
-        elif s>g:
-            if s-d>=g:
-                if visit[s-d] == 0:
-                    q.append([s-d,cnt+1])
-            elif s-d<g:
-                if visit[s+u] == 0:
-                    if s+u<=f:
-                        q.append([s+u,cnt+1])
-    
-f,s,g,u,d = map(int, input().split())
+board = [list(map(int, sys.stdin.readline().split())) for _ in range(N)]
 
-visit = [0]*(f+1)
-visit.insert(0,0)
+ice = []
+for i in range(N):
+    for j in range(M):
+        if board[i][j]:
+            ice.append((i, j))
 
-ans = 1000000
+c = 0
+while True:
+    new_ice = []
+    if len(ice) == 0:
+        c = 0
+        break
+    a = bfs()
+    if len(ice) != a:
+        break
+    for (x, y) in ice:
+        if board[x][y] < 0:
+            board[x][y] = 0
+        else:
+            new_ice.append((x, y))
 
-dfs(s,0)
+    ice = new_ice[:]
+    c += 1
 
-if ans == 1000000:
-    print('use the stairs')
-else:
+print(c)
+
+```
+
+```python
+import sys
+
+class IceBerg:
+
+    piece = int()
+    icePosition = []
+
+    def __init__(self, n, m, ice):
+        self.n = n
+        self.m = m
+        self.ice = ice
+
+        for i in range(1, self.n - 1):
+            for j in range(1, self.m - 1):
+                if self.ice[i][j] > 0:
+                    self.icePosition.append([i, j])
+
+    def icebergCount(self):
+        ret = 0
+        visit = [[False] * m for _ in range(n)]
+        for i, j in self.icePosition:
+            if visit[i][j] is False:
+                ret += 1
+                self.bfs(visit, i, j)
+
+        self.piece = ret
+        return ret
+
+    def bfs(self, visit, y, x):
+        qu = [[y, x]]
+        visit[y][x] = True
+
+        while len(qu):
+            posy, posx = qu.pop()
+
+            if self.ice[posy][posx - 1] > 0 and visit[posy][posx - 1] is False:
+                visit[posy][posx - 1] = True
+                qu.append([posy, posx - 1])
+            if self.ice[posy][posx + 1] > 0 and visit[posy][posx + 1] is False:
+                visit[posy][posx + 1] = True
+                qu.append([posy, posx + 1])
+            if self.ice[posy - 1][posx] > 0 and visit[posy - 1][posx] is False:
+                visit[posy - 1][posx] = True
+                qu.append([posy - 1, posx])
+            if self.ice[posy + 1][posx] > 0 and visit[posy + 1][posx] is False:
+                visit[posy + 1][posx] = True
+                qu.append([posy + 1, posx])
+
+    def melting(self):
+        melt = []
+        tmpPosition = []
+
+        for i, j in self.icePosition:
+            cnt = 0
+            if self.ice[i][j - 1] == 0:
+                cnt += 1
+            if self.ice[i][j + 1] == 0:
+                cnt += 1
+            if self.ice[i - 1][j] == 0:
+                cnt += 1
+            if self.ice[i + 1][j] == 0:
+                cnt += 1
+
+            if cnt > 0:
+                melt.append([i, j, cnt])
+            else:
+                tmpPosition.append([i, j])
+
+        for i, j, cnt in melt:
+            self.ice[i][j] -= cnt
+            if self.ice[i][j] < 0:
+                self.ice[i][j] = 0
+            if self.ice[i][j] != 0:
+                tmpPosition.append([i, j])
+
+        self.icePosition = tmpPosition
+
+n, m = map(int, sys.stdin.readline().split())
+ice = [list(map(int, sys.stdin.readline().split())) for _ in range(n)]
+
+iceberg = IceBerg(n, m, ice)
+ans = 0
+
+while iceberg.icebergCount() == 1:
+    ans += 1
+    iceberg.melting()
+
+if iceberg.piece >= 2:
     print(ans)
+else:
+    print(0)
+
 ```
 
