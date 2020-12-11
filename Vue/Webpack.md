@@ -777,12 +777,14 @@ index.html을 돌리기 위한 파일은 main.bundle.js인데 app.js를 눌렀�
 
 웹팩의 빌드(파일 변환) 과정을 이해하기 위해서는 아래 4가지 주요 속성에 대해서 알고 있어야 함
 
-- entry : build 대상 파일을 정의하는 곳
-- output : build 하고 나서 결과물을 보낼 주소
-- loader(module) : entry에서 output으로 변환할때 중간에 개입하는 속성
-- plugin
+![image-20201211180516412](Webpack.assets/image-20201211180516412.png)
 
+- **Entry** 속성은 웹팩을 실행할 대상 파일. 진입점
+- **Output** 속성은 웹팩의 결과물에 대한 정보를 입력하는 속성. 일반적으로 `filename`과 `path`를 정의
+- **Loader** 속성은 CSS, 이미지와 같은 비 자바스크립트 파일을 웹팩이 인식할 수 있게 추가하는 속성. 로더는 오른쪽에서 왼쪽 순으로 적용
+- **Plugin** 속성은 웹팩으로 변환한 파일에 추가적인 기능을 더하고 싶을 때 사용하는 속성. 웹팩 변환 과정 전반에 대한 제어권을 갖고 있음
 
+위 속성 이외에도 [resolve](https://webpack.js.org/configuration/resolve/#root), [devServer](https://webpack.js.org/configuration/dev-server/#root), [devtool](https://webpack.js.org/configuration/devtool/#devtool) 속성에 대해 알고 있으면 좋다.
 
 ### Entry
 
@@ -892,6 +894,8 @@ module.exports = {
 ### loader
 
 > [loader](https://joshua1988.github.io/webpack-guide/concepts/loader.html#loader)
+>
+> https://webpack.js.org/loaders/
 >
 > 로더(Loader)는 웹팩이 웹 애플리케이션을 해석할 때 자바스크립트 파일이 아닌 웹 자원(HTML, CSS, Images, 폰트 등)들을 변환할 수 있도록 도와주는 속성
 >
@@ -1053,6 +1057,8 @@ module: {
 
 ### Plugin
 
+> https://webpack.js.org/plugins/
+
 플러그인(plugin)은 웹팩의 기본적인 동작에 추가적인 기능을 제공하는 속성이다. 
 
 로더랑 비교하면 로더는 파일을 해석하고 변환하는 과정에 관여하는 반면, 플러그인은 해당 결과물의 형태를 바꾸는 역할을 한다.
@@ -1201,6 +1207,8 @@ module.exports = {
 
 7. CSS 파일을 별도로 분리하기 위해 `MiniCssExtractPlugin` 플러그인 설정 추가
 
+> 플러그인은 결과물에 대한 정보를 변화시켜서 제공해줌
+
 ```js
 // webpack.config.js
 var path = require('path');
@@ -1229,3 +1237,257 @@ module.exports = {
   ],
 }
 ```
+
+
+
+### Webpack Dev Server
+
+> [웹팩 데브 서버 문서](https://joshua1988.github.io/webpack-guide/devtools/webpack-dev-server.html)
+>
+> 예를 들어 CSS에 코드를 바꿨는데 그건 `npm run build`를 추가로 하지 않으면 갱신되지 않음 
+>
+> 이런 번거러움을 줄이기 위해 사용하는게 웹팩 데브 서버
+>
+> 웹팩 데브 서버는 웹 애플리케이션을 개발하는 과정에서 유용하게 쓰이는 도구다. 웹팩의 빌드 대상 파일이 변경 되었을 때 매번 웹팩 명령어를 실행하지 않아도 코드만 변경하고 저장하면 웹팩으로 빌드한 후 브라우저를 새로고침 해준다.
+>
+> 매번 명령어를 치는 시간과 브라우저를 **새로 고침하는 시간 뿐만 아니라 웹팩 빌드 시간 또한 줄여주기 때문에 웹팩 기반의 웹 애플리케이션 개발에 필수로 사용**
+
+#### 웹팩 데브 서버의 특징
+
+웹팩 데브 서버는 일반 웹팩 빌드와 다른점이 있다. 
+
+```json
+"scripts": {
+  "dev": "webpack-dev-server",
+  "build": "webpack"
+}
+```
+
+웹팩 데브 서버를 실행하여 웹팩 빌드를 하는 경우에는 빌드한 결과물이 파일 탐색기나 프로젝트 폴더에서 보이지 않는다. 좀 더 구체적으로 얘기하자면 웹팩 데브 서버로 빌드한 결과물은 메모리에 저장되고 파일로 생성하지는 않기 때문에 컴퓨터 내부적으로는 접근할 수 있지만 사람이 직접 눈으로 보고 파일을 조작할 순 없다.
+
+따라서, 웹팩 데브 서버는 개발할 때만 사용하다가 개발이 완료되면 웹팩 명령어를 이용해 결과물을 파일로 생성해야 한다.
+
+컴퓨터 구조 관점에서 파일 입출력보다 메모리 입출력이 더 빠르고 컴퓨터 자원이 덜 소모됨
+
+
+
+### Webpack devserver 실습
+
+1. 빈 폴더에서 아래 명령어로 `package.json` 파일을 생성
+
+```bash
+npm init -y
+```
+
+2. 아래 명령어로 필요 라이브러리 설치
+
+```bash
+npm i webpack webpack-cli webpack-dev-server html-webpack-plugin -D
+```
+
+3. `package.json` 파일에서 아래와 같이 `scripts` 속성에 커스텀 명령어를 추가
+
+```json
+{
+  // ...
+  "scripts": {
+    "dev": "webpack-dev-server"
+  },
+}
+```
+
+4. 프로젝트 루트 레벨에 `index.html` 파일 생성 후 내용 추가
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Webpack Dev Server</title>
+  </head>
+  <body>
+    <!-- 빌드 결과물이 정상적으로 로딩되면 아래 div 태그의 텍스트가 변경됨 -->
+    <div class="container">
+      TBD..
+    </div>
+    <!-- HTML Webpack Plugin에 의해 웹팩 빌드 내용이 아래에 추가됨 -->
+  </body>
+</html>
+```
+
+5. 프로젝트 루트 레벨에 `index.js` 파일 생성 및 아래 내용 추가
+
+> container class에 접근해서 div의 innerText를 Webpack loaded!로 넣어줌
+
+```js
+var div = document.querySelector('.container');
+div.innerText = 'Webpack loaded!!';
+```
+
+6. 웹팩 설정 파일 `webpack.config.js` 생성 후 아래 내용 추가
+
+> [HTMLWebpackPlugin 문서](https://webpack.js.org/plugins/html-webpack-plugin/)
+>
+> 웹팩 빌드 결과물에 대해서 html 파일 만들어주고 그 안에 build내용을 포함해서 최종적으로 생성된 html파일을 돌리기만 하면 웹팩에 결과가 다 들어가있다
+
+```js
+var path = require('path');
+//플러그인 라이브러리
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'none',
+  entry: './index.js',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+   //devSever를 쓸때 이 속성을 적어주면 되고, 추가적인건 API문서 참고하면됨
+  devServer: {
+    port: 9000,
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      // index.html 템플릿을 기반으로 빌드 결과물을 추가해줌
+      template: 'index.html',
+    }),
+  ],
+};
+```
+
+7. 명령어 입력 창에 `npm run dev` 를 입력하여 웹팩 데브 서버 실행
+
+> `package.json` 파일에서 `scripts` 속성에 커스텀 명령어를 추가했기때문에 쓸수 있음
+
+8. [localhost:9000](localhost:9000)에 접속 후 아래와 같이 화면이 뜨는지 확인
+
+![image-20201211181732721](Webpack.assets/image-20201211181732721.png)
+
+- 다른 값으로 바꾸고 저장을 하면 바로 컴파일링 되면서 알아서 바꿔줌
+
+![image-20201211181806580](Webpack.assets/image-20201211181806580.png)
+
+- 프로젝트 폴더에는 `dist`폴더와 `bundle.js`는 없지만 네트워크 패널에서 보면 있다!
+
+![image-20201211181848663](Webpack.assets/image-20201211181848663.png)
+
+- bundle.js를 깔고 싶다면 scripts에 "build":"webpack" 커스텀 명령어 추가하고 `npm run build`하면 됨
+
+
+
+## Webpack.config.js 설명
+
+```js
+// node path 라이브러리 가져옴
+var path = require('path')
+// webpack 라이브러리 가져옴
+var webpack = require('webpack')
+
+module.exports = {
+  // mode가 새로생김-> bundle.js가 어떻게 보이게 할지
+  mode: 'production',
+  // 웹팩 변환 대상파일 진입점
+  entry: './src/main.js',
+  // 대상 파일 변환해서 웹팩 결과를 담을 속성
+  output: {
+    // node path라이브러리 resolve api를 이용해서 dist밑에 build.js를 만들겠다
+    path: path.resolve(__dirname, './dist'),
+    // cdn배포를 할때 그 cdn주소에 포함될 수 있게 속성을 정의하는 곳
+    publicPath: '/dist/',
+    filename: 'build.js'
+  },
+  // 로더의 속성을 정의하는 곳
+  module: {
+    // 여러개 속성이 정의됨
+    rules: [
+      {
+        // css파일
+        test: /\.css$/,
+        use: [
+          // 2nd css변환시킨 파일을 작업했다
+          'vue-style-loader',
+          // 1st 작동 js파일이 아닌 파일에 대해 css를 읽을 수 있게 로더를 넣어줌
+          'css-loader'
+        ],
+      },      
+      {
+        // vue 확장파일
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+          }
+          // other vue-loader options go here
+        }
+      },
+      {
+        // js파일에 대해 바벨 로더를 돌렸는데 최대한 많은 브라우저가 호환될수있게 최신문법으로 변환해주는 도구
+        // 바벨을 쉽게 웹펙에 넣을수 있어서 웹팩을 많이 사용함
+        test: /\.js$/,
+        loader: 'babel-loader',
+        // 조심해야되는부분이 이 폴더는 라이브러리에 관계된 것이 들어있어서 이폴더까지 바벨로 변환할 필요없음
+        exclude: /node_modules/
+      },
+      {
+        // 이미지속성
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]?[hash]'
+        }
+      }
+    ]
+  },
+  // 웹팩으로 파일을 해석해나갈때 파일간 연관관곌르 해석할때 파일간의 해석방식을 정리함
+  resolve: {
+    alias: {
+      // vue$ 표시가 들어가는 것은 뒤의 주소로 인지하겠다고 별칭을 주는 거라고 생각하면 됨
+      'vue$': 'vue/dist/vue.esm.js'
+    },
+    // import를 할때 확장자, js, vue,jso는 붙이지 않아도 알아서 붙여줄게
+    extensions: ['*', '.js', '.vue', '.json']
+  },
+  // devServer설정
+  devServer: {
+    historyApiFallback: true,
+    noInfo: true,
+    overlay: true
+  },
+  // 성능관련된 힌트를 주는 속성
+  // 결과물의 사이즈가 초과가되면 웹팩에서 제한한 파일크기를 넘어가면 warning을 줌
+  performance: {
+    hints: false
+  },
+  // source-map여러가지 종류 중 하나를 선택해서 개발자도구에 빌드된 파일과 실제 파일을 연결해주는 링크를 제공해줌
+  devtool: '#eval-source-map'
+}
+
+// 아래는 webpack버전 3까지의 옵션임 지금은 4이상이니까 이건 위에 mode:'production'이라고만 적어주면됨
+// node.js의 실행 변수, 환경변수, 
+// npm run build
+// production용 배포가 node_env가 보통 production임
+// 배포를 할때 추가적으로 우리가 이런것들을 넣겠다고 정의함
+if (process.env.NODE_ENV === 'production') {
+  module.exports.devtool = '#source-map'
+  // http://vue-loader.vuejs.org/en/workflow/production.html
+  module.exports.plugins = (module.exports.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        // node_env를 production으로 바꾼다
+        NODE_ENV: '"production"'
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      compress: {
+        warnings: false
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  ])
+}
+
+```
+
