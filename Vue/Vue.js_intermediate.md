@@ -1020,3 +1020,973 @@ eventBus.$emit('refreshData', chartData);
 
 ![image-20201212164559086](Vue.js_intermediate.assets/image-20201212164559086.png)
 
+### Vuex 설치
+
+```sh
+npm i vuex --save
+```
+
+- src폴더 밑에  `store`라는 폴더를 만들고 그 아래에 `store.js` 파일 생성
+
+```js
+// 코어라이브러리를 가져옴
+import Vue from 'vue'
+import Vuex from 'vuex'
+// use는 vue의 플러그인 기능, 뷰를 사용할때 전역으로 모든 영역에 특정기능을 추가하고 싶을때 사용
+// global기능을 추가하고싶을때 사용함 
+Vue.use(Vuex);
+// export로 const를 하는 순간 store라는 변수를 밖에서 import 하면 쓸 수 있음 -> `main.js` import { store } from './store/store.js'
+
+export const store = new Vuex.Store({
+	// 다른 컴포넌트에서 `$store`로 쓰일 수 있다.
+});
+
+```
+
+- main.js
+
+```python
+import Vue from 'vue'
+import App from './App.vue'
+// store에 있는 store.js의 stor 변수를 가져옴
+import { store } from './store/store.js'
+
+new Vue({
+  el: '#app',
+  // 변수 등록 store:store,(축약형)
+  store,
+  render: h => h(App)
+})
+```
+
+### Vuex 기술 요소
+
+- state : 여러 컴포넌트에 공유되는 데이터 `data`
+- getters: 연산된 state값을 접근하는 속성 `computed`
+- mutations : state 값을 변경하는 이벤트 로직, 메서드 `methods`
+- actions : 비동기 처리 로직을 선언하는 메서드 `aysnc methods`
+
+#### state란?
+
+- 여러 컴포넌트간에 공유할 데이터- 상태
+
+```js
+// Vue
+data : {
+message: 'Hello Vue.js!'
+}
+
+//Vuex
+state:{
+message:'Hello Vue.js!'
+}
+```
+
+```html
+<!--template-->
+<!--Vue-->
+<p>
+    {{message}}
+</p>
+<!--Vuex-->
+<p>
+    {{this.$store.state.message}}
+</p>
+```
+
+
+
+#### getters란?
+
+- state값을 접근하는 속성이자 `computed()`처럼 미리 연산된 값을 접근하는 속성
+
+```js
+//store.js
+state :{
+    num:10
+},
+getters :{
+    getNumber(state) {
+        return state.num;
+    },
+     doubleNumber(state){
+         return state.num*2;
+     }
+}
+```
+
+```html
+<p>
+    <!--10-->
+    {{this.$store.getters.getNumber}} 
+    <!--20-->
+    {{this.$store.getters.doubleNumber}}
+</p>
+```
+
+
+
+#### mutations란?
+
+- state의 값을 변경할 수 있는 **유일한 방법**이자 메서드
+- mutation은 `commit()`으로 동작시킨다.
+
+```js
+//store.js
+state : {num:10},
+mutations : {
+    printNumber(state) {
+        return state.num
+    },
+    sumNumber(state,anotherNum) {
+        return state.num + anotherNum;
+    }
+}
+
+//App.vue
+//commit으로 mutattions에 있는 메서드명을 실행시킴
+this.$store.commit('printNumbers'); // 10
+this.$store.commit('sumNumbers',20); // 30
+```
+
+##### mutations의 commit()형식
+
+- state를 변경하기 위해 mutations를 동작시킬때 인자(payload)를 전달할 수 있음
+
+```js
+//store.js
+state:{storeNum : 10},
+mutations : {
+    modifyState(state,payload) {
+        console.log(payload.str); // 'passed from payload'
+        return state.storeNum += payload.num; //30
+    }
+}
+
+//App.vue
+this.$store.commit('modifyState',{
+    str:'passed from payload',
+    num:20
+});
+```
+
+
+
+### Todo를 Vuex로 리펙토링
+
+- store.js
+
+```js
+// 코어라이브러리를 가져옴
+import Vue from 'vue'
+import Vuex from 'vuex'
+// use는 vue의 플러그인 기능, 뷰를 사용할때 전역으로 모든 영역에 특정기능을 추가하고 싶을때 사용
+// global기능을 추가하고싶을때 사용함 
+Vue.use(Vuex);
+// localStorage를 불러오는걸 여기 적을거야
+	// fetch하면 localStorage에 들어있는 item을 arr안에 담아주고 그것을 반환해줌
+const storage = {
+	fetch() {
+		const arr = [];
+		if (localStorage.length > 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i) !== 'loglevel:webpack-dev-server') {
+          arr.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+        }
+      }
+    }
+		return arr;
+	}
+}
+
+// export로 const를 하는 순간 store라는 변수를 밖에서 import 하면 쓸 수 있음 -> `main.js` import { store } from './store/store.js'
+	// 다른 컴포넌트에서 `$store`로 쓰일 수 있다.
+export const store = new Vuex.Store({
+	state: {
+		todoItems: storage.fetch()
+	},
+	getters: {
+		getTodoItems(state) {
+			return state.todoItems;
+		}
+	},
+	mutations: {
+		addOneItem(state, todoItem) {
+			const obj = {completed: false, item: todoItem};
+			localStorage.setItem(todoItem, JSON.stringify(obj));
+			// data에 접근하기 위해서는 this가 아니라 state로 접근!!
+			state.todoItems.push(obj);
+		},
+		removeOneItem(state, payload) {
+			state.todoItems.splice(payload.index, 1);
+      localStorage.removeItem(payload.todoItem.item);
+		},
+		toggleOneItem(state, payload) {
+			state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+      localStorage.removeItem(payload.todoItem.item);
+      localStorage.setItem(payload.todoItem.item, JSON.stringify(payload.todoItem));
+		},
+		clearAllItems(state) {
+			state.todoItems = [];
+			localStorage.clear();
+		}
+	}
+});
+
+```
+
+- main.js
+
+```js
+import Vue from 'vue'
+import App from './App.vue'
+// store에 있는 store.js의 stor 변수를 가져옴
+import { store } from './store/store.js'
+
+new Vue({
+  el: '#app',
+  // 변수 등록 store:store,(축약형)
+  store,
+  render: h => h(App)
+})
+
+```
+
+- App.vue
+
+```vue
+<template>
+  <div id="app">
+    <!-- store에서 data를 관리하기 때문에 emit, props할필요가 없어져서 다 지움 -->
+    <TodoHeader></TodoHeader>
+    <TodoInput></TodoInput>
+    <TodoList></TodoList>
+    <TodoFooter></TodoFooter>
+  </div>
+</template>
+
+<script>
+import TodoHeader from './components/TodoHeader.vue'
+import TodoInput from './components/TodoInput.vue'
+import TodoList from './components/TodoList.vue'
+import TodoFooter from './components/TodoFooter.vue'
+
+export default {
+  components: {
+    TodoHeader,
+    TodoInput,
+    TodoList,
+    TodoFooter
+  }
+}
+</script>
+
+
+```
+
+- TodoInput.vue
+
+```vue
+<template>
+  <div class="inputBox shadow">
+    <input type="text" v-model="newTodoItem" @keyup.enter="addTodo">
+    <span class="addContainer" v-on:click="addTodo">
+      <i class="addBtn fas fa-plus" aria-hidden="true"></i>
+    </span>
+
+    <Modal v-if="showModal" @close="showModal = false">
+      <h3 slot="header">
+        경고
+        <i class="closeModalBtn fa fa-times"
+          aria-hidden="true"
+          @click="showModal = false">
+        </i>
+      </h3>
+      <p slot="body">할 일을 입력하세요.</p>
+    </Modal>
+  </div>
+</template>
+
+<script>
+import Modal from './common/Modal.vue'
+
+export default {
+  data() {
+    return {
+      newTodoItem: '',
+      showModal: false
+    }
+  },
+  methods: {
+    addTodo() {
+      if (this.newTodoItem !== '') {
+        // trim()은 입력된 값의 앞 뒤 공백을 없애줌
+        const item = this.newTodoItem.trim();
+        // commit을 하면 store.js에 있는 mutation을 실행시키기 위해서!
+        this.$store.commit('addOneItem', item);
+        this.clearInput();
+      } else {
+        this.showModal = !this.showModal;
+      }
+    },
+    clearInput() {
+      this.newTodoItem = '';
+    }
+  },
+  components: {
+    Modal
+  }
+}
+</script>
+
+
+```
+
+- TodoList.vue
+
+```vue
+<template>
+  <section>
+    <transition-group name="list" tag="ul">
+      <li v-for="(todoItem, index) in this.storedTodoItems" class="shadow" v-bind:key="todoItem.item">
+        <i class="checkBtn fas fa-check" v-bind:class="{checkBtnCompleted: todoItem.completed}" v-on:click="toggleComplete(todoItem, index)"></i>
+        <span v-bind:class="{textCompleted: todoItem.completed}">{{ todoItem.item }}</span>
+        <span class="removeBtn" v-on:click="removeTodo(todoItem, index)">
+          <i class="removeBtn fas fa-trash-alt"></i>
+        </span>
+      </li>
+    </transition-group>
+  </section>
+</template>
+
+<script>
+export default {
+  methods: {
+    removeTodo(todoItem, index) {
+      this.$store.commit('removeOneItem', {todoItem, index});
+    },
+    toggleComplete(todoItem, index) {
+      this.$store.commit('toggleOneItem', {todoItem, index});
+    }
+  },
+  computed: {
+    storedTodoItems() {
+      // return this.$store.state.todoItems;
+      return this.$store.getters.getTodoItems;
+    }
+  }
+}
+</script>
+
+```
+
+- TodoFooter.vue
+
+```vue
+<template>
+  <div class="clearAllContainer">
+    <span class="clearAllBtn" v-on:click="clearTodo">Clear All</span>
+  </div>
+</template>
+
+<script>
+export default {
+  methods: {
+    clearTodo() {
+      this.$store.commit('clearAllItems');
+    }
+  }
+}
+</script>
+
+```
+
+
+
+#### state는 왜 직접 변경하지 않고 mutations로 변경할까?
+
+- 여러 개의 컴포넌트에서 아래와 같이 state 값을 변경하는 경우 **어느 컴포넌트에서 해당 state를 변경했는지 추적하기가 어렵다**
+
+```js
+methods:{
+    increaseCounter(){this.$store.state.counter++;}
+}
+```
+
+- 특정 시점에 어떤 컴포넌트가 state를 접근하여 변경한건지 확인하기 어렵기 때문
+- 따라서, 뷰의 반응성을 거스르지 않게 명시적으로 상태 변화를 수행. **반응성, 디버깅, 테스팅 혜택**
+
+![image-20201213210304869](Vue.js_intermediate.assets/image-20201213210304869.png)
+
+#### actions란?
+
+- 비동기 처리 로직을 선언하는 메서드, 비동기 로직을 담당하는 `mutations`
+- 데이터 요청, Promise, ES6 async과 같은 비동기처리는 모두 `actions`에 선언
+
+```js
+//store.js
+state:{
+    num:10
+},
+mutations: {
+    doubleNumber(state){
+        state.num*2;
+    }
+},
+actions: {
+    delayDoubleNumber(context) { // context로 store의 메서드와 속성 접금
+        context.commit('doubleNumber');
+    }
+}
+
+//App.vue
+// dispatch를 쓰면 'delayDoubleNumber'라는 actions을 호출하고, commit을 하는데 'doubleNumber'라는 mutations를 실행시킴
+this.$store.dispatch('delayDoubleNumber');
+```
+
+
+
+##### actions 비동기 코드 예제1
+
+> incrementCounter가 실행되면 delayedAddcounter라는 액션이 호출되고 이 액션은 addCounter mutations를 2초 후에 실행시킴
+
+```js
+//store.js
+mutations : {
+    addCounter(state){
+        state.counter++
+    },
+},
+actions:{
+    delayedAddcounter(context){
+        setTimeout(()=>context.commit('addCounter'),2000);
+    }
+}
+
+//App.vue
+methods:{
+    incrementCounter(){
+        this.$store.dispatch('delayedAddCounter');
+    }
+}
+```
+
+##### actions 비동기 코드 예제2
+
+> getProduct가 실행되면 dispatch로 액션에서 fetchProductData액션이 호출되고 axios가 get요청을 보내서 성공하면 response를 받아서 setData라는 mutations를 호출할때 인자(fetchData)로 넘겨주고 state.product에 그 fetchData를 담아준다
+
+```js
+//store.js
+mutations : {
+    setData(state,fetchedData){
+        state.product = fetchedData;
+    }
+},
+actions:{
+    fetchProductData(context){
+        retrun axios.get('https:domain.com/products/1')
+        			.then(response => context.commit('setData',response));
+    }
+}
+
+
+//App.vue
+methods:{
+    getProduct() {
+        this.$store.dispatch('fetchProductData');
+    }
+}
+```
+
+#### 왜 비동기 처리 로직은 actions에 선언해야 할까?
+
+- 언제 어느 컴포넌트에서 해당 state를 호출하고, 변경했는지 확인하기 어려움
+- 여러 개의 컴포넌트에서 mutations로 시간 차를 두고 state를 변경하는 경우
+
+> 결론 : state값의 변화를 추적하기 어렵기 때문에 mutations 속성에는 동기 처리 로직만 넣어야 한다.
+>
+> mutations에서는 동기적, actions에서는 비동기처리로직을 처리해! 비동기가 다 처리되면 무조건 mutation으로 가져와서 그 값을 처리해
+
+![image-20201213211924565](Vue.js_intermediate.assets/image-20201213211924565.png)
+
+### 각 속성들을 더 쉽게 사용하는 방법 - Helper
+
+> Store에 있는 아래 4가지 속성들을 간편하게 코딩하는 방법
+
+- state -> mapState
+- getters -> mapGetters
+- mutations -> mapMutations
+- actions -> mapActions
+
+
+
+#### 헬퍼의 사용법
+
+- 헬퍼를 사용하고자 하는 vue파일에서 아래와 같이 해당 헬퍼를 로딩
+
+> `...`는 ES6의 Object Spread Operator 쓰는 이유?
+>
+> 기존에 computed나 methods에 들어있는 것을 그대로 가져오고, map헬퍼를 추가해주기 위해서 사용
+>
+> ![image-20201213213605226](Vue.js_intermediate.assets/image-20201213213605226.png)
+>
+> ` ...mapState(['num'])`이렇게 쓰면 해당 컴포넌트의 template에서 `this.num`과같이 접근이 가능하다!
+>
+> state나 getters는 보통 상태 접근해서 템플릿에 표현해주는 것이라 computed과 관계있다!
+
+```vue
+//App.vue
+import { mapState,mapGetters,mapMutations,mapActions } from 'vuex'
+export defalut {
+	computed() { ...mapState(['num']), ...mapGetters(['countedNum'])},
+	methods:{...mapMutations(['clickBtn']), ...mapActions(['asyncClickBtn'])}
+}
+```
+
+#### mapState
+
+- Vuex에 선언한 state 속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+```js
+//App.vue
+import {mapState} from 'vuex'
+
+computed() {
+...mapState(['num'])
+//num(){return this.$store.state.num;}가 같은 말
+}
+
+//store.js
+state:{
+    num:10
+}
+```
+
+```html
+<!--<p>{{this.$store.state.num}}</p>-->
+<p>
+    {{this.num}}
+</p>
+```
+
+
+
+#### mapGetters
+
+- Vuex에 선언한 getters속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+```js
+//App.vue
+import {mapGetters} from 'vuex'
+computed(){...mapGetters(['reverseMessage'])}
+
+//store.js
+getters:{
+    reverseMessage(state){
+        return state.msg.split('').reverse().join('');
+    }
+}
+```
+
+```html
+<!--<p>{{this.$store.getters.reverseMessage}}</p>-->
+<p>
+    {{this.reverseMessage}}
+</p>
+```
+
+
+
+#### mapMutations
+
+- Vuex에 선언한 mutations속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+```js
+//App.vue
+import { mapMutations } from 'vuex'
+
+methods:{
+    ...mapMutations(['clickBtn']),
+        authLogin(){},
+        displayTable(){}
+}
+
+//store.js
+mutations: {
+    clickBtn(state){
+        alert(state.msg);
+    }
+}
+```
+
+```html
+<button @click="clickBtn">
+    popup message
+</button>
+```
+
+
+
+#### mapActions
+
+- Vuex에 선언한 actions속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+```js
+//App.vue
+import {mapActions} from 'vuex'
+methods : {
+    ...mapActions(['delayClickBtn']),
+}
+
+//store.js
+ actions:{
+     delayClickBtn(context){
+         setTimeout(()=> context.commit('clickBtn'),2000);
+     }
+ }
+```
+
+```html
+<button @click="delayClickBtn">
+    delay popup message
+</button>
+```
+
+
+
+#### 헬퍼의 유연한 문법
+
+- Vuex에 선언한 속성을 그대로 컴포넌트에 연결하는 문법
+
+```js
+//배열 리터럴
+...mapMutations([
+    'clickBtn',//'clickBtn':clickBtn
+    'addNumber' // addMuber(인자) 인자를 자연스럽게 넘겨줌
+])
+```
+
+- Vuex에 선언한 속성을 컴포넌트의 특정 메서드에다가 연결하는 문법
+
+```js
+//객체 리터럴
+...mapMutations({
+    popupMsg:'clickBtn' // 컴포넌트 메서드명 : Store의 mutation 명
+})
+```
+
+
+
+#### Todo helper이용해서 refactoring
+
+- store.js
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex);
+
+const storage = {
+	fetch() {
+		const arr = [];
+		if (localStorage.length > 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i) !== 'loglevel:webpack-dev-server') {
+          arr.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+        }
+      }
+    }
+		return arr;
+	}
+}
+
+export const store = new Vuex.Store({
+	state: {
+		todoItems: storage.fetch()
+	},
+	getters: {
+		// todoItems를 가져옴
+		getTodoItems(state) {
+			return state.todoItems;
+		}
+	},
+	mutations: {
+		addOneItem(state, todoItem) {
+			const obj = {completed: false, item: todoItem};
+      localStorage.setItem(todoItem, JSON.stringify(obj));
+			state.todoItems.push(obj);
+		},
+		removeOneItem(state, payload) {
+			state.todoItems.splice(payload.index, 1);
+      localStorage.removeItem(payload.todoItem.item);
+		},
+		toggleOneItem(state, payload) {
+			state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+      localStorage.removeItem(payload.todoItem.item);
+      localStorage.setItem(payload.todoItem.item, JSON.stringify(payload.todoItem));
+		},
+		clearAllItems(state) {
+			state.todoItems = [];
+			localStorage.clear();
+		}
+	}
+});
+
+```
+
+- TodoList.vue
+
+```vue
+<template>
+  <section>
+    <transition-group name="list" tag="ul">
+      <li v-for="(todoItem, index) in this.storedTodoItems" class="shadow" v-bind:key="todoItem.item">
+        <i class="checkBtn fas fa-check" v-bind:class="{checkBtnCompleted: todoItem.completed}" v-on:click="toggleComplete({todoItem, index})"></i>
+        <span v-bind:class="{textCompleted: todoItem.completed}">{{ todoItem.item }}</span>
+        <!-- mapMutations로 보내는 인자가 2개이기 떄문에 객체로 묶어서 {todoItem, index} 하나로 보내줌 -->
+        <span class="removeBtn" v-on:click="removeTodo({todoItem, index})">
+          <i class="removeBtn fas fa-trash-alt"></i>
+        </span>
+      </li>
+    </transition-group>
+  </section>
+</template>
+
+<script>
+import { mapGetters, mapMutations } from 'vuex'
+
+export default {
+  methods: {
+    ...mapMutations({
+      // removeTodo가 일어났을 때 removeOneItem이라는 mutation일어남! 인자는 따로 적지 않아도 알아서 넘겨줌
+      // 다만 인자가 하나가 아니라 여러개일떄는 객체{} 묶어서 보내줌!
+      removeTodo: 'removeOneItem',
+      toggleComplete: 'toggleOneItem'
+    })
+  },
+  computed: {
+    // 객체리터럴 -> getters의 이름과 실제 컴포넌트의 이름이 다를때 컴포넌트이름:getters이름
+    ...mapGetters({
+      storedTodoItems: 'getTodoItems'
+    })
+  }
+}
+</script>
+```
+
+- TodoFooter.vue
+
+```vue
+<template>
+  <div class="clearAllContainer">
+    <span class="clearAllBtn" v-on:click="clearTodo">Clear All</span>
+  </div>
+</template>
+
+<script>
+import { mapMutations } from 'vuex'
+
+export default {
+  methods: {
+    ...mapMutations({
+      clearTodo: 'clearAllItems'
+    })
+  }
+}
+</script>
+```
+
+
+
+### 프로젝트 구조화와 모듈화 방법1
+
+- ES6의 Import & Export를 이용하여 속성별로 모듈화
+
+```js
+//store.js
+import Vue from 'vue'
+import Vuex from 'vuex'
+// 해당 파일 전체를(*) as(별칭)으로 부르겠다
+import * as getters from 'store/getters.js'
+import * as mutations from 'store/mutations.js'
+import * as actions from 'store/actions.js'
+
+export const store = new Vuex.Store({
+    state:{},
+    getters:getters,
+    mutations:mutations,
+    actions:actions
+});
+```
+
+- store.js
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import * as getters from './getters.js'
+import * as mutations from './mutations.js'
+
+Vue.use(Vuex);
+
+const storage = {
+	fetch() {
+		const arr = [];
+		if (localStorage.length > 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i) !== 'loglevel:webpack-dev-server') {
+          arr.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+        }
+      }
+    }
+		return arr;
+	}
+}
+
+export const store = new Vuex.Store({
+	state: {
+		todoItems: storage.fetch()
+	},
+	getters: getters,
+	mutations: mutations
+});
+
+```
+
+- getters.js
+
+```js
+export const getTodoItems = function(state) {
+	return state.todoItems;
+}
+```
+
+- mutations.js
+
+```js
+const addOneItem = function(state, todoItem) {
+	const obj = {completed: false, item: todoItem};
+	localStorage.setItem(todoItem, JSON.stringify(obj));
+	state.todoItems.push(obj);
+};
+
+const removeOneItem = function(state, payload) {
+	state.todoItems.splice(payload.index, 1);
+	localStorage.removeItem(payload.todoItem.item);
+};
+
+const toggleOneItem = function(state, payload) {
+	state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+	localStorage.removeItem(payload.todoItem.item);
+	localStorage.setItem(payload.todoItem.item, JSON.stringify(payload.todoItem));
+};
+
+const clearAllItems = function(state) {
+	state.todoItems = [];
+	localStorage.clear();
+};
+
+export { addOneItem, removeOneItem, toggleOneItem, clearAllItems };
+```
+
+
+
+### 프로젝트 구조화와 모듈화 방법2
+
+- 앱이 비대해져서 1개의 store로는 관리가 힘들때 `modules`속성 사용
+- store폴더 아래에 modules폴더 만듦
+
+```js
+//store.js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import todo from 'modules/todo.js'
+
+export const store = new Vuex.Store({
+    modules:{
+        moduleA:todo,//모듈명칭: 모듈파일명
+        todo//todo:todo
+    }
+});
+
+//todo.js
+const state={}
+const getters={}
+const mutations = {}
+const actions= {}
+```
+
+- store.js
+
+```js
+import Vue from 'vue'
+import Vuex from 'vuex'
+import todo from './modules/todo.js'
+
+Vue.use(Vuex);
+
+export const store = new Vuex.Store({
+	modules : {
+		todo
+	}
+});
+```
+
+- `store`>`modules`>`todo.js`
+
+```js
+const storage = {
+	fetch() {
+		const arr = [];
+		if (localStorage.length > 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        if (localStorage.key(i) !== 'loglevel:webpack-dev-server') {
+          arr.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+        }
+      }
+    }
+		return arr;
+	}
+}
+
+const state = {
+	todoItems: storage.fetch()
+};
+
+const getters = {
+	getTodoItems(state) {
+		return state.todoItems;
+	}
+};
+
+const mutations = {
+	addOneItem(state, todoItem) {
+		const obj = {completed: false, item: todoItem};
+    localStorage.setItem(todoItem, JSON.stringify(obj));
+		state.todoItems.push(obj);
+	},
+	removeOneItem(state, payload) {
+		state.todoItems.splice(payload.index, 1);
+    localStorage.removeItem(payload.todoItem.item);
+	},
+	toggleOneItem(state, payload) {
+		state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+    localStorage.removeItem(payload.todoItem.item);
+    localStorage.setItem(payload.todoItem.item, JSON.stringify(payload.todoItem));
+	},
+	clearAllItems(state) {
+		state.todoItems = [];
+		localStorage.clear();
+	}
+};
+
+
+// 한개의 파일에서 한번만 쓸수있음
+export default {
+	state,
+	getters,
+	mutations
+};
+```
+
