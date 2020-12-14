@@ -205,7 +205,7 @@ export default {
       // 입력값을 할당한 뒤,
       // 유튜브 영상 검색하는 api를 사용! GET요청
       const API_URL = 'https://www.googleapis.com/youtube/v3/search'
-      const API_KEY = 'AIzaSyB1bOHQSlLi46V8JZqTuWH-ytSeunxv4YA'
+      const API_KEY = '######'
       // 검색어가 없으면 작동안함
       if (this.userInput === ''){
         return
