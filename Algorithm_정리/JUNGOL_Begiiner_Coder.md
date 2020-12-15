@@ -865,6 +865,8 @@ for x in arr:
 
 
 
+## 수학
+
 ### J_1692_곱셈
 
 ```python
@@ -911,9 +913,7 @@ for i in range(10):
 
 
 
-
-
-## J_1071_약수와배수
+### J_1071_약수와배수
 
 ```python
 '''
@@ -1348,5 +1348,275 @@ if N != 1:
     print(M-N-cnt+1)
 else:
     print(M-N-cnt)
+```
+
+### J_2814_이진수
+
+```python
+'''
+20-12-13 13:26-13:30
+이진수를 입력받아 10진수로 변환하여 출력하는 프로그램 작성
+1. 이진수를 입력받는다
+2. 뒤에서부터 읽으면서 1이면 2*idx를 해서 더해줌
+'''
+n = input()
+bin=0
+for i in range(len(n))[::-1]:
+    bin += int(n[i])*2**(len(n)-i-1)
+print(bin)
+```
+
+
+
+### J_1534_10진수를2,8,16진수로
+
+```python
+'''
+20-12-13 13:31-
+10진수를 입력 받아서 2, 8, 16진수로 바꾸어 출력하는 프로그램을 작성하시오.
+입력의 첫줄에는 10진수 N(1≤N≤100,000)과 바꿀 진수 B(2, 8, 16)가 공백으로 구분하여 입력된다.
+16진수에서 10이상의 수는 순서대로 'A', 'B', 'C', 'D', 'E', 'F'로 나타낸다.
+
+10진수를 n진수로 바꾸는 함수를 만듦
+10을 n으로 나눈 나머지를 리스트에 담음
+여기서 16진수 일때 10이상이라면 A,B,C,D,E,F로 나타냄
+'''
+def change(ten,how):
+    global result
+    if ten == 0:
+        return
+    if ten%how >= 10:
+        result.append(chr(55+ten%how))
+    else:
+        result.append(ten%how)
+    change(ten//how,how)
+
+
+n,num = map(int,input().split())
+result = []
+change(n,num)
+print(*result[::-1],sep='')
+```
+
+### J_3106_진법변환
+
+```python
+'''
+20-12-13 13:42-14:04
+A진법의 수를 입력받아 B진법 수로 출력하는 프로그램
+테스트 케이스 끝 0 주어짐
+세수 A,N,B가 공백으로 주어짐
+A진법 수 N을 B진법수로 변환
+
+1. A진법의 수로 N을 10진수로 만들고, B로 나눈 나머지로 바꿈
+'''
+def change(num,how):
+    global result
+    if num == 0:
+        return
+    if num % how >= 10:
+        result.append(chr(num%how+55))
+    else:
+        result.append(num%how)
+    change(num//how,how)
+
+def ten(word,how):
+    ans = 0
+    for w in range(len(word))[::-1]:
+        if word[w].isalpha():
+           ans+=(ord(word[w])-55)*how**(len(word)-1-w)
+        else:
+            ans += int(word[w])*how**(len(word)-1-w)
+    return ans
+
+while True:
+    info = list(input().split())
+    if len(info) == 1:
+        break
+    A,N,B = int(info[0]),info[1],int(info[2])
+    if N=='0':
+        print(0)
+        continue
+    result = []
+    change(ten(N,A),B)
+    print(*result[::-1],sep='')
+```
+
+
+
+## 문자열
+
+### J_2604_그릇
+
+```python
+'''
+20-12-14 18:10-18:25
+( 이건 그릇이 바닥에 바로 놓인 모양 ) 는 거꾸로 놓인 모양
+( 이거하나당 10cm, ((는 +5cm해서 15cm ()는 +10해서 20cm
+
+1. 그릇을 입력받아 앞에서 부터 읽음
+2. 제일 처음 것을 pop해서 모양을 기억하고, ans+=10을 한다
+3. 그다음부터 pop하면서 모양이 다르면 +10, 같으면 +5를 한 뒤, 처음값을 다음값으로 바꿔주고 그 다음  값을 pop 반복
+'''
+bowls = list(input())
+# bowls = list('()()()))(')
+b = bowls.pop(0)
+ans = 10
+while bowls:
+    next = bowls.pop(0)
+    if next == b:
+        ans += 5
+    else:
+        ans += 10
+    b = next
+print(ans)
+```
+
+### J_2514_문자열찾기
+
+```python
+'''
+20-12-14 18:26-18:37
+주어진 문자열, 연속 3개의 문자가 IOI이거나 KOI인 문자열이 각각 몇 개 있는지 찾는 프로그램
+1. 문자열을 앞에 3개를 list로 초기값으로 word에 저장 후 IOI or KOI인지 확인
+2. 그다음 수를 볼때 word의 앞글자 pop, 다음 문자 뒤에 append,해서 확인 반복
+'''
+words = list(input())
+word = words[:3]
+ioi,koi = 0,0
+idx = 2
+while True:
+    # print(''.join(word))
+    if ''.join(word) == 'IOI':
+        ioi += 1
+    elif ''.join(word) == 'KOI':
+        koi += 1
+    word.pop(0)
+    idx+=1
+    if idx == len(words):
+        break
+    word.append(words[idx])
+
+print(koi,ioi,sep='\n')
+```
+
+### J_2857_세로읽기
+
+```python
+'''
+20-12-14 18:38-18:53
+1. 글들을 배열로 입력받는다
+2. 세로로 읽으면서 만약 빈칸이면 지나감, 계속 읽음
++여기서 제일 긴 줄을 기록한 뒤, 그 MAX만큼 5번 돌림
++ 해당 행에 index가 넘어갔다면 지나감
+3. 첫줄부터 입력받은 글들을 붙여서 줄력
+'''
+words =[list(input()) for _ in range(5)]
+MAX = 0
+word = []
+for x in words:
+    if len(x) > MAX:
+        MAX = len(x)
+for j in range(MAX):
+    for i in range(5):
+        if j >= len(words[i]):
+            continue
+        word.append(words[i][j])
+print(''.join(word))
+```
+
+
+
+### J_1880_암호풀기
+
+> 이거 답 나오는데 왜 제출하면 아무것도 안뜰까...ㅠㅠㅠ
+
+```python
+'''
+20-12-15 15:30-16
+26개 알파벳 소문자, 순서대로 복호화 키 대치
+암호화된 문자는 대소문자 혹은 공백이 올 수 있고 , 대문자느 ㄴ대문자로, 소문자는 소문자로 치환, 규칙에 맞게 출력 공백은 그대로 출ㄹ력
+암호화키, 복호화키 모두 줌
+아래 복호화키는 a->e b->y이런식 으로 대치됨
+eydbkmiqugjxlvtzpnwohracsf
+아래의 문자를 바꿔야됨
+Kifq oua zarxa suar bti yaagrj fa xtfgrj
+1. 복호화키를 list에 담고
+2. 바꿀 문자를 읽으면서 ord() <=90이면 대문자 복호화리스트[ord()-65]을 해서 바꾼뒤 다시 대문자(-32)로 바꿔줌
+97>=이면 [ord()-97]을 함
+3. 공백은 공백 그대로 넣음
+'''
+codes = list(input())
+secrets = list(input())
+words = []
+while secrets:
+    w = secrets.pop(0)
+    if w == " ":
+        words.append(w)
+    elif ord(w) >= 97:
+        ans = codes[ord(w)-97]
+        words.append(ans)
+    else:
+        ans = codes[ord(w)-65]
+        words.append(chr(ord(ans)-32))
+# print(''.join(words))
+print(*words,sep='')
+```
+
+- 이렇게 하니까 된다...ㅎ...why..?
+
+```python
+codes = input()
+secrets = input()
+words = []
+for w in secrets:
+    if w == " ":
+        print(w,end='')
+    elif ord(w) >= 97:
+        ans = codes[ord(w)-97]
+        words.append(ans)
+        print(ans,end='')
+    else:
+        ans = codes[ord(w)-65]
+        words.append(chr(ord(ans)-32))
+        print(chr(ord(ans)-32), end = '')
+```
+
+
+
+
+
+### J_1516_단어세기
+
+```python
+'''
+20-12-15 16:57-17:11
+임의의 문장 입력받아 각 단어별로 나눈 후, 단어들의 중복되는 개수 구하는 프로그램작성
+1. 입력된 스트링 글자 제한 없음, 알파벳 , 대소문자 공백, ,등도 입력으로 들어옴
+2. 단어사이 구분은 공백
+3. 공백을 제외한 모든 문자들이 포함됨
+
+문장 입력받음(문장의 길이 200이하)
+하나의 결과가 나온 후에도 계속 새로운 입력을 받다가, END가 입력되면 프로그램 종료(문장의 개수가 30 넘지 않음)
+각 문장 단위로 단어들의 발생 빈도를 오름차순(아스키코드순으로 출력)
+
+1. 문장을 입력받는다. 공백을 기준으로 나눔
+2. 각 단어들을 키로하는 dict를 만들고, 순서를 센다
+3. 아스키코드 순으로 정렬을 한 뒤, 출력
+
+'''
+while True:
+    result = dict()
+    words = list(input().split())
+    if ''.join(words) == "END":
+        break
+    for w in words:
+        if w in result:
+            result[w] += 1
+        else:
+            result[w] = 1
+    resultkey = sorted(result)
+    for k in resultkey:
+        print(k, ':', result[k])
 ```
 
