@@ -2,7 +2,7 @@
 
 [toc]
 
-## NVM 설치 및 버전 변경 방법
+## 1. 개발환경 설정 : NVM 설치 및 버전 변경 방법
 
 > [NVM 깃헙 설치 링크](https://github.com/nvm-sh/nvm#installing-and-updating)
 > 노드 버전을 그냥 전환하고 싶으면 `npm use 버전`을 쓰면됨
@@ -478,7 +478,7 @@ export default {};
 
 
 
-## Vue router
+## 3. 뷰 라우터 및 컴포넌트 설계
 
 > [뷰 라우터 오픈 소스](https://github.com/vuejs/vue-router)
 >
@@ -582,7 +582,7 @@ export default {};
 
 
 
-## Signup
+## 4. 회원 가입 페이지 개발
 
 - App.vue의 header ->`components` > `common` > `AppHeader.vue`
 
@@ -639,84 +639,6 @@ export default {
 
 ```sh
 $ npm i axios
-```
-
-#### API 구조화
-
-> [axios create() 문서](https://github.com/axios/axios#axioscreateconfig)
->
-> 한 컴포넌트에 계속 `import axios from 'axios'`를 쓰는 것이 아니라, src폴더 아래에 api폴더를 만들고, axios에 대한 공통부분을 구조화하고, 가져와 편하게 쓸 수 있다.
-
-- `src` > `api` > `index.js`
-
-> [타입스크립트 핸드북](https://joshua1988.github.io/ts/)
->
-> 타입스크립트는 자바스크립트에 타입을 부여한 언어다. 자바스크립트의 확장된 언어라고 볼 수 있다. 타입스크립트는 자바스크립트와 달리 브라우저에서 실행하려면 파일을 한번 변환해주어야 한다. 이 변환 과정을 우리는 **컴파일(complile)** 이라고 부른다
->
-> 왜 써야되는가??
->
-> - [에러의 사전 방지](https://joshua1988.github.io/ts/why-ts.html#에러의-사전-방지)
-> - [코드 가이드 및 자동 완성(개발 생산성 향상)](https://joshua1988.github.io/ts/why-ts.html#코드-자동-완성과-가이드)
->
-> - 예) 인자로 뭐가 들어가야되는지 알려줌
->
-> ![image-20201214134239588](Vue-til-끝장내기.assets/image-20201214134239588.png)
-
-```js
-import axios from 'axios';
-
-// axios create api이용 공통설정을 여기에 넣음, instance에 넣어서 라이브러리 재사용가능 
-const instance = axios.create({
-  // url을 공통화, 환경변수에 저장 `VUE_APP`을 쓰면 자동으로 로드돼서 쓸 수 있음!
-  baseURL: process.env.VUE_APP_API_URL,
-});
-
-// post로 회원가입을 요청을 날릴 수 있는 함수를 만듦
-function registerUser(userData) {
-  // signupform에서 export된 이 함수를 호출, 함수 결과가 promise이기 떄문에 return으로 해줘야 이후에 비동기동작을 수행할 수 있다
-  // instance.post는 axios.post(url,data)를 다 적지않고 코드를 줄일 수 있음
-  return instance.post('signup', userData);
-}
-
-export { registerUser };
-```
-
-##### 환경변수 만들기 프로젝트 폴더 위에 `.env`파일을 만듦
-
-> `VUE_APP`접두사가 붙은 변수는 자동로드!
->
-> [웹팩 DefinePlugin 문서](https://webpack.js.org/plugins/define-plugin/)
->
-> - env파일 규칙
->
-> [Vue CLI env 파일 규칙 문서](https://cli.vuejs.org/guide/mode-and-env.html#modes-and-environment-variables)
-
-- `.env`
-
-> 혹시나 development, production이 없을 때 공통으로 들어가는 url, develope나 production이 없을 때 우선순위를 가짐
-
-```sh
-VUE_APP_API_URL=https://vue-til.com/
-```
-
-- `.env.development`
-
-> 개발용 환경변수, prototype때는 이 url씀
->
-> 가장 높은 우선순위를 가짐
-
-```sh
-VUE_APP_API_URL=http://localhost:3000/
-```
-
-- `.env.production`
-
-> 좀더 정확하게하려면 `npm run build`를 했을 때 porduction으로 들어감
->
-> 배포에 해당하는 도메인 주소
-
-```sh
-VUE_APP_API_URL=https://vue-til.com/
 ```
 
 #### 비동기처리
@@ -798,7 +720,89 @@ export default {
 
 
 
-## Login
+## 5. 실무 환경 구성
+
+#### API 구조화
+
+> [axios create() 문서](https://github.com/axios/axios#axioscreateconfig)
+>
+> 한 컴포넌트에 계속 `import axios from 'axios'`를 쓰는 것이 아니라, src폴더 아래에 api폴더를 만들고, axios에 대한 공통부분을 구조화하고, 가져와 편하게 쓸 수 있다.
+
+- `src` > `api` > `index.js`
+
+> [타입스크립트 핸드북](https://joshua1988.github.io/ts/)
+>
+> 타입스크립트는 자바스크립트에 타입을 부여한 언어다. 자바스크립트의 확장된 언어라고 볼 수 있다. 타입스크립트는 자바스크립트와 달리 브라우저에서 실행하려면 파일을 한번 변환해주어야 한다. 이 변환 과정을 우리는 **컴파일(complile)** 이라고 부른다
+>
+> 왜 써야되는가??
+>
+> - [에러의 사전 방지](https://joshua1988.github.io/ts/why-ts.html#에러의-사전-방지)
+> - [코드 가이드 및 자동 완성(개발 생산성 향상)](https://joshua1988.github.io/ts/why-ts.html#코드-자동-완성과-가이드)
+>
+> - 예) 인자로 뭐가 들어가야되는지 알려줌
+>
+> ![image-20201214134239588](Vue-til-끝장내기.assets/image-20201214134239588.png)
+
+```js
+import axios from 'axios';
+
+// axios create api이용 공통설정을 여기에 넣음, instance에 넣어서 라이브러리 재사용가능 
+const instance = axios.create({
+  // url을 공통화, 환경변수에 저장 `VUE_APP`을 쓰면 자동으로 로드돼서 쓸 수 있음!
+  baseURL: process.env.VUE_APP_API_URL,
+});
+
+// post로 회원가입을 요청을 날릴 수 있는 함수를 만듦
+function registerUser(userData) {
+  // signupform에서 export된 이 함수를 호출, 함수 결과가 promise이기 떄문에 return으로 해줘야 이후에 비동기동작을 수행할 수 있다
+  // instance.post는 axios.post(url,data)를 다 적지않고 코드를 줄일 수 있음
+  return instance.post('signup', userData);
+}
+
+export { registerUser };
+```
+
+##### 환경변수 만들기 프로젝트 폴더 위에 `.env`파일을 만듦
+
+> `VUE_APP`접두사가 붙은 변수는 자동로드!
+>
+> [웹팩 DefinePlugin 문서](https://webpack.js.org/plugins/define-plugin/)
+>
+> - env파일 규칙
+>
+> [Vue CLI env 파일 규칙 문서](https://cli.vuejs.org/guide/mode-and-env.html#modes-and-environment-variables)
+
+- `.env`
+
+> 혹시나 development, production이 없을 때 공통으로 들어가는 url, develope나 production이 없을 때 우선순위를 가짐
+
+```sh
+VUE_APP_API_URL=https://vue-til.com/
+```
+
+- `.env.development`
+
+> 개발용 환경변수, prototype때는 이 url씀
+>
+> 가장 높은 우선순위를 가짐
+
+```sh
+VUE_APP_API_URL=http://localhost:3000/
+```
+
+- `.env.production`
+
+> 좀더 정확하게하려면 `npm run build`를 했을 때 porduction으로 들어감
+>
+> 배포에 해당하는 도메인 주소
+
+```sh
+VUE_APP_API_URL=https://vue-til.com/
+```
+
+#### 
+
+## 6. 로그인 페이지 개발
 
 ![image-20201214165233151](Vue-til-끝장내기.assets/image-20201214165233151.png)
 
@@ -1198,7 +1202,7 @@ button {
 
 
 
-## Main page
+
 
 ### 컴포넌트간 데이터 전달 방법 3가지
 
@@ -1209,6 +1213,8 @@ button {
 > 3. Vuex의 store이용
 
 ![image-20201214173507921](Vue-til-끝장내기.assets/image-20201214173507921.png)
+
+##  7. 로그인 상태 관리
 
 #### 3. Vuex이용
 
@@ -1490,5 +1496,1811 @@ export default {
 }
 </style>
 
+```
+
+
+
+## 8. API 인증 처리를 위한 토큰 관리
+
+### 학습노트 조회 GET(`/posts`)
+
+> [Json web 토큰 문서](https://jwt.io/)
+>
+> 401에러는 로그인토큰이 없어서 에러가 뜸!
+>
+> 로그인했을때 나오는 토큰이 필요하다!
+>
+> JWT 토큰 값을 복사해서 사용해야됨!
+
+![image-20201215210308842](Vue-til-끝장내기.assets/image-20201215210308842.png)
+
+![image-20201215210319544](Vue-til-끝장내기.assets/image-20201215210319544.png)
+
+- 토큰이 없어서 Unauthorized에러가 뜬다 로그인시 발급되는 토큰을 아래 value에 넣어줌!
+
+![image-20201215210554901](Vue-til-끝장내기.assets/image-20201215210554901.png)
+
+![image-20201215210636068](Vue-til-끝장내기.assets/image-20201215210636068.png)
+
+
+
+#### HTTP헤더에 토큰값을 실는 법
+
+```js
+import store from '@/store/index';
+// instance로 axios를 요청할때마다 아래의 속성들이 정의된 상태로 수행을함
+const instance = axios.create({
+  baseURL: process.env.VUE_APP_API_URL,
+//토큰은 headers에 Authorization에 실어주면됨! -> 토큰으로 api권한 인증 방법
+  headers: {
+    Authorization:'store.state.token,
+  }, 
+})
+
+```
+
+
+
+![image-20201215211901848](Vue-til-끝장내기.assets/image-20201215211901848.png)
+
+- 이렇게 저장된 토큰을 넘겨줘도 네트워크 패널에서 보면 `Authrization :`에 빈값이 들어있다!!
+
+![image-20201215212144084](Vue-til-끝장내기.assets/image-20201215212144084.png)
+
+- WHY??? 저장된 토큰값이 아니라 초기 토큰값이 넘어간 것!
+
+![image-20201215212310442](Vue-til-끝장내기.assets/image-20201215212310442.png)
+
+**이유!!**
+
+- 로그인 폼에서 axios를 호출했을 때는 이미 토큰값을 저장하기 전에 `index.js`파일을 js내에서 호출하자마자 이미 instance변수에는 header값에는 store.state.token(초기값)이 들어가있음
+- vue는 값이 바뀌면 갱신해주지만 javascript는 갱신해주지 않음!
+- axios의 `interceptors` api를 사용
+
+> [액시오스 인터셉터 문서](https://github.com/axios/axios#interceptors)
+>
+> : 서버로 요청을 보내는 것이나 서버에서 응답을 받을 때 화면단에(어떤 컴포넌트 단에서) 처리하기 전에 추가 로직을 넣을 수 있는 것
+>
+> ```js
+> // Add a request interceptor
+> axios.interceptors.request.use(function (config) {
+>     // Do something before request is sent
+>     //요청을 보내기전에 특정 코드를 넣을 수 있음
+>     return config;
+>   }, function (error) {
+>     // Do something with request error
+>     //그 요청이 실패했을 때 error를 화면에 보이기 전에 처리할 수 있음
+>     return Promise.reject(error);
+>   });
+> 
+> // Add a response interceptor
+> axios.interceptors.response.use(function (response) {
+>     // Any status code that lie within the range of 2xx cause this function to trigger
+>     //응답을 받기전에 처리를 할 수 있고
+>     // Do something with response data
+>     return response;
+>   }, function (error) {
+>     // Any status codes that falls outside the range of 2xx cause this function to trigger
+>     //에러가 났을 경우 전처리를 할 수 있다
+>     // Do something with response error
+>     return Promise.reject(error);
+>   });
+> ```
+
+```js
+//api>index.js
+import axios from 'axios';
+import store from '@/store/index';
+
+
+//이러면 헤더에 토큰이 저장되지 않음!!
+// instance로 axios를 요청할때마다 아래의 속성들이 정의된 상태로 수행을함
+ const instance = axios.create({
+   baseURL: process.env.VUE_APP_API_URL,
+// 토큰은 headers에 Authorization에 실어주면됨! -> 토큰으로 api권한 인증 방법
+   headers: {
+     Authorization:'store.state.token,
+   }, 
+ })
+
+// 회원가입 API
+function registerUser(userData) {
+  return instance.post('signup', userData);
+}
+
+// 로그인 API
+function loginUser(userData) {
+  return instance.post('login', userData);
+}
+
+// 학습 노트 데이터를 조회하는 API
+function fetchPosts() {
+  return instance.get('posts');
+}
+
+export { registerUser, loginUser, fetchPosts };
+```
+
+- inceptors.request.use에서 request를 보내기 전의 설정에 config를 console로 찍어보면 아래의 값이 나오고 headers에 Authorization의 키와 토큰값을 추가해주면 되는 것을 알수있다.
+
+> ```js
+> export function setInterceptors(instance) {
+>   // Add a request interceptor
+>   // axios.interceptors.request().use();
+>   // instance를 사용했기때문에 위코드와 아래코드는 같은 것!
+>   instance.interceptors.request.use(
+>     function(config) {
+>       // request에 요청을 보내기 직전의 설정을 해줌
+>       // console.log(config);
+>       // axios의 config에 headers가 존재함, headers에 Authorization이라는 속성이 있음
+>       config.headers.Authorization = store.state.token;
+>       return config;
+>     },
+>     function(error) {
+>       // Do something with request error
+>       return Promise.reject(error);
+>     },
+>   );
+> ```
+
+![image-20201215214628131](Vue-til-끝장내기.assets/image-20201215214628131.png)
+
+Authorization에 토큰 값이 잘 들어간 것을 알수 있다
+
+![image-20201215215131001](Vue-til-끝장내기.assets/image-20201215215131001.png)
+
+- LoginForm.vue
+
+```vue
+<template>
+  <div class="contents">
+    <div class="form-wrapper form-wrapper-sm">
+      <form @submit.prevent="submitForm" class="form">
+        <div>
+          <label for="username">id:</label>
+          <input id="username" type="text" v-model="username" />
+          <p class="validation-text">
+            <span class="warning" v-if="!isUsernameValid && username">
+              Please enter an email address
+            </span>
+          </p>
+        </div>
+        <div>
+          <label for="password">pw:</label>
+          <input id="password" type="text" v-model="password" />
+        </div>
+        <button
+          :disabled="!isUsernameValid || !password"
+          type="submit"
+          class="btn"
+        >
+          로그인
+        </button>
+      </form>
+      <p class="log">{{ logMessage }}</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import { loginUser } from '@/api/index';
+import { validateEmail } from '@/utils/validation';
+
+export default {
+  data() {
+    return {
+      // form values
+      username: '',
+      password: '',
+      // log
+      logMessage: '',
+    };
+  },
+  computed: {
+    isUsernameValid() {
+      return validateEmail(this.username);
+    },
+  },
+  methods: {
+    async submitForm() {
+      try {
+        // 비즈니스 로직
+        const userData = {
+          username: this.username,
+          password: this.password,
+        };
+        const { data } = await loginUser(userData);
+        // login하면 나오는 토큰값! 이것을 어딘가에 저장하고 api를 호출할때마다 불러오면됨!
+        console.log(data.token);
+        // token을 setToken mutations를 실행시켜 저장함
+        this.$store.commit('setToken', data.token);
+        this.$store.commit('setUsername', data.user.username);
+        this.$router.push('/main');
+      } catch (error) {
+        // 에러 핸들링할 코드
+        console.log(error.response.data);
+        this.logMessage = error.response.data;
+      } finally {
+        this.initForm();
+      }
+    },
+    initForm() {
+      this.username = '';
+      this.password = '';
+    },
+  },
+};
+</script>
+
+<style>
+.btn {
+  color: white;
+}
+</style>
+```
+
+- `store` > `index.js`
+
+```js
+import Vue from 'vue';
+import Vuex from 'vuex';
+
+Vue.use(Vuex);
+
+export default new Vuex.Store({
+  state: {
+    username: '',
+    token: '',
+  },
+  getters: {
+    isLogin(state) {
+      return state.username !== '';
+    },
+  },
+  mutations: {
+    setUsername(state, username) {
+      state.username = username;
+    },
+    clearUsername(state) {
+      state.username = '';
+    },
+    // token을 담아줌
+    setToken(state, token) {
+      state.token = token;
+    },
+  },
+});
+```
+
+## 9. 학습 노트 데이터 조회
+
+- `api` > `index.js`
+
+> **여기서 instacne에 토큰값이 header에 들어있는데 회원가입과 로그인api에도 쓰고있다! 엄격한 백엔드면 오류가 났을수도 있다!  원래는 분리해주고 instance에 헤더값이 들어있어야되는 것은 로그인 이후의 api들이다!**
+
+```js
+import axios from 'axios';
+// interceptors함수를 가져옴
+import { setInterceptors } from './common/interceptors';
+
+// 액시오스 초기화 함수
+function createInstance() {
+  // 함수안에서 생성된 변수라 함수 밖에서는 존재하지 않음
+  const instance = axios.create({
+    baseURL: process.env.VUE_APP_API_URL,
+  });
+  // instance를 만든 것을 setInterceptors의 인자로 넘겨줌!! 
+  // -> setInterceptors함수의 반환결과로 instance가 나옴, -> createInstance의 return값이 바뀐 instance가 됨!
+  return setInterceptors(instance);
+}
+// 바뀐 결과를 instance에 담아줌 -> setInterceptors에 설정된 값을 가지고 instance를 매번 요청하게 됨!!
+const instance = createInstance();
+
+// 회원가입 API
+function registerUser(userData) {
+  return instance.post('signup', userData);
+}
+
+// 로그인 API
+function loginUser(userData) {
+  return instance.post('login', userData);
+}
+
+// 학습 노트 데이터를 조회하는 API
+function fetchPosts() {
+  // posts는 api문서에 사용자가 등록한 게시물을 가져오는 API
+  return instance.get('posts');
+}
+
+export { registerUser, loginUser, fetchPosts };
+
+```
+
+- `api` > `common` > `interceptors.js`
+
+```js
+import store from '@/store/index';
+
+// common폴더를 만들어 interceptors.js를 만든다 -> api의 index.js가 너무 길어지면 가독성이 떨어지기 떄문
+
+// 함수에 코드를 넣어주는게 좋음 
+export function setInterceptors(instance) {
+  // Add a request interceptor
+  // axios.interceptors.request().use();
+  // instance를 사용했기때문에 위코드와 아래코드는 같은 것!
+  instance.interceptors.request.use(
+    function(config) {
+      // request에 요청을 보내기 직전의 설정을 해줌
+      // console.log(config);
+      // axios의 config에 headers가 존재함, headers에 Authorization이라는 속성이 있음
+      // config의 headers에 Authorization이라는 키와 토큰값을 추가함 
+      config.headers.Authorization = store.state.token;
+      return config;
+    },
+    function(error) {
+      // Do something with request error
+      return Promise.reject(error);
+    },
+  );
+
+  // Add a response interceptor
+  instance.interceptors.response.use(
+    function(response) {
+      // Any status code that lie within the range of 2xx cause this function to trigger
+      // Do something with response data
+      return response;
+    },
+    function(error) {
+      // Any status codes that falls outside the range of 2xx cause this function to trigger
+      // Do something with response error
+      return Promise.reject(error);
+    },
+  );
+  // 다시 instance로 넘겨줌
+  return instance;
+}
+
+```
+
+
+
+- Mainpage.vue
+
+```vue
+<template>
+  <div>
+    <div class="main list-container contents">
+      <h1 class="page-header">Today I Learned</h1>
+      <!-- 만약에 로딩중이면 보여짐 -->
+      <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+      <!-- 로딩중이 아니라면 ul이 뜸 -->
+      <ul v-else>
+        <!-- data의 키값 `_id`, `title` 등등을 이용해 html에서 접근할 수 있다 -->
+        <!-- post를 하나의 컴포넌트로 만들어서 v-for로 돌림, postItem을 props로 넘겨줌 -->
+        <PostListItem
+          v-for="postItem in postItems"
+          :key="postItem._id"
+          :postItem="postItem"
+        ></PostListItem>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import PostListItem from '@/components/posts/PostListItem.vue';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+// api를 가져옴
+import { fetchPosts } from '@/api/index';
+
+export default {
+  components: {
+    PostListItem,
+    LoadingSpinner,
+  },
+  data() {
+    return {
+      postItems: [],
+      isLoading: false,
+    };
+  },
+  methods: {
+    async fetchData() {
+      // fetchPosts를 불러오는 시간동안 로딩을 표시해줌
+      this.isLoading = true;
+      // data는 response.data
+      const { data } = await fetchPosts();
+      // 데이터를 받아오고나면 false로 바꿈
+      this.isLoading = false;
+      // 받아온posts배열을 담아줌
+      this.postItems = data.posts;
+    },
+  },
+  // 컴포넌트가 생성되자마자 data를 가져옴!
+  created() {
+    this.fetchData();
+  },
+};
+</script>
+
+<style></style>
+
+```
+
+- PostListItem.vue
+
+```vue
+<template>
+  <li>
+    <!-- postItem에 접근할때 api문서를 참고해 키값으로 접근 -->
+    <div class="post-title">
+      {{ postItem.title }}
+    </div>
+    <div class="post-contents">
+      {{ postItem.contents }}
+    </div>
+    <div class="post-time">
+      {{ postItem.createdAt }}
+    </div>
+  </li>
+</template>
+
+<script>
+export default {
+  // props로 받음
+  props: {
+    // postItem을 자세하게 적어야됨(실무)
+    postItem: {
+      type: Object,
+      // 항상값이 넘어오는지 체크!
+      required: true,
+    },
+  },
+};
+</script>
+
+<style></style>
+
+```
+
+- LoadingSpinner.vue
+
+```vue
+<template>
+  <div class="spinner-container">
+    <div class="spinner" />
+  </div>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style scoped>
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 240px;
+}
+.spinner {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 5px solid #e0e0e0;
+  border-bottom: 5px solid #fe9616;
+  animation: spin 1s linear infinite;
+  position: relative;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
+```
+
+
+
+## 10. 브라우저 저장소를 이용한 인증 값 관리
+
+> `src` > `utils` > `cookies.js`
+>
+> data store, token이나 username을 저장해놓고 사용하기위함!
+>
+> **왜 쿠키를 쓰는가?**
+>
+> 새로고침을 하게되면 에러가 뜬다 ->  Unauthorized
+>
+> ![image-20201215222218323](Vue-til-끝장내기.assets/image-20201215222218323.png)
+>
+> WHY?? 로그인항 상태를 자바스크립트 상태에 저장을 했었다
+>
+> 그러니 당연히 새로고침을 하게되면 js가 리셋됨!
+>
+> 이런부분들을 쿠키로 처리할 수 있다
+>
+> ```js
+> //cookies.js
+> function saveAuthToCookie(value) {
+>   document.cookie = `til_auth=${value}`;
+> }
+> 
+> function saveUserToCookie(value) {
+>   document.cookie = `til_user=${value}`;
+> }
+> 
+> function getAuthFromCookie() {
+>   return document.cookie.replace(
+>     /(?:(?:^|.*;\s*)til_auth\s*=\s*([^;]*).*$)|^.*$/,
+>     '$1',
+>   );
+> }
+> 
+> function getUserFromCookie() {
+>   return document.cookie.replace(
+>     /(?:(?:^|.*;\s*)til_user\s*=\s*([^;]*).*$)|^.*$/,
+>     '$1',
+>   );
+> }
+> 
+> function deleteCookie(value) {
+>   document.cookie = `${value}=; expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+> }
+> 
+> export {
+>   saveAuthToCookie,
+>   saveUserToCookie,
+>   getAuthFromCookie,
+>   getUserFromCookie,
+>   deleteCookie,
+> };
+> 
+> ```
+>
+> - LoginForm.vue에 아래코드처럼 cookie에 정의된 함수를 import해와서 사용해도, 새로고침하면 사라진다!
+>
+> ![image-20201215223006250](Vue-til-끝장내기.assets/image-20201215223006250.png)
+>
+> 왜냐하면 쿠키에 저장된 값이 뷰의 store에 저장돼있지 않기 때문!
+>
+> 그렇기 때문에 store에 저장해줌
+>
+> ```js
+> //store > index.js
+> import Vue from 'vue';
+> import Vuex from 'vuex';
+> // cookie.js의 함수들을 모두 가져와 store에 저장함
+> import {
+>   getAuthFromCookie,
+>   getUserFromCookie,
+>   saveAuthToCookie,
+>   saveUserToCookie,
+> } from '@/utils/cookies';
+> import { loginUser } from '@/api/index';
+> 
+> Vue.use(Vuex);
+> 
+> export default new Vuex.Store({
+>   state: {
+>     //매번 store를 생성할때마다 || or연산을 사용해서 getUser(Auth)FromCookie가 있으면 그 값을 없다면 빈값을 초기값으로 한다!
+>     username: getUserFromCookie() || '',
+>     token: getAuthFromCookie() || '',
+>   },
+>   getters: {
+>     isLogin(state) {
+>       return state.username !== '';
+>     },
+>   },
+>   mutations: {
+>     setUsername(state, username) {
+>       state.username = username;
+>     },
+>     clearUsername(state) {
+>       state.username = '';
+>     },
+>     setToken(state, token) {
+>       state.token = token;
+>     },
+>   },
+> 
+> });
+> ```
+>
+> 그러면 아래처럼 token과 username이 저장된 것을 볼 수 있다.
+>
+> ![image-20201215223638607](Vue-til-끝장내기.assets/image-20201215223638607.png)
+>
+> 여기서 좀더 refactoring!!
+>
+> *loginForm에서 컴포넌트단에 너무 코드가 복잡해지는 것을 막기위해 actions활용(해도되고 loginform에 그냥 적어도됨)*
+>
+> ```js
+> //store > index.js 밑에 actions추가
+>   actions: {
+>     // loginForm에서 컴포넌트단에 너무 코드가 복잡해지는 것을 막기위해 actions활용(해도되고 loginform에 그냥 적어도됨)
+>     // 비동기처리 async await
+>     // LOGIN을 dispatch로 호출할때 userData를 받아옴,
+>     async LOGIN({ commit }, userData) {
+>       const { data } = await loginUser(userData);
+>       console.log(data.token);
+>       // this.$store은 안적어도됨! store안이니까 commit만 적으면됨!
+>       commit('setToken', data.token);
+>       commit('setUsername', data.user.username);
+>       saveAuthToCookie(data.token);
+>       saveUserToCookie(data.user.username);
+>       //  async는 무조건 Promise를 return, 하지만 나중에 활용될수 있는 data를 위해 data를 return!안넣어도 promise가 return돼서 안적어줘도됨!
+>       return data;
+>     },
+>   },
+> ```
+>
+> - LoginForm.vue
+>
+> ```vue
+> ...
+> <script>
+> import { validateEmail } from '@/utils/validation';
+> 
+> export default {
+>   data() {
+>     return {
+>       // form values
+>       username: '',
+>       password: '',
+>       // log
+>       logMessage: '',
+>     };
+>   },
+>   computed: {
+>     isUsernameValid() {
+>       return validateEmail(this.username);
+>     },
+>   },
+>   methods: {
+>     async submitForm() {
+>       try {
+>         // 비즈니스 로직
+>         const userData = {
+>           username: this.username,
+>           password: this.password,
+>         };
+>         // 브라우저저장소(쿠키)에 userData를 저장해두면 새로고침을 했을 때도 로그인이 풀리지 않는다!
+>         // LOGIN action을 호출함, await가 붙어야함!! why?? action이 다 끝나고 rouoter로 main으로 이동해야되기때문에 비동기처리 해줘야됨!!
+>         await this.$store.dispatch('LOGIN', userData);
+>         this.$router.push('/main');
+>       } catch (error) {
+>         // 에러 핸들링할 코드
+>         console.log(error.response.data);
+>         this.logMessage = error.response.data;
+>       } finally {
+>         this.initForm();
+>       }
+>     },
+>     initForm() {
+>       this.username = '';
+>       this.password = '';
+>     },
+>   },
+> };
+> </script>
+> 
+> <style>
+> .btn {
+>   color: white;
+> }
+> </style>
+> 
+> ```
+>
+> 
+
+
+
+## 11. 학습 노트 데이터 생성
+
+> [아이오닉 아이콘 사이트](https://ionicons.com/usage)
+>
+> template에 사용하려면 cdn을 가져와서 index.html에 등록하고, 원하는 아이콘을 찾아 class이름을 가져오오는데 그냥 코드 복붙이 아니라 Basic usage를 가져와 class를 적어주면됨!
+>
+> ![image-20201215225345487](Vue-til-끝장내기.assets/image-20201215225345487.png)
+
+- PostAddPage.vue router등록
+
+```js
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+// import LoginPage from '@/views/LoginPage.vue';
+// import SignupPage from '@/views/SignupPage.vue';
+
+Vue.use(VueRouter);
+
+export default new VueRouter({
+  mode: 'history',
+  routes: [
+...
+    {
+      path: '/add',
+      component: () => import('@/views/PostAddPage.vue'),
+    },
+  ],
+});
+
+```
+
+먼저 이렇게 눈에 보이는 화면부터 코딩한 후, data를 다룸!
+
+![image-20201215230413960](Vue-til-끝장내기.assets/image-20201215230413960.png)
+
+#### 학습노트 등록 API구현
+
+> api > index.js
+>
+> ```js
+> //추가
+> // 학습 노트 데이터를 생성하는 API
+> function createPost(postData) {
+>   return instance.post('posts', postData);
+> }
+> 
+> export { registerUser, loginUser, fetchPosts, createPost };
+> ```
+
+![image-20201215215914049](Vue-til-끝장내기.assets/image-20201215215914049.png)
+
+- data의 키값 `_id`, `title` 등등을 이용해 html에서 접근할 수 있다
+
+![image-20201215220002830](Vue-til-끝장내기.assets/image-20201215220002830.png)
+
+![image-20201215231341374](Vue-til-끝장내기.assets/image-20201215231341374.png)
+
+동일한 게시글이 존재하면 에러가 뜸! 
+
+![image-20201215231413167](Vue-til-끝장내기.assets/image-20201215231413167.png)
+
+원래는 더 디테일한 error코득 들어가겠지만 학습용이라 간단하게 표현
+
+![image-20201215231435478](Vue-til-끝장내기.assets/image-20201215231435478.png)
+
+- PostAddPage.vue
+
+```vue
+<template>
+  <div class="form-container">
+    <PostAddForm></PostAddForm>
+  </div>
+</template>
+
+<script>
+import PostAddForm from '@/components/posts/PostAddForm.vue';
+
+export default {
+  components: {
+    PostAddForm,
+  },
+};
+</script>
+
+<style></style>
+
+```
+
+- PostAddForm.vue
+
+```vue
+<template>
+  <div class="contents">
+    <h1 class="page-header">Create Post</h1>
+    <div class="form-wrapper">
+      <!-- submit이벤트일어나면 submitForm메소드 연결, .prevent(Form기능없앰) -->
+      <form class="form" @submit.prevent="submitForm">
+        <div>
+          <label for="title">Title:</label>
+          <input id="title" type="text" v-model="title" />
+        </div>
+        <div>
+          <label for="contents">Contents:</label>
+          <textarea id="contents" type="text" rows="5" v-model="contents" />
+          <!-- content가 200자이상 넘을때만 길다고 표현! -->
+          <p
+            v-if="!isContentsValid"
+            class="validation-text warning isContentTooLong"
+          >
+            Contents length must be less than 200
+          </p>
+        </div>
+        <button type="submit" class="btn">Create</button>
+      </form>
+      <p class="log">
+        {{ logMessage }}
+      </p>
+    </div>
+  </div>
+</template>
+
+<script>
+// api가져옴
+import { createPost } from '@/api/index';
+
+export default {
+  data() {
+    return {
+      // vda 단축키
+      title: '',
+      contents: '',
+      logMessage: '',
+    };
+  },
+  computed: {
+    isContentsValid() {
+      // contents의 길이가 200자 이하로만 valid
+      return this.contents.length <= 200;
+    },
+  },
+  methods: {
+    async submitForm() {
+      try {
+        // createPost에 바인딩된 title과 contents를 인자로 보내줌(비동기처리)
+        const response = await createPost({
+          title: this.title,
+          contents: this.contents,
+        });
+        console.log(response);
+      } catch (error) {
+        // 에러가 들어옴
+        console.log(error.response.data.message);
+        this.logMessage = error.response.data.message;
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.form-wrapper .form {
+  width: 100%;
+}
+.btn {
+  color: white;
+}
+</style>
+```
+
+
+
+## 12. 데이터 성격 별로 API 함수 모듈화
+
+> 데이터 성격별로 API함수 모듈화 한 뒤,  각 컴포넌트에 import한 api주소 변경해줌!
+
+- `api` > `index.js`
+
+> **여기서 instacne에 토큰값이 header에 들어있는데 회원가입과 로그인api에도 쓰고있다! 엄격한 백엔드면 오류가 났을수도 있다!  원래는 분리해주고 instance에 헤더값이 들어있어야되는 것은 로그인 이후의 api들이다!**
+
+```js
+import axios from 'axios';
+import { setInterceptors } from './common/interceptors';
+
+// baseurl만 들어있는 기본 인스턴스 값!
+function createInstance() {
+  return axios.create({
+    baseURL: process.env.VUE_APP_API_URL,
+  });
+}
+
+// 액시오스 초기화 함수
+// auth가 들어있는 instance
+function createInstanceWithAuth(url) {
+  const instance = axios.create({
+    // instance의 baseURL에 공통적으로 들어가는 반복되는 url을 포함시킴
+    baseURL: `${process.env.VUE_APP_API_URL}${url}`,
+  });
+  return setInterceptors(instance);
+}
+//instance, posts를 내보냄(api분리를위해)
+export const instance = createInstance();
+//기본 url이 posts가 되는 instance들을 posts인스턴스에 넣음
+export const posts = createInstanceWithAuth('posts');
+
+// api url
+// GET - posts
+// POST - posts
+// PUT - posts {id}
+// DELETE - posts {id}
+```
+
+- `api` > `auth.js`
+
+> 사용자 관련 api분리
+
+```js
+// 로그인, 회원 가입, (ex) 회원 탈퇴
+import { instance } from './index';
+
+// 회원가입 API
+function registerUser(userData) {
+  return instance.post('signup', userData);
+}
+
+// 로그인 API
+function loginUser(userData) {
+  return instance.post('login', userData);
+}
+
+export { registerUser, loginUser };
+```
+
+- `api` > `posts.js`
+
+> 학습노트 관련 apiqnsfl
+
+```js
+// 학습 노트 조작과 관련된 CRUD API 함수 파일
+import { posts } from './index';
+
+// 학습 노트 데이터를 조회하는 API
+function fetchPosts() {
+  return posts.get('/');
+}
+
+// 학습 노트 데이터를 생성하는 API
+function createPost(postData) {
+  return posts.post('/', postData);
+}
+
+export { fetchPosts, createPost };
+```
+
+
+
+
+
+## 13. 학습 노트 삭제 기능
+
+![image-20201215235200213](Vue-til-끝장내기.assets/image-20201215235200213.png)
+
+- `api` > `posts.js`
+
+```js
+//추가
+// 학습 노트 데이터를 삭제하는 API
+function deletePost(postId) {
+  return posts.delete(postId);
+}
+
+export { fetchPosts, createPost, deletePost };
+```
+
+- `PostListItem.vue`
+
+```vue
+<template>
+  <li>
+    <div class="post-title">
+      {{ postItem.title }}
+    </div>
+    <div class="post-contents">
+      {{ postItem.contents }}
+    </div>
+    <div class="post-time">
+      {{ postItem.createdAt }}
+      <!-- 수정아이콘 -->
+      <i class="icon ion-md-create"></i>
+      <!-- 삭제아이콘 -->
+      <i class="icon ion-md-trash" @click="deleteItem"></i>
+    </div>
+  </li>
+</template>
+
+<script>
+import { deletePost } from '@/api/posts';
+
+export default {
+  props: {
+    postItem: {
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    // 삭제메서드, 비동기처리
+    async deleteItem() {
+      // confirm을 이용해 삭제할건지 물어본다
+      if (confirm('You want to delete it?')) {
+        // _id가 키값
+        await deletePost(this.postItem._id);
+        // 삭제가 됐다고 화면에 반영하기 위해 refresh이벤트를 emit으로 MainPage컴포넌트로보냄!
+        this.$emit('refresh');
+      }
+      // console.log('deleted');
+    },
+  },
+};
+</script>
+
+<style></style>
+```
+
+- `MainPage.vue`
+
+```vue
+<template>
+  <div>
+    <div class="main list-container contents">
+      <h1 class="page-header">Today I Learned</h1>
+      <LoadingSpinner v-if="isLoading"></LoadingSpinner>
+      <ul v-else>
+        <!-- postlistitem에서 refresh이벤트가 발생하면 fetchData를 다시 호출해서 post갱신 -->
+        <PostListItem
+          v-for="postItem in postItems"
+          :key="postItem._id"
+          :postItem="postItem"
+          @refresh="fetchData"
+        ></PostListItem>
+      </ul>
+    </div>
+    <router-link to="/add" class="create-button">
+      <i class="ion-md-add"></i>
+    </router-link>
+  </div>
+</template>
+...
+```
+
+
+
+
+
+## 14. 학습 노트 데이터 수정
+
+- `routes` > `index.js`
+
+> PostListItem에서 수정router로 보낼때 id값을 같이 보내줌 'this.$router.push(`/post/${id}`)' url로 push
+
+```js
+//라우터 추가, id값을 params로 넘겨줌
+	{
+      // :id는 posteditpage에 $route에 보면 params로 id가 넘어감!
+      path: '/post/:id',
+      component: () => import('@/views/PostEditPage.vue'),
+    },
+```
+
+- `PostListItem.vue`
+
+```vue
+<template>
+  <li>
+    <div class="post-title">
+      {{ postItem.title }}
+    </div>
+    <div class="post-contents">
+      {{ postItem.contents }}
+    </div>
+    <div class="post-time">
+      {{ postItem.createdAt }}
+      <!-- 수정아이콘을 클릭하면 editPage로이동 -->
+      <i class="icon ion-md-create" @click="routeEditPage"></i>
+      <i class="icon ion-md-trash" @click="deleteItem"></i>
+    </div>
+  </li>
+</template>
+
+<script>
+import { deletePost } from '@/api/posts';
+
+export default {
+  props: {
+    postItem: {
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    async deleteItem() {
+      if (confirm('You want to delete it?')) {
+        await deletePost(this.postItem._id);
+        this.$emit('refresh');
+      }
+      // console.log('deleted');
+    },
+    routeEditPage() {
+      // page의 id값을 router와 같이 보내줌
+      const id = this.postItem._id;
+      this.$router.push(`/post/${id}`);
+    },
+  },
+};
+</script>
+
+<style></style>
+```
+
+
+
+- `PostEditPage.vue`
+
+```vue
+<template>
+  <div class="form-container">
+    <PostEditForm></PostEditForm>
+  </div>
+</template>
+
+<script>
+import PostEditForm from '@/components/posts/PostEditForm.vue';
+
+export default {
+  components: {
+    PostEditForm,
+  },
+};
+</script>
+
+<style></style>
+```
+
+### 학습노트 수정을 위한 특정 게시물 조회 기능
+
+![image-20201216001137343](Vue-til-끝장내기.assets/image-20201216001137343.png)
+
+- `api` > `posts.js`
+
+```js
+//추가
+// 특정 학습 노트(하나)를 조회하는 API
+function fetchPost(postId) {
+  return posts.get(postId);
+}
+export { fetchPosts, fetchPost, createPost, deletePost, editPost };
+```
+
+- `PostEditForm.vue`
+
+> ![image-20201216001622049](Vue-til-끝장내기.assets/image-20201216001622049.png)
+>
+> id는 $route의 params의 id값!
+
+```js
+//추가
+  // 원래있던 내용을 불러옴!
+  async created() {
+    // id는 route의 params의 id값을 가져옴
+    const id = this.$route.params.id;
+    // fetchPost(id) :해당 id값의 post를 응답 결과가 data에 저장됨, response.data
+    const { data } = await fetchPost(id);
+    // 그 data의 title,contents.의 값을 this.title과 contents에 저장
+    this.title = data.title;
+    this.contents = data.contents;
+  },
+```
+
+![image-20201216002017256](Vue-til-끝장내기.assets/image-20201216002017256.png)
+
+
+
+- `api` > `posts.js`
+
+```js
+// 학습 노트 데이터를 수정하는 API
+function editPost(postId, postData) {
+  return posts.put(postId, postData);
+}
+
+export { fetchPosts, fetchPost, createPost, deletePost, editPost };
+```
+
+- `PostEditForm.vue`
+
+```js
+  //...
+  methods: {
+    async submitForm() {
+      const id = this.$route.params.id;
+      try {
+        // id,와 바꾼 title과 contents를 같이 인자로 보내줌!
+        await editPost(id, {
+          title: this.title,
+          contents: this.contents,
+        });
+        this.$router.push('/main');
+      } catch (error) {
+        // 에러났을때 보여주는 코드
+        console.log(error);
+        this.logMessage = error;
+      }
+    },
+  },
+  //...
+```
+
+
+
+
+
+## 15. 날짜 형식 포맷팅 `filter`
+
+> [뷰 필터 안내 문서](https://vuejs.org/v2/guide/filters.html#ad)
+>
+> ```html
+> <!--데이터 | 필터이름-->
+> {{ message | capitalize }}
+> ```
+
+- PostListItem.vue 
+
+> 이렇게 쓰면 해당 컴포넌트만 쓸수있기 때문에 전역으로 설정해주는 것이 좋다.
+
+```vue
+<template>
+  <li>
+    <div class="post-time">
+      {{ postItem.createdAt | formatDate }}
+    </div>
+  </li>
+</template>
+
+<script>
+import { deletePost } from '@/api/posts';
+
+export default {
+    //...
+// 이렇게쓸수도 있지만 이 filter는 이 컴포넌트에서만 쓸수있음 -> 다른곳에서도 쓸수있게 전역으로 설정하는게 좋다!
+   filters:{
+     formatData(value){
+       return new Data(value);
+     },
+   },
+//...
+```
+
+- `utils` > `filter.js`
+
+```js
+// 필터 관련 함수가 존재하는 파일
+export function formatDate(value) {
+  const date = new Date(value);
+  const year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  month = month > 9 ? month : `0${month}`;
+  const day = date.getDate();
+  let hours = date.getHours();
+  hours = hours > 9 ? hours : `0${hours}`;
+  const minutes = date.getMinutes();
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+```
+
+- 위 filter.js를 `main.js`에 등록을 한다
+
+```js
+import Vue from 'vue';
+import App from './App.vue';
+import router from '@/routes/index';
+import store from '@/store/index';
+import { formatDate } from '@/utils/filters';
+
+// formatDate는 이렇게하면 전역으로 설정됨
+Vue.filter('formatDate', formatDate);
+Vue.config.productionTip = false;
+
+new Vue({
+  render: h => h(App),
+  router,
+  store,
+}).$mount('#app');
+```
+
+
+
+
+
+## 16. 라우터 심화
+
+> [라우터 네비게이션 가드 문서](https://router.vuejs.org/guide/advanced/navigation-guards.html)
+>
+> [라우터 네비게이션 가드 관련 영상(완벽 가이드 수강 권한 필요)](https://www.inflearn.com/course/vue-js/lecture/17055)
+>
+> [데이터 호출 시점]
+>
+> 1. 라우터 네비게이션 가드
+>
+> - 특정 URL로 접근하기 전의 동작을 정의하는 속성(함수)
+>
+> 2. 컴포넌트 라이프 사이클 훅
+>
+> - created : (컴포넌트가 생성) 되자마자 호출되는 로직
+
+- `routes` > `index.js`
+
+```js
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import store from '@/store/index';
+// import LoginPage from '@/views/LoginPage.vue';
+// import SignupPage from '@/views/SignupPage.vue';
+
+Vue.use(VueRouter);
+
+// 라우터 네비게이션 가드를 사용하기 위해 new VueRouter 인스턴스를 router 변수에 담아준다
+const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    {
+      path: '/',
+      redirect: '/login',
+    },
+    {
+      path: '/login',
+      component: () => import('@/views/LoginPage.vue'),
+    },
+    {
+      path: '/signup',
+      component: () => import('@/views/SignupPage.vue'),
+    },
+    // 사용자가 로그인하지 않은 상태라면 들어갈수 없게 설정을해줌
+    // meta속성에서 auth(임의로설정한이름, 내가 정함):true로 설정
+    {
+      path: '/main',
+      component: () => import('@/views/MainPage.vue'),
+      meta: { auth: true },
+    },
+    {
+      path: '/add',
+      component: () => import('@/views/PostAddPage.vue'),
+      meta: { auth: true },
+    },
+    {
+      path: '/post/:id',
+      component: () => import('@/views/PostEditPage.vue'),
+      meta: { auth: true },
+    },
+    {
+      path: '*',
+      component: () => import('@/views/NotFoundPage.vue'),
+    },
+  ],
+});
+// router네비게이션가드 beforeEach에 콜백함수의 인자로 to,from,next가 들어감
+// to:이동하려는 페이지 , from:현재페이지 , next:페이지이동할때 호출하는 API
+router.beforeEach((to, from, next) => {
+  // 라우터페이지정보에(to).meta에.auth에 true 이고(&&:AND)
+  // 그정보가 store의 getters에 isLogin에 사용자가 로그인했는지 여부가 true/false로 있음
+  // auth:true인 라우터는 login했는지 확인하고 안했으면(False,!) 로그인페이지로 이동
+  if (to.meta.auth && !store.getters.isLogin) {
+    // log를찍고
+    console.log('인증이 필요합니다');
+    // next를 호출해야지 /login페이지로 이동
+    next('/login');
+    // return을 꼭 적어줘야됨! 그래야 아래에 있는 next()가 실행되지 않는다
+    return;
+  }
+  next();
+});
+
+// router를 main.js에 등록해주면 export해줘야됨
+export default router;
+```
+
+- `AppHeader.vue`
+
+```vue
+<template>
+  <header>
+    <div>
+      <router-link :to="logoLink" class="logo">
+        TIL
+        <span v-if="isUserLogin">by {{ $store.state.username }}</span>
+      </router-link>
+    </div>
+<!--...-->
+</template>
+
+<script>
+import { deleteCookie } from '@/utils/cookies';
+
+export default {
+  computed: {
+    isUserLogin() {
+      return this.$store.getters.isLogin;
+    },
+    // 로그인이돼있다면 main으로, 아니라면 login페이지로 보냄
+    logoLink() {
+      return this.$store.getters.isLogin ? '/main' : '/login';
+    },
+  },
+    //...
+};
+</script>
+```
+
+### (추가) 로그아웃했을 때 쿠키,토큰값 지우기
+
+- `components` > `common` > `AppHeader.vue`
+
+```js
+//추가
+import { deleteCookie } from '@/utils/cookies';
+  methods: {
+    logoutUser() {
+      this.$store.commit('clearUsername');
+      this.$store.commit('clearToken');
+      // 로그아웃을하면, 쿠키를 지워주는 코드
+      deleteCookie('til_auth');
+      deleteCookie('til_user');
+      this.$router.push('/login');
+    },
+  },
+```
+
+
+
+- `store` > `index.js`
+
+```js
+import Vue from 'vue';
+import Vuex from 'vuex';
+import {
+  getAuthFromCookie,
+  getUserFromCookie,
+  saveAuthToCookie,
+  saveUserToCookie,
+} from '@/utils/cookies';
+import { loginUser } from '@/api/auth';
+
+Vue.use(Vuex);
+
+export default new Vuex.Store({
+//...
+    // 로그아웃했을때 token값도 지워줌
+    clearToken(state) {
+      state.token = '';
+    },
+  },
+//...
+});
+
+```
+
+
+
+
+
+## 17. 프런트엔드 테스팅
+
+> [State of JS 2019 - 테스팅](https://2019.stateofjs.com/testing/)
+>
+> [Jest 공식 사이트](https://jestjs.io/en/)
+
+### 테스트 코드가 필요한 이유
+
+> 예를들어, 로그인을 하는 로직에서 확인해야될 것이 아래의 두 가지이다.
+>
+> 1. id인풋박스에 이메일을 입력했을 때 이메일이 맞는지 확인하는 로직
+> 2. id,pw가 맞는 경우에 로그인 처리가 된다. 다음페이지로 이동
+>
+> 이때 로그인 로직이 맞는지 확인하기위해 일일이 손으로 다 쳐야 됐는데, 
+>
+> **테스트 코드는 일일이 기능을 손으로 확인하는 시간을 줄여준다.**
+
+
+
+### 테스팅 환경 구성
+
+- `package.json`
+
+> 명령어 만듦
+
+```json
+{
+  "name": "vue-til",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    // 기본적으로는 test:unit이라고 돼있는데 학습차원에서 test로 바꿈
+    //  --watchAll vue-cli 서비스에서 jest(js test) 도구에서 test 코드를 실행할때 watchAll옵션을 붙여, test 코드 파일이 변화될때마다 자동으로 변환해줌
+    "test": "vue-cli-service test:unit --watchAll",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "core-js": "^3.4.4",
+    "vue": "^2.6.10",
+    "vue-router": "^3.1.3",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.1.0",
+    "@vue/cli-plugin-eslint": "^4.1.0",
+      //vue-cli를 create할때 test를 선택해서 자동으로 깔렸다
+    "@vue/cli-plugin-unit-jest": "^4.1.0",
+    "@vue/cli-service": "^4.1.0",
+    "@vue/eslint-config-prettier": "^5.0.0",
+      //vue-cli를 create할때 test를 선택해서 자동으로 깔렸다
+    "@vue/test-utils": "1.0.0-beta.29",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^5.16.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-vue": "^5.0.0",
+    "prettier": "^1.19.1",
+    "vue-template-compiler": "^2.6.10"
+  }
+}
+
+```
+
+- `jest.config.js`
+
+```js
+module.exports = {
+  preset: '@vue/cli-plugin-unit-jest',
+  testMatch: [
+    // test파일의 대상을 지정할 수 있음
+    '<rootDir>/src/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)',
+  ],
+};
+```
+
+**js파일과 테스트코드와의 차이점은 파일명 중간에 `.spec` or `.test`가 들어가있는지의 여부**
+
+**기본적으로 개인 선호도 차이지만 test파일과 폴더는 가까워야된다고 해서 `components`폴더 아래에 `__test__`폴더를 만들어서 그아래에 test파일들을 넣음!**
+
+- `components` > `LoginForm.spec.js`
+
+> `package.json`에 적은 명령어에 의해 아래의 코드를 bash에 적으면 `LoginForm.spec.js`가 실행이 됨!
+
+```sh
+$ npm t
+```
+
+
+
+### Javascript testcode예시
+
+> [Jest describe() API 문서](https://jestjs.io/docs/en/api#describename-fn)
+>
+> - `main.js`
+>
+> ```js
+> export function sum(a, b) {
+>   return a + b;
+> }
+> ```
+>
+> **describe()** : 연관된 테스트 케이스를 그룹화하는 API
+>
+> **test()**:하나의 테스트 케이스를 검증하는 API
+>
+> **expect().toBe()**: 기대되는 값(expect괄호)에 실제 값(toBe)이 어떤값(toBe괄호)이다 라고 예상하는 API 
+>
+> 아래의 코드에 빨간줄이 쳐지는 이유는 ESLint에서 jest문법을 이해할 수 없어서  생김
+>
+> -> 이것은 `.eslintrc.js`파일에서 `env`에 `jest:true`를 추가해주면 됨
+>
+> ```js
+>   env: {
+>     node: true,
+>     jest: true
+>   },
+> ```
+>
+> ![image-20201216013023173](Vue-til-끝장내기.assets/image-20201216013023173.png)
+>
+> 그 결과 값
+>
+> ![image-20201216013052410](Vue-til-끝장내기.assets/image-20201216013052410.png)
+>
+> -> 보통 아닌값을 넣어서 Fail이 어떻게 뜨는지 봄
+>
+> toBe앞에 not을 붙이면 쉽게 반대의 test를 할 수 있음
+>
+> `expect(result).not.toBe(30)`
+>
+> ![image-20201216013559790](Vue-til-끝장내기.assets/image-20201216013559790.png)
+
+
+
+###  Vue 컴포넌트 테스트 방법
+
+> ```js
+> // 테스트 유틸 라이브러리 로딩
+> // 컴포넌트 로딩
+> 
+> describe('컴포넌트 이름', () => {
+>   test('테스트 할 동작이나 기능(컴포넌트가 마운팅되면 화면에 그려져야 )', () => {
+>     // 내용 정의
+>   });
+> });
+> ```
+
+> #### (참고) el과 `.$mount()`의 차이
+>
+> new Vue에서 `el:'#app`으로 설정하면 뷰 인스턴스가 생성될 때 elment를 지정하는 것과 ,
+>
+> `$.mount(''#app')` : 인스턴스가 생성되고 인스턴스가 `#app`을 mount한다
+>
+> **+ jest는 좋은점이 console을 찍었을 때 instance의 내용들을 확인할 수 있다**
+>
+> ![image-20201216014444133](Vue-til-끝장내기.assets/image-20201216014444133.png)
+>
+> 하지만 매번 이렇게 import하고  마운팅하기엔 너무 비효율적이다
+>
+> 이것을 도와주는 `vue test utils`라이브러리 `shallowMount`(특정 컴포넌트를 mounting한다)를 사용한다
+>
+> *보통 wrapper라고 씀, wrapper.vm은 instance와 같음! -> ex) wrapper.vm.username => username이 들어있다*
+>
+> ![image-20201216015631957](Vue-til-끝장내기.assets/image-20201216015631957.png)
+>
+> [Vue Test Utils 공식 문서](https://vue-test-utils.vuejs.org/guides/)
+>
+> [find() API 문서](https://vue-test-utils.vuejs.org/api/wrapper/#find)
+>
+> ![image-20201216020907883](Vue-til-끝장내기.assets/image-20201216020907883.png)
+>
+> *wrapper의 find api이용, 로그인 컴포넌트가 화면에 부착되었을 때 템플릿안에 있는 태그, html요소를 쫓아갈 수 있음*
+>
+>  *find안에 class가 warning인 html요소를 가져와 idInput에 담는다*
+>
+> *ex)loginForm에 data에 넣었던 username이 vue내부적으로 v-model을 이용해서 로그인폼에 있는 인풋박스까지 연결된 것을 알 수 있다.*
+>
+> *input값의 element의 value는 그 해당 input값의 값을 의미, html에 `value=` or `type=text`라고 돼있는 것의 바인딩된 값!*
+>
+>  
+
+### 사용자관점의  테스트 코드 작성
+
+> username에 값을 연결되는거라든지, computed가 잘돌아가는지 뷰라이브러리의 동작이기 때문에 이걸 테스트할 필요는 없고, 사용자가 에러를 어떻게 보는가를 사용자 입장에서 test하는 것이 중요하다!
+>
+> 예) username이 맞지 않았다면 class가 warning인 span태그가 뜨게해야된다!
+>
+> **find()**는 템플릿 태그 쪽에 있는 html 요소들을 css선택자를 이용해서 쫓아갈 수 있다
+>
+> 항상 반대케이스도 같이 넣어본다!
+
+- ``components` > `LoginForm.spec.js`
+
+```js
+// vue test utils 라이브러리를 가져옴
+// 특정 컴포넌트를 mounting할수있음
+import { shallowMount } from '@vue/test-utils';
+// loginForm에대해 test할거니까 import
+import LoginForm from './LoginForm.vue';
+
+// 컴포넌트의 이름이 최소 단위
+describe('LoginForm.vue', () => {
+  test('ID가 이메일 형식이 아니면 경고 메시지가 출력된다', () => {
+  // loginForm을 바로 mount하는 라이브러리
+  // 보통 wrapper라고 씀, wrapper.vm은 instance와 같음! -> ex) wrapper.vm.username => username이 들어있다
+    const wrapper = shallowMount(LoginForm, {
+      data() {
+        return {
+          username: 'test',
+        };
+      },
+    });
+    // wrapper의 find api이용, 로그인 컴포넌트가 화면에 부착되었을 때 템플릿안에 있는 태그, html요소를 쫓아갈 수 있음
+    // find안에 class가 warning인 html요소를 가져와 warningText에 담는다
+    const warningText = wrapper.find('.warning');
+    // html()은 warningText의 html을 호출하면 해당 html태그가 뜸!
+    // console.log(warningText.html());
+    // waringText가 있으면(존재하면,.exists()) 있으면 true,
+    expect(warningText.exists()).toBeTruthy();
+  });
+
+```
+
+- `LoginForm.vue`
+
+```vue
+			<span class="warning" v-if="!isUsernameValid && username">
+              Please enter an email address
+            </span>
+```
+
+- ``components` > `LoginForm.spec.js`
+
+```js
+//추가
+  test('ID와 PW가 입력되지 않으면 로그인 버튼이 비활성화 된다', () => {
+    const wrapper = shallowMount(LoginForm, {
+      data() {
+        return {
+          username: '',
+          password: '',
+        };
+      },
+    });
+    // button element로 찾아도되고, .btn으로 찾아도됨
+    const button = wrapper.find('button');
+    //button element(요소에 접근해 )disabled가 true인지 아닌지 
+    expect(button.element.disabled).toBeTruthy();
+  });
+});
+```
+
+- `LoginForm.vue`
+
+```vue
+<!-- class를 추가함, id가 이메일형태가 아니거나 password가 없으면 disabled class적용, 둘다 있으면 null -->
+        <button
+          :disabled="!isUsernameValid || !password"
+          type="submit"
+          class="btn"
+          :class="!isUsernameValid || !password ? 'disabled' : null"
+        >
+```
+
+
+
+### (추가) ToastPopup.vue
+
+```vue
+<template>
+	<div class="toast" :class="toastAnimationClass">
+		{{ message }}
+	</div>
+</template>
+
+<script>
+import bus from '@/utils/bus.js';
+let toastTimer;
+export default {
+	data() {
+		return {
+			open: false,
+			message: '',
+		};
+	},
+	computed: {
+		toastAnimationClass() {
+			return this.open ? 'show' : null;
+		},
+	},
+	methods: {
+		showToast(message) {
+			this.message = message;
+			this.open = true;
+			clearTimeout(toastTimer);
+			toastTimer = setTimeout(this.hideToast, 2000);
+		},
+		hideToast() {
+			this.open = false;
+		},
+	},
+	created() {
+		bus.$on('show:toast', this.showToast);
+	},
+	beforeDestroy() {
+		bus.$off('show:toast', this.showToast);
+	},
+};
+</script>
+
+<style scoped>
+.toast {
+	position: fixed;
+	width: 400px;
+	height: 56px;
+	background-color: #22252e;
+	border-radius: 2px;
+	box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.2);
+	color: white;
+	bottom: -120px;
+	margin-left: -200px;
+	left: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: transform 750ms ease-out;
+}
+.toast.show {
+	transform: translateY(-150px);
+	transition: transform 500ms ease-in-out;
+}
+</style>
 ```
 
