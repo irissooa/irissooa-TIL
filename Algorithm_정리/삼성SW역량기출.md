@@ -3631,3 +3631,838 @@ for tc in range(1,T+1):
         print(*x)
 ```
 
+
+
+## BOJ_20057_마법사상어와토네이도
+
+> a위치에 남은 비율과 밖으로 나간 모래를 제외한 만큼 보낸다는 걸 남은 비율로 생각해서 시간이 오래걸림....
+
+```python
+'''
+20-12-13 14:16-14:45(밥-15:50)-18
+토네이도가 x->y로 이동할때
+y의 모래는 x의 위아래 1%만큼
+y의 아래 위 7%만큼, 두칸 아래 위 2%
+x->y진행방향 옆 ->a의 아래 위 10%, ->한칸 더 5%
+a는 y의 55%모래를 더함
+모두 소수점은 버림
+범위를 벗어나는 모래의 수를 모두 더함
+
+1. arr[N//2-1][N//2-1]에서 시작
+2. 좌, 하, 우, 상 으로 움직임! 칸수 1,1,2,2,3,3,4,4,5,5,6,6 이렇게 움직임
+3. 가야될칸만큼 갔을때 flag = true,  flag가 true이고 같은 수의 칸만큼 가면 칸수 다시 리셋한 뒤 가야될칸수  += 1, flag=false로 리셋
+4. 이동을 할때 계산할 모래 값을 arr[ni][nj]로 갱신하고 그 그 값의 1%는 arr[pi][pj]의  아래 위에 1%.
+arr[ni][nj]아래위 한칸에 7%, 두칸아래위 2%,
+arr[ni][nj]의 방향만큼 한칸 더 간 곳에서 55%를 담고, 그 아래 위 10%,
+그 한칸 더간 곳의 방향으로 한칸을 더 가서 5%.....
+이것을 함수로 만들어서,,
+pd가 0왼쪽일때
+1% : (ni-1,nj+1),(ni+1,nj+1) // 7% : (ni-1,nj),(ni+1,nj) //2% : (ni-2,nj),(ni+2,nj) // 55% : (ni,nj-1) // 10% : (ni-1,nj-1),(ni+1,nj-1)//5%:(ni,nj-2)
+pd가 2오른쪽
+1% : (ni-1,nj-1),(ni+1,nj-1) // 7% : (ni-1,nj),(ni+1,nj) //2% : (ni-2,nj),(ni+2,nj) // 55% : (ni,nj+1) // 10% : (ni-1,nj+1),(ni+1,nj+1)//5%:(ni,nj+2)
+pd가 3위
+1% : (ni+1,nj-1),(ni+1,nj+1) // 7% : (ni,nj-1),(ni,nj+1) //2% : (ni,nj-2),(ni,nj+2) // 55% : (ni-1,nj) // 10% : (ni-1,nj-1),(ni-1,nj+1)//5%:(ni-2,nj)
+pd가 1아래
+1% : (ni-1,nj-1),(ni-1,nj+1) // 7% : (ni,nj-1),(ni,nj+1) //2% : (ni,nj-2),(ni,nj+2) // 55% : (ni+1,nj) // 10% : (ni+1,nj-1),(ni+1,nj+1)//5%:(ni+2,nj)
+범위체크 다해주고 갈수 없다면 나간 모래 += 그 값만큼
+bfs로 풀어보쟈...
+'''
+import sys
+sys.stdin = open('input.txt','r')
+input = sys.stdin.readline
+from collections import deque
+di = [0,1,0,-1] #좌하우상
+dj = [-1,0,1,0]
+
+tornado = [[(-1,1,0.01),(1,1,0.01),(-1,0,0.07),(1,0,0.07),(-2,0,0.02),(2,0,0.02),(-1,-1,0.1),(1,-1,0.1),(0,-2,0.05),(0,-1,0)],
+    [(-1,-1,0.01),(-1,1,0.01),(0,-1,0.07),(0,1,0.07),(0,-2,0.02),(0,2,0.02),(1,-1,0.1),(1,1,0.1),(2,0,0.05),(1,0,0)],
+    [(-1,-1,0.01),(1,-1,0.01),(-1,0,0.07),(1,0,0.07),(-2,0,0.02),(2,0,0.02),(-1,1,0.1),(1,1,0.1),(0,2,0.05),(0,1,0)],
+    [(1,-1,0.01),(1,1,0.01),(0,-1,0.07),(0,1,0.07),(0,-2,0.02),(0,2,0.02),(-1,-1,0.1),(-1,1,0.1),(-2,0,0.05),(-1,0,0)]]
+
+def check(i,j,sand,per,remain):
+    global outsand
+    if i < 0 or i >= N or j < 0 or j >= N:
+        if per == 0:
+            outsand += remain
+        else:
+            outsand += int(sand*per)
+        # print('나간거',int(sand*per),outsand)
+    else:
+        if per == 0:
+            arr[i][j] += remain
+            # print(remain,'남은거')
+        else:
+            arr[i][j] += int(sand * per)
+
+
+
+def BFS(i,j):
+    q = deque()
+    q.append((i,j))
+    flag = False
+    gocnt = 0
+    togo = 1
+    pd = 0
+    while q:
+        pi,pj = q.popleft()
+        if pi == 0 and pj == 0:
+            return
+        ni = pi + di[pd]
+        nj = pj + dj[pd]
+        sand = arr[ni][nj]
+        remain = sand
+        arr[ni][nj]=0
+        q.append((ni,nj))
+        gocnt += 1
+        if sand:
+            for next in tornado[pd]:
+                mi,mj,per = next
+                check(ni+mi,nj+mj,sand,per,remain)
+                remain -= int(sand * per)
+        
+        if gocnt == togo:
+            #한번 이미 그만 큼 갔으면
+            if flag:
+                togo += 1
+                flag = False
+            else:
+                flag = True
+            gocnt = 0
+            pd = (pd+1)%4
+
+
+N = int(input())
+arr = [list(map(int,input().split())) for _ in range(N)]
+outsand = 0
+BFS(N//2,N//2)
+print(outsand)
+
+```
+
+- 다른코드
+
+```python
+import sys
+
+
+def main():
+    N = int(sys.stdin.readline())
+    board = []
+    for i in range(N):
+        board.append(list(map(int, sys.stdin.readline().split())))
+    tornado = [N // 2, N // 2] #최초 토네이도의 좌표
+    distance = 1
+    cnt = 0
+    endflag = 0
+    while 1: #좌상단으로 가면 종료
+        for i in range(1, distance + 1): #좌로 이동
+            tornado[1] -= 1
+            if tornado[1] < 0: #토네이도가 밖으로 나감
+                endflag = 1
+                break
+            cnt += movingdust(board, tornado, 2, N)
+        if endflag:
+            break
+        for i in range(1, distance + 1): #하
+            tornado[0] += 1
+            cnt += movingdust(board, tornado, 3, N)
+        distance += 1
+        for i in range(1, distance + 1): #우
+            tornado[1] += 1
+            cnt += movingdust(board, tornado, 0, N)
+        for i in range(1, distance + 1): #상
+            tornado[0] -= 1
+            cnt += movingdust(board, tornado, 1, N)
+        distance += 1
+    print(cnt)
+
+
+def movingdust(board, pos, direction, N): #pos에 있는
+    out = 0
+    y, x = pos[0], pos[1]
+    dust = board[y][x]
+    left = dust
+    if direction == 0:
+        moving = dust * 5 // 100
+        if 0 <= x + 2 < N:
+            board[y][x + 2] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 10 // 100
+        if 0 <= y - 1 < N and 0 <= x + 1 < N :
+            board[y - 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x + 1 < N :
+            board[y + 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 7 // 100
+        if 0 <= y - 1 < N:
+            board[y - 1][x] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N:
+            board[y + 1][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 2 // 100
+        if 0 <= y - 2 < N:
+            board[y - 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 2 < N:
+            board[y + 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 1 // 100
+        if 0 <= y - 1 < N and 0 <= x - 1 < N:
+            board[y - 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x - 1 < N:
+            board[y + 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x + 1 < N:
+            board[y][x + 1] += left
+        else:
+            out += left
+    if direction == 1:
+        moving = dust * 5 // 100
+        if 0 <= y - 2 < N:
+            board[y - 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 10 // 100
+        if 0 <= y - 1 < N and 0 <= x - 1 < N:
+            board[y - 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y - 1 < N and 0 <= x + 1 < N:
+            board[y - 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 7 // 100
+        if 0 <= x - 1 < N:
+            board[y][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x + 1 < N:
+            board[y][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 2 // 100
+        if 0 <= x - 2 < N:
+            board[y][x - 2] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x + 2 < N:
+            board[y][x + 2] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 1 // 100
+        if 0 <= y + 1 < N and 0 <= x - 1 < N:
+            board[y + 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x + 1 < N :
+            board[y + 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y - 1 < N:
+            board[y - 1][x] += left
+        else:
+            out += left
+    if direction == 2:
+        moving = dust * 5 // 100
+        if 0 <= x - 2 < N:
+            board[y][x - 2] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 10 // 100
+        if 0 <= y - 1 < N and 0 <= x - 1 < N:
+            board[y - 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x - 1 < N:
+            board[y + 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 7 // 100
+        if 0 <= y - 1 < N:
+            board[y - 1][x] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N:
+            board[y + 1][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 2 // 100
+        if 0 <= y - 2 < N:
+            board[y - 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 2 < N:
+            board[y + 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 1 // 100
+        if 0 <= y - 1 < N and 0 <= x + 1 < N:
+            board[y - 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x + 1 < N:
+            board[y + 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x - 1 < N:
+            board[y][x - 1] += left
+        else:
+            out += left
+    if direction == 3:
+        moving = dust * 5 // 100
+        if 0 <= y + 2 < N:
+            board[y + 2][x] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 10 // 100
+        if 0 <= y + 1 < N and 0 <= x - 1 < N:
+            board[y + 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N and 0 <= x + 1 < N:
+            board[y + 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 7 // 100
+        if 0 <= x - 1 < N:
+            board[y][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x + 1 < N:
+            board[y][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 2 // 100
+        if 0 <= x - 2 < N:
+            board[y][x - 2] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= x + 2 < N:
+            board[y][x + 2] += moving
+        else:
+            out += moving
+        left -= moving
+        moving = dust * 1 // 100
+        if 0 <= y - 1 < N and 0 <= x - 1 < N:
+            board[y - 1][x - 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y - 1 < N and 0 <= x + 1 < N:
+            board[y - 1][x + 1] += moving
+        else:
+            out += moving
+        left -= moving
+        if 0 <= y + 1 < N:
+            board[y + 1][x] += left
+        else:
+            out += left
+    return out
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+
+## BOJ_20058_마법사상어와파이어스톰
+
+> 얼음을 녹이는 과정이 한번에 들어가야되는데 그걸 차례로 해줘서 틀렸던 거였다!!!ㅠㅠㅠㅠㅠ(이것때문에 시간 많이 듦...ㅠ)
+
+```python
+'''
+20-12-13 18:25-20(잠시뷰...22:40)+14일 19-20
+L의 크기에따라 arr을 2**L의 정사각형을 arr에서 나눠서 그 부분을 시계방향으로 90도 회전
+파이어스톰을 시전하려면 단계L을 정함
+파이어스톰을 Q번 시전
+전부 회전시킨 다음, 각 칸마다 상하좌우를 봤을대 얼음이 없는 0 인 값이 하나라도 있으면 얼음의 양이 1줄어듦
+모든 파이어스톰(L의 수만큼 돌린다음)
+1. 남아있는 얼음 A[r][c]의 합
+2. 남아있는 얼음 중 가장 큰 덩어리가 차지하는 칸의 개수
+구해라
+
+1. 2**N정사각형 배열을 temp로 만듦
+2. 각 범위만큼 돌릴건데 arr[i][j] = temp[j][2**L-1-i]의 위치에 가는데
+for i in range(0,2**N,2**L); for j in range(0,2**N,2**L);for r in range(2**L);for c in (2**L)
+arr[i+r][j+c] = temp[i+c][j+2**L-1-r] 에 담는다
+3. 각 칸을 회전시킬때 arr[i][j]가 0이 아닌 값을 q에 바뀐 좌표로 담아줌
+4. 회전을 다한 뒤, q에 담긴 값들을 돌리면서 상하좌우에얼음이 아닌것이 2개이상 있으면 그 값을 -1해주고 그 값이 0이 아니면 다시 nextq에담아줌!
+5. L을 전부 돌린 후 q에 담긴 값을 돌려보면서 연결된 덩어리 개수를 구하고 MAX값 갱신
+
+'''
+import sys
+input = sys.stdin.readline
+from collections import deque
+
+di = [-1,1,0,0] #상하좌우
+dj = [0,0,-1,1]
+def rotate(L):
+    temp = [[0 for j in range(2**N)] for i in range(2**N)]
+    # 돌림
+    q = deque()
+    for i in range(0,2**N,2**L):
+        for j in range(0,2**N,2**L):
+            for r in range(2**L):
+                for c in range(2**L):
+                    temp[i+c][j+2**L-1-r] = arr[i+r][j+c]
+                    if arr[i+r][j+c]:
+                        q.append((i+c,j+2**L-1-r))
+
+    #q를 바탕으로 상하좌우 돌아보며 얼음이 아닌것이 2개이상 있으면 1줄어든다.
+    nextq = deque()
+    while q:
+        pi,pj = q.popleft()
+        cnt = 0
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= 2**N or nj < 0 or nj >= 2**N:
+                cnt += 1
+                continue
+            if not temp[ni][nj]:
+                cnt += 1
+                continue
+        if cnt >=2:
+            nextq.append((pi,pj))
+    #한번에 1씩 줄여주기 -> 이거때문에 시간이 엄청 오래 걸렸따...ㅠ문제이해가 잘안된다,,,
+    while nextq:
+        pi,pj = nextq.popleft()
+        temp[pi][pj] -=1
+        if temp[pi][pj] < 0:
+            temp[pi][pj] = 0
+    return temp
+
+#bfs로 안하면 메모리 초과남
+def check(pi,pj):
+    global MAX,cnt
+    q = deque()
+    q.append((pi,pj))
+    visited[pi][pj] = True
+    while q:
+        pi,pj = q.popleft()
+        cnt+=1
+        for d in range(4):
+            ni = pi + di[d]
+            nj = pj + dj[d]
+            if ni < 0 or ni >= 2**N or nj < 0 or nj >= 2**N:
+                continue
+            if visited[ni][nj]:
+                continue
+            if not arr[ni][nj]:
+                continue
+            visited[ni][nj] = True
+            q.append((ni,nj))
+    if cnt > MAX:
+        MAX = cnt
+    return
+
+N,Q = map(int,input().split())
+arr = [list(map(int,input().split())) for _ in range(2**N)]
+L_info = list(map(int,input().split()))
+
+#돌리고 arr 다시 갱신
+for l in L_info:
+    arr = rotate(l)
+
+# L다돌아본 뒤 얼음 뭉치개수 구하기
+MAX = 0
+visited = [[False for j in range(2**N)] for i in range(2**N)]
+SUM = 0
+for i in range(2**N):
+    for j in range(2**N):
+        SUM+=arr[i][j]
+        if not visited[i][j] and arr[i][j]:
+            cnt = 0
+            check(i,j)
+
+print(SUM)
+print(MAX)
+```
+
+
+
+- 다른사람 코드
+
+```python
+from sys import*
+input=stdin.readline
+from collections import*
+def bfs(x, y):
+    global res
+    visit[x][y]=1
+    res += board[x][y]
+    cnt = 1
+    q=deque()
+    q.append((x, y))
+    while q:
+        x, y = q.popleft()
+        for dx, dy in [(0, 1), (0, -1), (-1, 0), (1, 0)]:
+            nx, ny = x+dx, y+dy
+            if nx<0 or ny<0 or nx>n-1 or ny>n-1 or visit[nx][ny] or not board[nx][ny]: continue
+            res += board[nx][ny]
+            visit[nx][ny]=1
+            cnt += 1
+            q.append((nx, ny))
+    return cnt
+N, K = map(int,input().split())
+n = 1 << N
+board = []
+for i in range(n):
+    board.append(list(map(int,input().split())))
+L = list(map(int,input().split()))
+for l in L:
+    l = 1<<l
+    zeros = [[1]*(n+2) for _ in range(n+2)]
+    for sx in range(0, n, l):
+        for sy in range(0, n, l):
+            #여기서 90도 회전 해줘야함
+            temp = [[0]*l for _ in range(l)]
+            for i in range(l):
+                for j in range(l):
+                    temp[j][l-i-1] = board[i+sx][j+sy]
+            for i in range(l):
+                for j in range(l):
+                    board[sx+i][sy+j] = temp[i][j]
+                    if temp[i][j]: zeros[sx+i+1][sy+j+1]=0
+    #n * n 돌면서 주위 0이하 두개이상인곳 체크
+    for i in range(n):
+        for j in range(n):
+            if board[i][j] and (zeros[i][j+1] + zeros[i+1][j+2] + zeros[i+1][j] + zeros[i+2][j+1])>=2: board[i][j]-=1
+#마지막 n*n 돌면서 BFS cnt 가장 큰거 구하고(그냥 전역변수로 구해도 됨), 전역변수로 sum 구하기
+visit = [[0]*n for _ in range(n)]
+res = 0
+cnt = 0
+for i in range(n):
+    for j in range(n):
+        if not visit[i][j] and board[i][j]:
+            cnt = max(cnt, bfs(i, j))
+print(res, cnt, sep='\n')
+
+```
+
+
+
+
+
+## BOJ_12100_2048
+
+```python
+'''
+1.상하좌우 4방향을 5번 돈다
++ 2048규칙 ->
+상 : 열을 보는데 위에서부터 보는데, 두개씩 비교해서 만약 수가 같으면 더해서 해당 행 배열 제일 앞에 넣어줌, 만약 다르면 앞의 수를 배열에넣고 그다음 수를 꺼내서 비교
+하 : 열을보는데 아래서부터 봄
+좌 : 행을 보는데 앞에서부터 봄
+우 : 행을 보는데 뒤에서부터 봄
+이렇게 한번 움직여서 한 배열에 넣은뒤, 재귀로 보냄(arr,cnt,max)이렇게 상하좌우 전부 돌리게 완전탐색
+2. 바꾼 배열을 재귀돌림
+'''
+import sys
+sys.stdin = open('input.txt','r')
+from collections import deque
+input = sys.stdin.readline
+
+
+def move(arr,cnt):
+    global result
+    if cnt ==5:
+        for i in range(N):
+            if result < max(arr[i]):
+                result = max(arr[i])
+        return
+    for d in range(4):
+        temp = [[0 for j in range(N)] for i in range(N)]
+        # 상
+        if d == 0:
+            for i in range(N):
+                q = deque()
+                for j in range(N):
+                    if arr[j][i]:
+                        q.append(arr[j][i])
+                idx = 0
+                while q:
+                    if len(q) > 1:
+                        a, b = q.popleft(), q.popleft()
+                        if a == b:
+                            temp[idx][i] = a + b
+                        else:
+                            temp[idx][i] = a
+                            # 제일앞에 다시 넣어줌->다음수와비교해야되니까
+                            q.appendleft(b)
+                        idx += 1
+                    else:
+                        c = q.popleft()
+                        temp[idx][i] = c
+            # print('위',cnt,MAX,'---')
+            # for x in temp:
+            #     print(x)
+            move(temp,cnt+1)
+        # 아래
+        elif d == 1:
+            for i in range(N):
+                q = deque()
+                for j in range(N - 1, -1, -1):
+                    if arr[j][i]:
+                        q.append(arr[j][i])
+                idx = N - 1
+                while q:
+                    if len(q) > 1:
+                        a, b = q.popleft(), q.popleft()
+                        if a == b:
+                            temp[idx][i] = a + b
+                        else:
+                            temp[idx][i] = a
+                            q.appendleft(b)
+                        idx -= 1
+                    else:
+                        c = q.popleft()
+                        temp[idx][i] = c
+            # print('아래',cnt, MAX, '---')
+            # for x in temp:
+            #     print(x)
+            move(temp, cnt + 1)
+        # 왼쪽
+        elif d == 2:
+            for i in range(N):
+                q = deque()
+                for j in range(N):
+                    if arr[i][j]:
+                        q.append(arr[i][j])
+                idx = 0
+                while q:
+                    if len(q) > 1:
+                        a, b = q.popleft(), q.popleft()
+                        if a == b:
+                            temp[i][idx] = a + b
+                        else:
+                            temp[i][idx] = a
+                            q.appendleft(b)
+                        idx += 1
+                    else:
+                        c = q.popleft()
+                        temp[i][idx] = c
+            # print('왼',cnt, MAX, '---')
+            # for x in temp:
+            #     print(x)
+            move(temp, cnt + 1)
+        # 오른쪽
+        else:
+            for i in range(N):
+                q = deque()
+                for j in range(N - 1, -1, -1):
+                    if arr[i][j]:
+                        q.append(arr[i][j])
+                idx = N - 1
+                while q:
+                    if len(q) > 1:
+                        a, b = q.popleft(), q.popleft()
+                        if a == b:
+                            temp[i][idx] = a + b
+                        else:
+                            temp[i][idx] = a
+                            q.appendleft(b)
+                        idx -= 1
+                    else:
+                        c = q.popleft()
+                        temp[i][idx] = c
+            # print('오',cnt, MAX, '---')
+            # for x in temp:
+            #     print(x)
+            move(temp, cnt + 1)
+
+
+N = int(input())
+arr = [list(map(int,input().split())) for _ in range(N)]
+result = 0
+move(arr,0)
+print(result)
+```
+
+
+
+- 다른코드
+
+```python
+import sys
+read = sys.stdin.readline
+
+n = int(read())
+r_q = [[] for _ in range(n)]
+c_q = [[] for _ in range(n)]
+
+for r in range(n):
+    s = [*map(int, read().split())]
+    for c in range(n):
+        tmp = s[c]
+        if tmp != 0:
+            r_q[r].append(tmp)
+            c_q[c].append(tmp)
+
+def move(o, t= 1, b= True, n= n):
+    o_r = []
+    node = False
+
+    for i in o:
+        o_r.append(i.copy())
+        k = 0
+        while True:
+            try:
+                if i[k] == i[k+1]:
+                    node = True
+                    i[k] += i.pop(k+1)
+                k += 1
+            except: break
+
+    if t == 5 or (node == False and b == False):
+        tmp = 0
+        for i in o:
+            for j in i:
+                if j > tmp:
+                    tmp = j
+        return tmp
+
+    new_c = [[] for _ in range(n)]
+    new_c_r = [[] for _ in range(n)]
+
+    for i in o:
+        k = 0
+        for j in i:
+            new_c[k].append(j)
+            k += 1
+
+    if node == False:
+        for i in o:
+            k = -1
+            for j in i[::-1]:
+                new_c_r[k].append(j)
+                k -= 1
+
+        return max(move(new_c, t+1, node),move(new_c_r, t+1, node))
+
+    for i in o_r:
+        k = -1
+        while True:
+            try:
+                if i[k] == i[k-1]:
+                    i[k] += i.pop(k-1)
+                k -= 1
+            except: break
+
+    for i in o_r:
+        k = -1
+        for j in i[::-1]:
+            new_c_r[k].append(j)
+            k -= 1
+
+    return max(move(o, t+1),move(o_r, t+1),move(new_c, t+1),move(new_c_r, t+1))
+
+print(max(move(r_q), move(c_q)))
+
+```
+
+```python
+from itertools import chain
+import sys
+read = sys.stdin.readline
+
+n = int(read().strip())
+blocks = [list(map(int, read().strip().split())) for _ in range(n)]
+
+
+def move_blocks(now_blocks, depth, direction):
+    # 위 아래 경우에는 transpose
+    if direction == 0 or direction == 1:
+        now_blocks = list(map(list, zip(*now_blocks)))
+
+    nxt_blocks = []
+    for line in now_blocks:
+        non_zero = [i for i in line if i]
+
+        # 왼쪽으로 move
+        if direction == 0 or direction == 3:
+            for i in range(1, len(non_zero)):
+                if non_zero[i-1] == non_zero[i]:
+                    non_zero[i-1] += non_zero[i]
+                    non_zero[i] = 0
+
+            non_zero = [i for i in non_zero if i]
+            non_zero = non_zero + [0]*(n-len(non_zero))
+
+        else:
+            for i in range(len(non_zero)-1, 0, -1):
+                if non_zero[i-1] == non_zero[i]:
+                    non_zero[i] += non_zero[i-1]
+                    non_zero[i-1] = 0
+
+            non_zero = [i for i in non_zero if i]
+            non_zero = [0] * (n - len(non_zero)) + non_zero
+
+        nxt_blocks.append(non_zero)
+
+    if direction == 0 or direction == 1:
+        nxt_blocks = list(map(list, zip(*nxt_blocks)))
+
+    if depth == 5:
+        global max_value
+        max_value = max(max_value, max(list(chain(*nxt_blocks))))
+        return
+
+    move_blocks(nxt_blocks, depth+1, 0)
+    move_blocks(nxt_blocks, depth+1, 1)
+    move_blocks(nxt_blocks, depth+1, 2)
+    move_blocks(nxt_blocks, depth+1, 3)
+
+
+max_value = 0
+for i in range(4):
+    move_blocks(blocks, 1, i)
+print(max_value)
+
+```
+
