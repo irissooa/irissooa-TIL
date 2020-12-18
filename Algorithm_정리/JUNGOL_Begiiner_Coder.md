@@ -1703,3 +1703,376 @@ for i in range(100):
 print(ans)
 ```
 
+
+
+### J_1311_카드게임
+
+```python
+'''
+20-12-17 11:33-13:03
+카드 4장, 뽑기 36장중 5장뽑음
+R,B,Y,G
+점수 규칙
+1. 카드 5장 모두 같은색, 숫자가 연속적, 점수는 가장 높은 숫자에 900 더함
+2. 카드 5장 중 4장 숫자가 같음, 점수는 같은 숫자에 800을 더함
+3. 같은 5장 중 3장의 숫자가 같고 나머지 2장도 숫자가 같을때, 점수는 3장이 같은 숫자에 10을 곱하고 2장이 같은 숫자를 더한 다음 700더함
+4. 5장의 카드 색깔이 모두 같을 댸 점수는 가장 높은 숫자에 600을 더함
+5. 카드 5장의 숫자가 연속적일때 점수는 가장 높은 숫자에 500을 더함
+6. 카드 5장 중 3장의 숫자가 같을 때 점수는 같은 숫자에 400을 더한다.
+7.카드 5장 중 2장의 숫자가 같고 또 다른 2장의 숫자가 같을 때
+점수는 같은 숫자 중 큰 숫자에 10을 곱하고 같은 숫자 중 작은 숫자를 더한 다음 300을 더한다.
+8. 카드 5장 중 2장의 숫자가 같을 때 점수는 같은 숫자에 200을 더한다.
+9.위의 어떤 경우에도 해당하지 않을 때 점수는 가장 큰 숫자에 100을 더한다.
+'''
+import sys
+sys.stdin = open('input.txt','r')
+# 같은색개수 return
+def samecolor():
+    return len(card)
+
+# 숫자가 연속적인지 확인
+def continuous():
+    for n in range(4):
+        if numbers[n] != numbers[n+1] -1:
+           return False
+    return True
+
+# 같은 수 개수와 숫자
+def samenum():
+    ans = 0
+    MAX = 0
+    number = 0
+    for n in range(1,10):
+        ans = numbers.count(n)
+        if ans > MAX:
+            MAX = ans
+            number = n
+    return MAX,number
+
+card = dict()
+numbers = []
+for _ in range(5):
+    a,num = input().split()
+    numbers.append(int(num))
+    if a not in card:
+        card[a] = [int(num)]
+    else:
+        card[a].append(int(num))
+# print(card)
+numbers.sort()
+result = 0
+if continuous():
+    # 카드 5장 같은색
+    if samecolor() == 1:
+        ans = max(numbers)+900
+    # 연속적이기만할때
+    else:
+        ans = max(numbers) + 500
+    if result < ans:
+        result = ans
+if samecolor()==1:
+    ans = max(numbers)+600
+    if result < ans:
+        result = ans
+same,samenumber=samenum()
+# print(same,samenumber)
+if same == 4:
+    ans = samenumber + 800
+elif same == 3:
+    # 나머지2장도 같을때
+    check =0
+    for n in numbers:
+        if n != samenumber and not check:
+            check = n
+        elif check == n:
+            ans = samenumber*10 + check+700
+            break
+    else:
+        ans = samenumber+400
+elif same == 2:
+    # 또다른 2장이 같을 때
+    check,checknum = 0,''
+    for n in numbers:
+        if n != samenumber and not check:
+            checknum = n
+            check += 1
+        elif n != samenumber and check == 1:
+            if checknum == n:
+                ans = max(samenumber,checknum)*10 + min(samenumber,checknum) +300
+                break
+            else:
+                checknum = n
+    else:
+        ans = samenumber + 200
+    if result < ans:
+        result = ans
+else:
+    ans = max(numbers) + 100
+if result < ans:
+    result = ans
+print(result)
+
+```
+
+
+
+### J_1997_떡먹는호랑이
+
+```python
+'''
+20-12-17 13:05-13:40
+오늘 떡 = 어제 받은 떡의 개수 + 그저께 받은 떡의 개수
+호랑이를 만나서 무사히 넘어온 D일째, 떡의 개수 K개
+할머니가 호랑이를 처음 만난 날의 떡의 개수A
+그 다음날 호랑이에게 준 떡의 개수B 계산
+
+1. for문2개, 마지막전날 개수를 임의로 정하고, 그전날 떡의 개수(K-마지막전날)를 로 정하고 그 전날은 두값의 차 값으로 해서 0일째 0가 되는지 확인
+'''
+D,K = map(int,input().split())
+ans = 0
+for a in range(10,K)[::-1]:
+    d =D
+    A = a
+    B = K-A
+    d-=2
+    flag = False
+    while d>=0 and A > B and B > 0:
+        next = A-B
+        d-=1
+        if d == 0:
+            print(B,A,sep='\n')
+            flag = True
+            break
+        A = B
+        B = next
+    if flag:
+        break
+
+```
+
+
+
+### J_1733_오목
+
+```python
+'''
+20-12-18 10:05
+오목 검정바둑알 1, 흰바둑알 1, 빈자리0, 19줄 19개숫자
+가로,세로,대각선, 여섯알 이상 연속적으로 놓인 경우 이긴것아님, 5알이면 이김, 검정흰색 동시에 이기는 경우 엉ㅄ음
+검정 이기면1, 흰색 2, 아직 승부가 결정되지 않으면 0
+이긴 바둑돌의 가장 왼쪽에 있는 바둑알 출력
+
+1. 0이아닌 수를 만났을때, 가로만 확인, 세로만 확인, 대각선만 확인하는 for문을 만들어 5개면 출력!
+각 방문배열을 따로 만듦,
+'''
+from collections import deque
+import sys
+sys.stdin = open('input.txt','r')
+di = [0,1,1,1] #가로(우),세로(하),대각선(좌하대, 우하대)
+dj = [1,0,-1,1]
+
+def check(i,j,color):
+    hor.add((i,j))
+    ver.add((i,j))
+    ldia.add((i,j))
+    rdia.add((i,j))
+    H,V,R,L = deque(),deque(),deque(),deque()
+    H.append((i,j,color))
+    V.append((i,j,color))
+    R.append((i,j,color))
+    L.append((i, j, color))
+#     가로
+    garo = 1
+    ans =[i,j]
+    while H:
+        pi,pj,pc = H.popleft()
+        ni,nj = pi+di[0], pj+dj[0]
+        if ni < 0 or ni >= 19 or nj < 0 or nj >= 19:
+            break
+        if arr[ni][nj] != pc:
+            break
+        if (ni,nj) in hor:
+            break
+        garo += 1
+        H.append((ni,nj,pc))
+        hor.add((ni,nj))
+        if ans[1] > nj:
+            ans = [ni,nj]
+    if garo == 5:
+        print(arr[i][j])
+        print(ans[0]+1,ans[1]+1)
+        return True
+#     세로
+    sero = 1
+    ans =[i,j]
+    while V:
+        pi,pj,pc = V.popleft()
+        ni,nj = pi+di[1], pj+dj[1]
+        if ni < 0 or ni >= 19 or nj < 0 or nj >= 19:
+            break
+        if arr[ni][nj] != pc:
+            break
+        if (ni,nj) in ver:
+            break
+        sero += 1
+        V.append((ni,nj,pc))
+        ver.add((ni,nj))
+        if ans[1] > nj:
+            ans = [ni,nj]
+    if sero == 5:
+        print(arr[i][j])
+        print(ans[0]+1,ans[1]+1)
+        return True
+    # 좌대각선
+    ldae = 1
+    ans =[i,j]
+    while L:
+        pi,pj,pc = L.popleft()
+        ni,nj = pi+di[2], pj+dj[2]
+        if ni < 0 or ni >= 19 or nj < 0 or nj >= 19:
+            break
+        if arr[ni][nj] != pc:
+            break
+        if (ni,nj) in ldia:
+            break
+        ldae += 1
+        L.append((ni,nj,pc))
+        ldia.add((ni,nj))
+        if ans[1] > nj:
+            ans = [ni,nj]
+    if ldae == 5:
+        print(arr[i][j])
+        print(ans[0]+1,ans[1]+1)
+        return True
+    # 우대각선
+    rdae = 1
+    ans =[i,j]
+    while R:
+        pi,pj,pc = R.popleft()
+        ni,nj = pi+di[3], pj+dj[3]
+        if ni < 0 or ni >= 19 or nj < 0 or nj >= 19:
+            break
+        if arr[ni][nj] != pc:
+            break
+        if (ni,nj) in rdia:
+            break
+        rdae += 1
+        R.append((ni,nj,pc))
+        rdia.add((ni,nj))
+        if ans[1] > nj:
+            ans = [ni,nj]
+    if rdae == 5:
+        print(arr[i][j])
+        print(ans[0]+1,ans[1]+1)
+        return True
+    return False
+
+
+
+
+
+arr = [list(map(int,input().split())) for _ in range(19)]
+flag = False
+hor, ver, ldia, rdia = set(), set(), set(), set()
+for i in range(19):
+    for j in range(19):
+        if arr[i][j]:
+            if check(i,j,arr[i][j]):
+                flag = True
+                break
+    if flag:
+        break
+if not flag:
+    print(0)
+
+```
+
+- 다른코드
+
+```python
+dr = [-1, 0, 1, 1]  # 우상, 우, 우하, 하
+dc = [1, 1, 1, 0]
+
+
+def checker(r, c, n):
+    for d in range(4):
+        cnt = 1
+        nr = r + dr[d]
+        nc = c + dc[d]
+        while board[nr][nc] == n:
+            cnt += 1
+            nr += dr[d]
+            nc += dc[d]
+        if cnt == 5:
+            nr2 = r - dr[d]
+            nc2 = c - dc[d]
+            if board[nr2][nc2] != n:
+                return True
+    return False
+
+
+def omok():
+    global ans
+    for i in range(1, 20):
+        for j in range(1, 20):
+            if board[i][j] != 0:
+                if checker(i, j, board[i][j]):
+                    ans = board[i][j]
+                    print(ans)
+                    print(i, j)
+                    return
+
+
+board = [[0] * 21]
+for _ in range(19):
+    board += [[0] + list(map(int, input().split())) + [0]]
+board += [[0] * 21]
+ans = 0
+omok()
+if ans == 0:
+    print(ans)
+```
+
+
+
+### J_1761_숫자야구
+
+```python
+'''
+20-12-18 11:38-12
+1~9까지ㅣ 서로 다른 숫자 세개
+3개 물어봄, 동일한 자리, 스트라이크, 다른자리 볼
+영수가 생각하고 있을 가능성이 있는 답의 개수
+1. 1~9까지 3자리를 임의로 만들어서 확인하는데
+2. 주어진 조건과 모두 맞는 것의 개수를 구해라
+'''
+import sys
+sys.stdin = open('input.txt','r')
+N = int(input())
+infos=[]
+for _ in range(N):
+    infos.append(list(map(int,input().split())))
+ans = 0
+for i in range(1,10):
+    for j in range(1,10):
+        for k in range(1,10):
+            if i == j or i == k or j ==k :
+                continue
+            temp = str(100*i+10*j+k)
+            for info in infos:
+                num,s,b = info
+                num = str(num)
+                S,B = 0,0
+                for n in range(3):
+                    if num[n] == temp[n]:
+                        S += 1
+                    elif int(num[n]) in [i,j,k]:
+                        B+= 1
+                if S != s or B != b:
+                    break
+            else:
+                ans += 1
+                # print(temp,num)
+print(ans)
+```
+
