@@ -2042,11 +2042,11 @@ async loginUser1() {
 
 ### async & await의 에러처리 (try, catch)
 
-> try~catch는javascript의 에러 처리방법으로  then~catch보다 좋은게
+> try,catch는javascript의 에러 처리방법으로  then,catch보다 좋은게
 >
->  Promise의 then~catch는 네트워크 요청에 대해서만 예외처리를 한다
+>  Promise의 then,catch는 네트워크 요청에 대해서만 예외처리를 한다
 >
-> 반면에, try~catch는 비동기처리 분만 아니라 일반적인 js코드 에러까지 예외처리를 함,  더 포괄적이다
+> 반면에, try,catch는 비동기처리 분만 아니라 일반적인 js코드 에러까지 예외처리를 함,  더 포괄적이다
 
 ```js
     async loginUser1() {
