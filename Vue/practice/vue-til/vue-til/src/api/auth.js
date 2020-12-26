@@ -1,11 +1,12 @@
-import { instance } from './index';
+import { auth } from './index';
 
-function registerUser(userData) {
-  return instance.post('signup', userData);
+// users
+function loginUser(data) {
+	return auth.post('login', data);
 }
 
-function loginUser(userData) {
-  return instance.post('login', userData);
+function signupUser(data) {
+	return auth.post('signup', data);
 }
 
-export { registerUser, loginUser };
+export { loginUser, signupUser };

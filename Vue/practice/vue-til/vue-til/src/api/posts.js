@@ -1,11 +1,30 @@
 import { posts } from './index';
 
+// posts
+function createNewPost(data) {
+	return posts.post('/', data);
+}
+
 function fetchPosts() {
-  return posts.get('posts');
+	return posts.get('/');
 }
 
-function createPost(postData) {
-  return posts.post('posts', postData);
+function fetchPostById(id) {
+	return posts.get(id);
 }
 
-export { fetchPosts, createPost };
+function editPostById(id, data) {
+	return posts.put(id, data);
+}
+
+function deletePostById(id) {
+	return posts.delete(id);
+}
+
+export {
+	createNewPost,
+	fetchPosts,
+	fetchPostById,
+	editPostById,
+	deletePostById,
+};

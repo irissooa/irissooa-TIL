@@ -1,8 +1,8 @@
 <template>
 	<div class="contents">
-		<PageHeader>Create Post</PageHeader>
+		<PageHeader>Edit Post</PageHeader>
 		<div class="form-wrapper">
-			<form @submit.prevent="submitForm" class="form">
+			<form @submit.prevent="editForm" class="form">
 				<div>
 					<label for="title">Title</label>
 					<input id="title" type="text" v-model="title" />
@@ -16,12 +16,6 @@
 						rows="5"
 						v-model="contents"
 					></textarea>
-					<p class="validation-text" :class="{ reverse: isContentTooLong }">
-						<span v-if="isContentTooLong" class="warning"
-							>Maximum Length is 50</span
-						>
-						<span>{{ contentsLength }} / 250</span>
-					</p>
 				</div>
 				<button
 					type="submit"
@@ -29,7 +23,7 @@
 					:class="isButtonDisabled"
 					:disabled="isButtonDisabled"
 				>
-					Create
+					Edit
 				</button>
 			</form>
 			<p class="log">
@@ -41,7 +35,7 @@
 
 <script>
 import PageHeader from '@/components/common/PageHeader.vue';
-import { createNewPost } from '@/api/posts';
+import { fetchPostById, editPostById } from '@/api/posts.js';
 import bus from '@/utils/bus.js';
 
 export default {
@@ -56,51 +50,45 @@ export default {
 		};
 	},
 	computed: {
-		contentsLength() {
-			return this.contents.length;
-		},
-		isContentTooLong() {
-			return this.contents.length > 250;
-		},
 		isButtonDisabled() {
-			return !this.title || !this.contents || this.contents.length > 50
-				? 'disabled'
-				: null;
+			return !this.title || !this.contents ? 'disabled' : null;
 		},
 	},
 	methods: {
-		async submitForm() {
+		setForm({ title, contents }) {
+			this.title = title;
+			this.contents = contents;
+		},
+		async editForm() {
 			try {
-				const response = await createNewPost({
+				const id = this.$route.params.id;
+				const response = await editPostById(id, {
 					title: this.title,
 					contents: this.contents,
 				});
-				bus.$emit('show:toast', `${response.data.data.title} was created`);
+				bus.$emit('show:toast', `${response.data.title} was editted`);
 				this.$router.push('/main');
 			} catch (error) {
 				console.log(error);
-				this.resultMessage = error.data.message;
+				this.resultMessage = error.data.error.errmsg;
 			}
 		},
+	},
+	async created() {
+		try {
+			const id = this.$route.params.id;
+			const { data } = await fetchPostById(id);
+			this.setForm(data);
+		} catch (error) {
+			console.log(error);
+		}
 	},
 };
 </script>
 
 <style scoped>
-.form textarea {
-	margin-bottom: 0;
-}
-.form .validation-text {
-	margin-bottom: 1rem;
-	font-size: 1rem;
-	display: flex;
-	flex-direction: row-reverse;
-	justify-content: space-between;
-}
-.form .validation-text.reverse {
-	flex-direction: row;
-}
 .btn {
+	background-color: #fc5185;
 	color: white;
 }
 .log {
