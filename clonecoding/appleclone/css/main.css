@@ -1,0 +1,362 @@
+/* 만들어서 적용할 css */
+@charset 'utf-8';
+/* 폰트 sans폰트 가져오기 */
+html {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 14px;
+}
+body {
+	/* 가로스크롤이 안생기게 설정 */
+	overflow-x: hidden;
+	/* apple 글자색과 같게 */
+	color: rgb(29, 29, 31);
+	/* 자간 줄임 */
+	letter-spacing: -0.05em;
+	/* 백그라운드 흰색 */
+	background: white;
+}
+p {
+	/* 문단 글자사이 거리 */
+	line-height: 1.6;
+}
+/* a태그 글자색, text-decoration none은 밑줄 없앰 */
+a {
+	color: rgb(29, 29, 31);
+	text-decoration: none;
+}
+
+body.before-load {
+	overflow: hidden;
+}
+.container {
+	/* iPhone 가로 스크롤 방지 */
+	overflow-x: hidden;
+}
+.global-nav {
+	/* absolute를 하면 메뉴들이 공간을 차지하지 않아서 스크롤 영역의 섹션을 나눌때 오차가 사라짐(이렇게 해야 의외의 버그들을 없앨 수 있음) */
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	/* absolute일땐 width를 강제로 높여줘야 적용됨 */
+	width: 100%;
+	/* nav높이 44px(애플 직접 재봄) */
+	height: 44px;
+	padding: 0 1rem;
+}
+.local-nav {
+	position: absolute;
+	top: 45px;
+	left: 0;
+	z-index: 11;
+	width: 100%;
+	height: 52px;
+	/* 좌우패딩을 줌(모바일로 봤을때 좌우에 너무 딱 붙어있어서) */
+	padding: 0 1rem;
+	border-bottom: 1px solid #ddd;
+}
+.local-nav-sticky .local-nav {
+	position: fixed;
+	top: 0;
+	background: rgba(255, 255, 255, 0.1);
+	/* for iPhone */
+	-webkit-backdrop-filter: saturate(180%) blur(15px);
+	-moz-backdrop-filter: saturate(180%) blur(15px);
+	-o-backdrop-filter: saturate(180%) blur(15px);
+	backdrop-filter: saturate(180%) blur(15px);
+}
+/* 두개 겹치니까 공통으로 씀 */
+.global-nav-links,
+.local-nav-links {
+	display: flex;
+	/* main방향의 수직방향 중간 */
+	align-items: center;
+	/* 최대 width가 1000px로 지정 브라우저 크기가 그것보다 작아지면 그것에 맞게 작아지면되는데 더 커지지는 않게! */
+	max-width: 1000px;
+	/* 알아서 부모만큼 높이가 늘어나게 100%로 지정 */
+	height: 100%;
+	/* 중간으로 정렬해줘야되니까 0, 왼쪽오른쪽 auto */
+	margin: 0 auto;
+}
+.global-nav-links {
+	/* 이건 global에만 주면됨 왜냐면 global nav는 균일하게 띄어져있지만 local nav는 로고만 왼쪽, 나머지메뉴는 오른쪽에 붙어있음 */
+	justify-content: space-between;
+}
+/* local nav의 로고 */
+/* 이렇게 부모도 적어준 이유는 .product-name이라고 적으면 local-nav-links a 보다 우선순위가 낮기때문에 부모클래스 아래의 적용할 클래스를 적어줌 */
+/* a그냥 태그 이름보다 클래스이름이 우선순위가 더 높음 */
+.local-nav-links .product-name {
+	/* 오른쪽 margin auto를 하면 margin 오른쪽을 다써서 나머지 메뉴들을 오른쪽에 붙임 */
+	margin-right: auto;
+	/* 이건 로고니까 폰트사이즈 더 크게함 */
+	font-size: 1.4rem;
+	/* 굵게 */
+	font-weight: bold;
+}
+/* a태그인 local-nav-link에 적용,  */
+.local-nav-links a {
+	/* 폰트사이즈를 얘만 좀 줄임 */
+	font-size: 0.8rem;
+}
+/* not은 class가 product-name을 제외하고, margin-left적용 */
+.local-nav-links a:not(.product-name) {
+	margin-left: 2em;
+}
+/* 스크롤섹션에 공통적용 */
+.scroll-section {
+	position: relative;
+	/* 뷰포트높이(인터넷브라우저 창의 높이)에 절반만큼 padding top을 준단 말 각 요소들 사이사이에 padding-top이 여유롭게 생김 */
+	padding-top: 50vh;
+}
+/* 스크롤-섹션-아이디값을 이용해서 h1태그에 적용 */
+#scroll-section-0 h1 {
+	position: relative;
+	top: -10vh;
+	z-index: 5;
+	/* html이 14px로 적용돼있으니 14*4px이된다 */
+	font-size: 4rem;
+	/* 가운데정렬 */
+	text-align: center;
+}
+.main-message {
+	/* 수직,수평 가운데 정렬 */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* 높이의 35%에 위치 */
+	top: 35vh;
+	/* 각 요소들간 위아래에 margin을 줘서 띄움 */
+	margin: 5px 0;
+	/* height의 3배높이 */
+	height: 3em;
+	font-size: 2.5rem;
+	/* 기본 투명도를 0으로 줌, 0~1로 스크롤비율에따라 커질건데 처음에 보이면안되니까 0 */
+	opacity: 0;
+}
+.main-message p {
+	font-weight: bold;
+	/* 글자 가운데 정렬 */
+	text-align: center;
+	/* 행간을 좀 좁혀줌 */
+	line-height: 1.2;
+}
+.main-message small {
+	/* small자체를 block을 줘서 박스를 만들어줌 */
+	display: block;
+	margin-bottom: 0.5em;
+	font-size: 1.2rem;
+}
+#scroll-section-2 .main-message {
+	font-size: 3.5rem;
+}
+/* 설명 */
+.description {
+	/* 브라우저크기가 어떻든 max-width를 적용하기 위해, 어차피 브라우저에서는 1000px을 넘지않아서 여기에 적용해도 관계없다 */
+	/* scroll-section에 바로 적용안한건, 이런 max-width를 두는건 컨테이너에 적용하는건 좋지 않다, 아래에 비디오나 사진요소로 꽉채울수도있기 때문에 해당 요소만 적용해줌 */
+	max-width: 1000px;
+	margin: 0 auto;
+	/* 위 nav에 좌우 1rem을 줬기 때문에 그걸 맞춰줌 */
+	padding: 0 1rem;
+	font-size: 1.2rem;
+	/* 연한회색 */
+	color: #888;
+}
+/* 설명의 강조요소 */
+.description strong {
+	/* 작은 설명글자가 strong을 왼쪽에 감싸고 있음-> float:left */
+	float: left;
+	/* fontsize는 rem으로 하고, margin, heghit은 em으로 하는 이유? em은 현재 내 폰트 사이즈(rem)의 몇배가 적용됨, */
+	/* 만약 em을 rem으로 바꾸면 root(14px)의 몇배가 적용됨 내가 원하는건 현재 내 폰트에 비례한 사이즈를 적용하길 원하기 때문에 em을 씀 */
+	/* 0.2em은 storng의 폰트사이즈의 0.2배 정도로 오른쪽에 margin을 주고싶어서 em을 사용함 */
+	/* 1rem이 14px 3rem(14*3=42px)거기에 0.2배는 8.4px */
+	margin-right: 0.2em;
+	/* 글자크기 3배 */
+	font-size: 3rem;
+	/* 색도 진한색 */
+	color: rgb(29, 29, 31);
+}
+.sticky-elem.desc-message {
+	width: 45%;
+	font-weight: bold;
+	opacity: 0;
+}
+/* 설명 선*/
+.pin {
+	/* 길쭉한 직사각형으로 만듦 */
+	width: 1px;
+	height: 100px;
+	background: rgb(29, 29, 31);
+}
+#scroll-section-2 .b {
+	top: 10%;
+	left: 40%;
+}
+#scroll-section-2 .c {
+	top: 15%;
+	left: 45%;
+}
+.mid-message {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 1rem;
+	font-size: 2rem;
+	color: #888;
+}
+/* strong은 색이 다르니까 따로처리 */
+.mid-message strong {
+	color: rgb(29, 29, 31);
+}
+.canvas-caption {
+	max-width: 1000px;
+	margin: -24rem auto 0;
+	padding: 0 1rem;
+	font-size: 1.2rem;
+	color: #888;
+}
+.footer {
+	/* flex로 가로세로 중앙정렬 */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* font의 7배 높이 */
+	height: 7rem;
+	color: white;
+	background: darkorange;
+}
+.sticky-elem {
+	/* 현재 스크롤구간에 해당하는요소만 보여주기위해, js에 나중에 해당 section만 보여주게할거얌 */
+	/* 기본적으로 none으로 안보이게 만들고, 해당 section이 되면 보이게 적용할거다 */
+	display: none;
+	/* sticky는 IE에서 11에서도 지원을 안함, 최소 상업용 사이트라면 11에서는 적용할 수 있게 만드는게 좋기 때문에 fixed를 사용 */
+	position: fixed;
+	/* 폭을 꽉차게 늘려줌 */
+	left: 0;
+	width: 100%;
+}
+/* 각 scroll 색션이 되면 display를 block으로 바꿈 */
+#show-scene-0 #scroll-section-0 .sticky-elem,
+#show-scene-1 #scroll-section-1 .sticky-elem,
+#show-scene-2 #scroll-section-2 .sticky-elem,
+#show-scene-3 #scroll-section-3 .sticky-elem {
+	display: block;
+	will-change: transform, opacity;
+}
+.scroll-effect-end .sticky-elem {
+	/* 스크롤 효과가 모두 끝나고, 아래 일반 콘텐츠 영역에서는 sticky-elem들을 모두 안보이도록 */
+	display: none !important;
+}
+.sticky-elem-canvas {
+	top: 0;
+	height: 100%;
+}
+.sticky-elem-canvas canvas {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+#scroll-section-3 {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.image-blend-canvas.sticky {
+	position: fixed;
+	top: 0;
+	z-index: 10;
+}
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100;
+	background: white;
+	opacity: 0;
+	transition: 0.5s;
+}
+.before-load .container {
+    display: none;
+}
+.before-load .loading {
+	opacity: 1;
+}
+@keyframes loading-spin {
+	100% { transform: rotate(360deg); }
+}
+@keyframes loading-circle-ani {
+	0% { stroke-dashoffset: 157; }
+	75% { stroke-dashoffset: -147; }
+	100% { stroke-dashoffset: -157; }
+}
+.loading-circle {
+	width: 54px;
+	height: 54px;
+	animation: loading-spin 3s infinite;
+}
+.loading-circle circle {
+	stroke: black;
+	stroke-width: 4;
+	/* getTotalLength()로 stroke의 길이를 얻어올 수 있음 */
+	stroke-dasharray: 157, 157;
+	stroke-dashoffset: 0;
+	fill: transparent;
+	animation: loading-circle-ani 1s infinite;
+	/* transition: 1s; */
+}
+/* .loading-circle:hover circle {
+	stroke-dashoffset: -157;
+} */
+
+.normal-content {
+	margin-bottom: 10rem;
+}
+/* 미디어의 크기도 맞춰줌 1024px기준, 1024이상이면 아래의 css가 적용된단 말 */
+/* 브라우저가 되면, 아래의 css로 적용됨 */
+@media (min-width: 1024px) {
+	#scroll-section-0 h1 {
+		/* 폰트사이즈가 브라우저 크기에 비례해서 달라지기 위해 vw(윈도우 사이즈의 9퍼센트크기) */
+		/* vw은 창크기에 따라 따라가겠다라는 의도, rem은 창의크기가 어떻든 어느정도 크기 제한을 하겠다란 의도로 사용 */
+		/* apple에서는 보통 title들을 vw로 함 */
+		font-size: 9vw;
+	}
+	.main-message {
+		font-size: 4vw;
+	}
+	.description {
+		padding: 0;
+		font-size: 2rem;
+	}
+	.description strong {
+		font-size: 6rem;
+	}
+	#scroll-section-2 .main-message {
+		font-size: 6vw;
+	}
+	.main-message small {
+		font-size: 1.5vw;
+	}
+	.sticky-elem.desc-message {
+		width: 20%;
+	}
+	#scroll-section-2 .b {
+		top: 20%;
+		left: 53%;
+	}
+	#scroll-section-2 .c {
+		left: 55%;
+	}
+	.mid-message {
+		width: 1000px;
+		padding: 0;
+		font-size: 4vw;
+	}
+	.canvas-caption {
+		margin-top: -8rem;
+		padding: 0;
+		font-size: 2rem;
+	}
+}
