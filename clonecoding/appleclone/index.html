@@ -12,9 +12,13 @@
 	<!-- 우리가 만든 적용할 css를 만들어줌 -->
 	<link rel="stylesheet" href="css/main.css">
 </head>
+<!-- 처음에 loading이 보여야되니까 before-load class적용 -> 로딩되면 제거하면됨-->
 <body class="before-load">
+	<!-- loading처리 -->
 	<div class="loading">
+		<!-- svg태그에 css적용-->
 		<svg class="loading-circle">
+			<!-- circle태그 원의 중점의 위치, 반지름 지정 -->
 			<circle cx="50%" cy="50%" r="25"></circle>
 		</svg>
 	</div>
@@ -42,6 +46,7 @@
 			<h1>AirMug Pro</h1>
 			<!-- 스크롤에 따라 동작하지만 눈에 딱 고정시키는 요소들한테 모두 적용(sticky-elem) 
 				스크롤값에 따라 변동이되는거지 자연스럽게 스크롤돼어 올라가는 요소들이 아님 -->
+				<!-- 캔버스를 넣음, sticky-elem -->
 			<div class="sticky-elem sticky-elem-canvas">
 				<canvas id="video-canvas-0" width="1920" height="1080"></canvas>
 			</div>
@@ -100,6 +105,18 @@
 			<canvas class="image-blend-canvas" width="1920" height="1080"></canvas>
 			<p class="canvas-caption">
 				Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eveniet at fuga quae perspiciatis veniam impedit et, ratione est optio porro. Incidunt aperiam nemo voluptas odit quisquam harum in mollitia. Incidunt minima iusto in corporis, dolores velit. Autem, sit dolorum inventore a rerum distinctio vero illo magni possimus temporibus dolores neque adipisci, repudiandae repellat. Ducimus accusamus similique quas earum laborum. Autem tempora repellendus asperiores illum ex! Velit ea corporis odit? Ea, incidunt delectus. Sapiente rerum neque error deleniti quis, et, quibusdam, est autem voluptate rem voluptas. Ratione soluta similique harum nihil vel. Quas inventore perferendis iusto explicabo animi eos ratione obcaecati.
+			</p>
+		</section>
+		<!-- 하단 콘텐츠 추가 -->
+		<section class="normal-content">
+			<p class="mid-message">
+				Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eveniet at fuga quae perspiciatis veniam impedit et, ratione
+				est optio porro. Incidunt aperiam nemo voluptas odit quisquam harum in mollitia. Incidunt minima iusto in corporis,
+				dolores velit. Autem, sit dolorum inventore a rerum distinctio vero illo magni possimus temporibus dolores neque
+				adipisci, repudiandae repellat. Ducimus accusamus similique quas earum laborum. Autem tempora repellendus asperiores
+				illum ex! Velit ea corporis odit? Ea, incidunt delectus. Sapiente rerum neque error deleniti quis, et, quibusdam, est
+				autem voluptate rem voluptas. Ratione soluta similique harum nihil vel. Quas inventore perferendis iusto explicabo animi
+				eos ratione obcaecati.
 			</p>
 		</section>
 		<!-- footer -->

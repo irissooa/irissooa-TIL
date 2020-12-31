@@ -24,7 +24,7 @@ a {
 	color: rgb(29, 29, 31);
 	text-decoration: none;
 }
-
+/* body에 befor-load가 붙어있으면 스크롤이 되지 않게 overflow를 숨김(overflow면 스크롤이 될수있기때문) */
 body.before-load {
 	overflow: hidden;
 }
@@ -37,6 +37,7 @@ body.before-load {
 	position: absolute;
 	top: 0;
 	left: 0;
+	/* canvas때문에 메뉴가 안보임, 포지션이 absolute니까 z-index로 앞으로 나오게함  */
 	z-index: 10;
 	/* absolute일땐 width를 강제로 높여줘야 적용됨 */
 	width: 100%;
@@ -48,6 +49,7 @@ body.before-load {
 	position: absolute;
 	top: 45px;
 	left: 0;
+	/* canvas때문에 메뉴가 안보임, 포지션이 absolute니까 z-index로 앞으로 나오게함  */
 	z-index: 11;
 	width: 100%;
 	height: 52px;
@@ -55,14 +57,19 @@ body.before-load {
 	padding: 0 1rem;
 	border-bottom: 1px solid #ddd;
 }
+/* 이 클래스가 붙으면 위에 고정시키고 불투명처리 */
 .local-nav-sticky .local-nav {
 	position: fixed;
 	top: 0;
+	/* 투명도가 있는 흰색 */
 	background: rgba(255, 255, 255, 0.1);
 	/* for iPhone */
+	/* ios에서는 -webkit-을 붙여줘야됨 */
 	-webkit-backdrop-filter: saturate(180%) blur(15px);
+	/* 파이어폭스 */
 	-moz-backdrop-filter: saturate(180%) blur(15px);
 	-o-backdrop-filter: saturate(180%) blur(15px);
+	/* 뿌옇게 처리하는 것, 애플 개발자도구를 보고 그대로 가져옴 */
 	backdrop-filter: saturate(180%) blur(15px);
 }
 /* 두개 겹치니까 공통으로 씀 */
@@ -104,14 +111,19 @@ body.before-load {
 }
 /* 스크롤섹션에 공통적용 */
 .scroll-section {
+	/* 자식들의 기준이 static이 아님 scroll-sction이 된다, offsetTop의 기준을 static(제일처음)이 아니라 section시작점이 되게하기 위해 */
 	position: relative;
 	/* 뷰포트높이(인터넷브라우저 창의 높이)에 절반만큼 padding top을 준단 말 각 요소들 사이사이에 padding-top이 여유롭게 생김 */
 	padding-top: 50vh;
 }
 /* 스크롤-섹션-아이디값을 이용해서 h1태그에 적용 */
 #scroll-section-0 h1 {
+	/* 제일처음 등장하는 글은 position을 absolute로 적용안했기 때문에 기본인 static이다, static은 absolute보다 뒤로 깔리기 때문에 캔버스에 가려 보이지 않음
+		z-index를 사용하려면 static이면 안됨, 그래서 relative로 바꿔줌 */
 	position: relative;
+	/* 스크롤색션에 padding이 절반만큼돼있어서 살짝 글이 내려가있다 조금 올려줌(position이 relative라 top 쓸 수 있음)  */
 	top: -10vh;
+	/* 캔버스 보다 위로 올리기 위해 적용 */
 	z-index: 5;
 	/* html이 14px로 적용돼있으니 14*4px이된다 */
 	font-size: 4rem;
@@ -178,6 +190,7 @@ body.before-load {
 .sticky-elem.desc-message {
 	width: 45%;
 	font-weight: bold;
+	/* 처음에 등장할때 부드럽게 등장하기위해 0부터시작 */
 	opacity: 0;
 }
 /* 설명 선*/
@@ -196,6 +209,7 @@ body.before-load {
 	left: 45%;
 }
 .mid-message {
+	/* 메뉴랑 크기를 맞추기 위해 */
 	max-width: 1000px;
 	margin: 0 auto;
 	padding: 0 1rem;
@@ -208,6 +222,7 @@ body.before-load {
 }
 .canvas-caption {
 	max-width: 1000px;
+	/* 마지막 문단, 좀 더 위에서 보여지게 하려고 margintop을 음수로줌 */
 	margin: -24rem auto 0;
 	padding: 0 1rem;
 	font-size: 1.2rem;
@@ -239,79 +254,117 @@ body.before-load {
 #show-scene-2 #scroll-section-2 .sticky-elem,
 #show-scene-3 #scroll-section-3 .sticky-elem {
 	display: block;
+	/* transform과 opacity를 바꿀거라고 미리 알려줌(브라우저가 미리 준비를함) 처리시 버벅임이 줄어듦 */
+	/* 이페이지에 굳이 안써도 되지만 애플은 쓰고 있음, 근데 많이 사용하면 안됨(성능개선을 위한 최후의 수단) */
 	will-change: transform, opacity;
 }
 .scroll-effect-end .sticky-elem {
 	/* 스크롤 효과가 모두 끝나고, 아래 일반 콘텐츠 영역에서는 sticky-elem들을 모두 안보이도록 */
+	/* 절대로 안보여지게 important로 지정 */
 	display: none !important;
 }
+/* 꽉 채워야되니까 top으로 함 */
 .sticky-elem-canvas {
 	top: 0;
+	/* canvas top위치가 올바르게 하려면 container의 height도 100%으로 맞춰줘야됨 */
 	height: 100%;
 }
+/* sticky-elem-canvas안에 canvas에 적용 */
 .sticky-elem-canvas canvas {
 	position: absolute;
+	/* top 0은 이미 클래스에 0이 적용돼있지만, scale을 조정했기 때문에 바뀐 스케일이라 top이 0이 아님 */
+	/* position의 top,left 50%로 적용하고, js에서 translate를 이용해 -50%,-50%를 적용하면 가운데 정렬이 됨 */
 	top: 50%;
 	left: 50%;
 }
+/* 섹션3번 container를 가운데 정렬, 이건 height가 다 채워져야 fixed가 적용되기때문에 container를 가운데정렬해줘야됨 */
 #scroll-section-3 {
+	/* 그냥 flex는 기본적으로 가로배치이기때문에 column으로 세로배치로 바꿈 */
 	display: flex;
 	flex-direction: column;
+	/* 가로방향으로 중간정렬해야됨 */
 	align-items: center;
 }
+/* image-blend-canvas클래스에 sticky클래스가 붙으면 적용됨 */
 .image-blend-canvas.sticky {
 	position: fixed;
+	/* top도 0으로 적용해도 canvas에 적용된 scale때문에 완전히 위에 붙지 않는다 이건 js에서 따로 적용하면됨! */
 	top: 0;
 	z-index: 10;
 }
 .loading {
+	/* 가운데 위치 */
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	/* 고정 */
 	position: fixed;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
+	/* 제일 위로 */
 	z-index: 100;
 	background: white;
+	/* 로딩이 끝나면 0으로 안보이게함 */
 	opacity: 0;
+	/* 사라질때  */
 	transition: 0.5s;
 }
+/* 로드가 되기 전에는 containerclass가 보이지 않게 설정 */
 .before-load .container {
     display: none;
 }
+/* 로딩되기전에는 1로 보이다가 */
 .before-load .loading {
 	opacity: 1;
 }
 @keyframes loading-spin {
+	/* 끝날때 360도 돌림 */
 	100% { transform: rotate(360deg); }
 }
+/* 애니메이션 만듦 */
 @keyframes loading-circle-ani {
+	/* 시작점 */
 	0% { stroke-dashoffset: 157; }
+	/* 끝부분에 속도를 느려지게하려고 75%에서 끊어줌 */
 	75% { stroke-dashoffset: -147; }
 	100% { stroke-dashoffset: -157; }
 }
+/* 로딩 원 container */
 .loading-circle {
+	/* 54인 이유 지름이 50이고, stroke가 2*2(선은 중앙에 있어 4가 아니라 2만 적용)이기 때문 */
 	width: 54px;
 	height: 54px;
+	/* 3초 무한 반복 */
 	animation: loading-spin 3s infinite;
 }
+/* loading-circle에 circle class */
 .loading-circle circle {
+	/* 테두리선 svg에서는 stroke */
 	stroke: black;
+	/* svg는 바깥 빈박스의 설정에 따라 크기가 달라지기때문에 단위를 따로 적지 않는다 */
+	/* 예, html에서 viewBox(0,0,540,540)설정 하면 540에서 4만큼!그래서 매우 작게 나옴 */
 	stroke-width: 4;
-	/* getTotalLength()로 stroke의 길이를 얻어올 수 있음 */
+	/* js에서 getTotalLength()로 stroke의 길이를 얻어올 수 있음 */
+	/* svg에 속성, 없던 선이 생기게 함(원의 둘레 157) */
 	stroke-dasharray: 157, 157;
+	/* 선을 사라지게 함 */
 	stroke-dashoffset: 0;
+	/* 안애 색 채우기, 색이 아예 안들어가려면 fill:none */
+	/* transparent는 투명하게 */
 	fill: transparent;
+	/* 재생을 animation이나 transition을 이용해서 로딩 원 구현 */
 	animation: loading-circle-ani 1s infinite;
 	/* transition: 1s; */
 }
+/* transition을 쓰려면 아래의 코드를 써야됨 */
 /* .loading-circle:hover circle {
 	stroke-dashoffset: -157;
 } */
 
 .normal-content {
+	/* 보기좋게 적당히 떨어지게 설정 */
 	margin-bottom: 10rem;
 }
 /* 미디어의 크기도 맞춰줌 1024px기준, 1024이상이면 아래의 css가 적용된단 말 */
@@ -355,6 +408,7 @@ body.before-load {
 		font-size: 4vw;
 	}
 	.canvas-caption {
+		/* 모바일이 default라서 window로 바꼈을때 조정해줌 */
 		margin-top: -8rem;
 		padding: 0;
 		font-size: 2rem;
