@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+			height: 500vh;
+		body {
+		}
+		body.before-load {
+			overflow-y: hidden;
+		}
+		.sample-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+		}
+	</style>
+</head>
+<body class="before-load">
+	<!-- 브라우저에 맞춰서 픽스됨 왜냐하면 width가 100%라서 -->
+	<canvas class="sample-canvas" width="1920" height="1080"></canvas>
+
+	<script>
+		// canvas는 모든 드로잉 조작을 할때 getContext메서드를 호출해서 context객체를 이용. 이 두개(canvas,context) 기본
+		const canvas = document.querySelector('.sample-canvas');
+		const context = canvas.getContext('2d');
+
+		const videoImages = [];
+		let totalImagesCount = 960;
+		let progress;
+		let currentFrame;
+
+		function setImages() {
+			for (let i = 0; i < totalImagesCount; i++) {
+				let imgElem = new Image();
+				imgElem.src = `../video/002/IMG_${7027 + i}.JPG`;
+				videoImages.push(imgElem);
+			}
+		}
+
+		function init() {
+			document.body.classList.remove('before-load');
+			// 처음에 실행할때, 첫번째 이미지를 먼저 그려주고 시작!
+			context.drawImage(videoImages[0], 0, 0);
+
+			window.addEventListener('scroll', function () {
+				progress = pageYOffset / (document.body.offsetHeight - window.innerHeight);
+				if (progress < 0) progress = 0;
+				if (progress > 1) progress = 1;
+
+				currentFrame = Math.round((totalImagesCount - 1) * progress);
+				// context객체에 drawImage메서드를 이용해 그림(그릴이미지객체, x좌표, y좌표)
+				context.drawImage(videoImages[currentFrame], 0, 0);
+			});
+		}
+
+		window.addEventListener('load', init);
+		setImages();
+	</script>
+</body>
+</html>

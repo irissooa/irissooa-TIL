@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			height: 500vh;
+		}
+		body.before-load {
+			overflow-y: hidden;
+		}
+		.sample-video {
+			/* fixed로 고정하고 스크롤에 따라 딱딱 나오게 함 */
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+		}
+	</style>
+</head>
+<body class="before-load">
+	<!-- 비디오를 직접 넣었을때 그래서 테스트를 할때는 저화질로 함 그래서 우린 다른 방법을 이용할거다 -->
+	<!-- low vs high 차이, 고화질은 상당히 깨끗한 화질이지만 저화질은 크게하면 꺠짐  근데 스크롤하는데 너무 느리게 버벅임-->
+	<video class="sample-video" src="../video/sample-low.mp4" muted></video>
+	<!-- <video class="sample-video" src="../video/sample-high.mp4" muted></video> -->
+
+	<script>
+		const videoElem = document.querySelector('.sample-video');
+		let progress;
+		let currentFrame;
+		function init() {
+			document.body.classList.remove('before-load');
+
+			window.addEventListener('scroll', function () {
+				// 현재 얼만큼 스크롤됐는지 비율을 구함 (스크롤 가능 높이= 전체 body높이에서 맨마지막에 스크롤이 필요없는 화변높이만큼 뺀 높이 즉, 전체 스크롤 가능 범위 분에 현재 스크롤된 양)
+				progress = pageYOffset / (document.body.offsetHeight - window.innerHeight);
+				console.log(progress);
+				// 바운스 효과로 0보다 작아지거나 1보다커지는 것을 막는 안전장치
+				if (progress < 0) progress = 0;
+				if (progress > 1) progress = 1;
+				// videoduration은 비디오 전체 시간을 나타냄 거기에 지금 어느위치에 있는지 progress를 곱해 현재시간을 구함
+				videoElem.currentTime = videoElem.duration * progress;
+			});
+		}
+		// 비디오로드
+		window.addEventListener('load', init);
+	</script>
+</body>
+</html>

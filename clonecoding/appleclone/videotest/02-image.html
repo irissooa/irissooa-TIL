@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			height: 500vh;
+		}
+		body.before-load {
+			overflow-y: hidden;
+		}
+		.sample-img {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+		}
+	</style>
+</head>
+<!-- 이미지 순서로 비디오를 보여주는 방식, 스크롤을 몇프로 내리면 몇번째 이미지가 나올지 계산 -->
+<body class="before-load">
+	<!-- 16초 짜리를 초당 60프레임으로 이미지로 만듦 -->
+	<img class="sample-img" src="../video/002/IMG_7027.JPG">
+
+	<script>
+		// img를 잡음
+		const imgElem = document.querySelector('.sample-img');
+		const videoImages = [];
+		// 총이미지 개수
+		let totalImagesCount = 960;
+		let progress;
+		let currentFrame;
+		// 이미지를 한장한장 넘어감
+		function setImages() {
+			for (let i = 0; i < totalImagesCount; i++) {
+				let imgElem = new Image();
+				imgElem.src = `../video/002/IMG_${7027 + i}.JPG`;
+				videoImages.push(imgElem);
+			}
+		}
+
+		function init() {
+			document.body.classList.remove('before-load');
+
+			window.addEventListener('scroll', function () {
+				progress = pageYOffset / (document.body.offsetHeight - window.innerHeight);
+				if (progress < 0) progress = 0;
+				if (progress > 1) progress = 1;
+
+				requestAnimationFrame(function () {
+					// 소수로 값이 나오니까 round로 반올림을 시켜서 0~959 index값을 나타내야되니까 현재프레임을 스크롤된 비율에 따라 인덱스번호로 만든것을 넣어줌
+					currentFrame = Math.round((totalImagesCount - 1) * progress);
+					imgElem.src = videoImages[currentFrame].src;
+				});
+			});
+		}
+		// 이미지 로드
+		window.addEventListener('load', init);
+		setImages();
+	</script>
+</body>
+</html>

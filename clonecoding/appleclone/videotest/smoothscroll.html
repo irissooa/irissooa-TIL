@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>부드러운 스크롤</title>
+	<!-- 스크롤을 내리거나 올릴때 동영상이 끊김 없이 부드럽게 표현되게하기위함 -->
+	<style>
+		body {
+			height: 500vh;
+		}
+		.box {
+			position: fixed;
+			top: 100px;
+			left: 0;
+			width: 0;
+			height: 100px;
+			background: orange;
+		}
+	</style>
+</head>
+<body>
+	<div class="box"></div>
+
+	<script>
+		const box = document.querySelector('.box');
+		let acc = 0.1;
+		let delayedYOffset = 0;
+		// requestAnimationFrame id변수
+		let rafId;
+		// requestAnimationFrame상태를 나타내는 변수
+		let rafState;
+		// scroll이 일어나면
+		window.addEventListener('scroll', () => {
+			// box.style.width = `${window.pageYOffset}px`;
+			// scroll이 일어났고, requestAnimation상태가 꺼져있으면 다시 실행시킴
+			if (!rafState) {
+				// 값이변할때만 rafId갱신
+				rafId = requestAnimationFrame(loop);
+				rafState = true;
+			}
+		});
+
+		function loop() {
+			// 속도를 감속시키는 식, 현재위치 + 목표지점(현재스크롤위치)에서 현재위치를 뺴고 *0.1로 현재위치를 계속 갱신,
+			// 이거를 재귀처럼 계속 반복하면 끝날지점으로 갈수록 속도가 느려지면스 애니메이션이 부드러워진다
+			delayedYOffset = delayedYOffset + (pageYOffset - delayedYOffset) * acc;
+			box.style.width = `${delayedYOffset}px`;
+			console.log('loop');
+
+			rafId = requestAnimationFrame(loop);
+			// 두 지점의 차이 절대값(목표, delayedYoffset)가 1px이하면 거의 같단말! 그때 requestAnimagionFrame을 취소함(cancelAnimationFrame)
+			if (Math.abs(pageYOffset - delayedYOffset) < 1) {
+				cancelAnimationFrame(rafId);
+				rafState = false;
+			}
+		}
+
+		loop();
+	</script>
+</body>
+</html>

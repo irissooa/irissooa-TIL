@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		body {
+			height: 500vh;
+		}
+		body.before-load {
+			overflow-y: hidden;
+		}
+        h1 {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            font-size: 1rem;
+        }
+		.sample-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+		}
+	</style>
+</head>
+<body class="before-load">
+    <h1>scroll 이벤트 대신 requestAnimationFrame을 이용한 방법(모바일에서 특히 더 부드러워요)</h1>
+	<canvas class="sample-canvas" width="1920" height="1080"></canvas>
+
+	<script>
+		const canvas = document.querySelector('.sample-canvas');
+		const context = canvas.getContext('2d');
+		const videoImages = [];
+		let totalImagesCount = 960;
+		let progress;
+		let currentFrame;
+
+		function setImages() {
+			for (let i = 0; i < totalImagesCount; i++) {
+				let imgElem = new Image();
+				imgElem.src = `../video/002/IMG_${7027 + i}.JPG`;
+				videoImages.push(imgElem);
+			}
+		}
+
+		function loop() {
+			progress = pageYOffset / (document.body.offsetHeight - window.innerHeight);
+			if (progress < 0) progress = 0;
+			if (progress > 1) progress = 1;
+
+			currentFrame = Math.round((totalImagesCount - 1) * progress);
+			context.drawImage(videoImages[currentFrame], 0, 0);
+
+			requestAnimationFrame(loop);
+		}
+
+		function init() {
+			document.body.classList.remove('before-load');
+			context.drawImage(videoImages[0], 0, 0);
+
+			// window.addEventListener('scroll', function () {
+			// 	progress = pageYOffset / (document.body.offsetHeight - window.innerHeight);
+			// 	if (progress < 0) progress = 0;
+			// 	if (progress > 1) progress = 1;
+
+			// 	currentFrame = Math.round((totalImagesCount - 1) * progress);
+			// 	context.drawImage(videoImages[currentFrame], 0, 0);
+			// });
+
+			loop();
+		}
+
+		window.addEventListener('load', init);
+		setImages();
+	</script>
+</body>
+</html>
