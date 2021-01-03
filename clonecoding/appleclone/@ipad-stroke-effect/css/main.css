@@ -1,0 +1,178 @@
+@charset 'utf-8';
+
+html {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-size: 14px;
+}
+body {
+	overflow-x: hidden;
+	color: rgb(29, 29, 31);
+	letter-spacing: -0.05em;
+	background: white;
+}
+p {
+	line-height: 1.6;
+}
+a {
+	color: rgb(29, 29, 31);
+	text-decoration: none;
+}
+
+.container {
+	/* iPhone 가로 스크롤 방지 */
+	overflow-x: hidden;
+}
+.scroll-section {
+	position: relative;
+	padding-top: 50vh;
+	color: #fff;
+}
+#scroll-section-0 h1 {
+	position: relative;
+	top: -10vh;
+	z-index: 5;
+	font-size: 3.5rem;
+	text-align: center;
+}
+.main-message {
+	top: 40vh;
+	font-size: 2.5rem;
+	opacity: 0;
+}
+.main-message.b {
+	font-size: 3.5rem;
+}
+.main-message.c {
+	font-size: 4.5rem;
+}
+.main-message p {
+	font-weight: bold;
+	text-align: center;
+	line-height: 1.2;
+}
+.main-message small {
+	display: block;
+	margin-bottom: 0.5em;
+	font-size: 1.2rem;
+}
+.mid-message {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 0 1rem;
+	font-size: 2rem;
+	color: #888;
+}
+.sticky-elem {
+	display: none;
+	position: fixed;
+	left: 0;
+	width: 100%;
+}
+#show-scene-0 #scroll-section-0 .sticky-elem,
+#show-scene-1 #scroll-section-1 .sticky-elem {
+	display: block;
+	will-change: transform, opacity;
+}
+.scroll-effect-end .sticky-elem {
+	/* 스크롤 효과가 모두 끝나고, 아래 일반 콘텐츠 영역에서는 sticky-elem들을 모두 안보이도록 */
+	display: none !important;
+}
+.normal-content {
+	padding: 20vh 0;
+}
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100;
+	background: white;
+	opacity: 0;
+	transition: 0.5s;
+}
+.before-load .container {
+    display: none;
+}
+.before-load .loading {
+	opacity: 1;
+}
+@keyframes loading-spin {
+	100% { transform: rotate(360deg); }
+}
+@keyframes loading-circle-ani {
+	0% { stroke-dashoffset: 157; }
+	75% { stroke-dashoffset: -147; }
+	100% { stroke-dashoffset: -157; }
+}
+.loading-circle {
+	width: 54px;
+	height: 54px;
+	animation: loading-spin 3s infinite;
+}
+.loading-circle circle {
+	stroke: black;
+	stroke-width: 4;
+	/* getTotalLength()로 stroke의 길이를 얻어올 수 있음 */
+	stroke-dasharray: 157, 157;
+	stroke-dashoffset: 0;
+	fill: transparent;
+	animation: loading-circle-ani 1s infinite;
+}
+
+.pencil-logo {
+	left: 50%;
+	top: 50%;
+	width: 1000vw;
+	transform: translate(-10%, -50%);
+}
+.pencil {
+	left: auto;
+	top: auto;
+	right: -10%;
+	bottom: -80%;
+	width: 3.5vw;
+	transform: rotate(-120deg);
+}
+.ribbon-path {
+	left: 50%;
+	top: 50%;
+	min-width: 850px;
+	transform: translate(-50%, -50%);
+}
+/* 여기서 stroke-dasharray, dashoffset을 이용해서 stroke선 표현 */
+.ribbon-path path {
+	fill: none;
+	stroke: #FF0044;
+	stroke-width: 62;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-dasharray: 1401, 1401;
+	stroke-dashoffset: 1401;
+}
+
+@media (min-width: 1024px) {
+	#scroll-section-0 h1 {
+		font-size: 9vw;
+	}
+	.main-message {
+		font-size: 4vw;
+	}
+	.main-message.b {
+		font-size: 7vw;
+	}
+	.main-message.c {
+		font-size: 10vw;
+	}
+	.main-message small {
+		font-size: 1.5vw;
+	}
+	.mid-message {
+		width: 1000px;
+		padding: 0;
+		font-size: 4vw;
+	}
+}
