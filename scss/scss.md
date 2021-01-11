@@ -139,3 +139,279 @@
 
 ![image-20210110165012138](scss.assets/image-20210110165012138.png)
 
+
+
+## Scss 문법
+
+### vars
+
+> (참고) html body에 `div#box$*5`를 쓰면 id가 box1부터 box5인 div가 자동 생성
+>
+> 처음 배울 때는 css랑 똑같이 적어도됨! 그러다가 익숙해지면 개선!
+>
+> 반복되는 코드가 나올때 예를들어 아래의 글자색, 배경색, width 등
+>
+> ```scss
+> body {
+>   background-color: #ddd;
+> }
+> 
+> #box1 {
+>   color:#ff0;
+>   background-color: #00f;
+>   width:100px;
+> }
+> 
+> #box2 {
+>   color:#f00;
+>   background-color: #00f;
+>   width:100px;
+> }
+> 
+> #box3 {
+>   color:#ff0;
+>   background-color: #00f;
+>   width:300px;
+> }
+> 
+> #box4 {
+>   color :#f00;
+>   background-color: #00f;
+>   width:300px;
+> }
+> 
+> #box5 {
+>   color:#0f0;
+>   background-color: #00f;
+> }
+> ```
+>
+> 이렇게 적으면 파란색을 노란색으로 고치고 싶다면 다 바꿔줘야됨! 이걸 변수로 처리하면 한번만 바꾸면 된다!
+>
+> ```scss
+> $bg-color:rgb(73, 83, 221);
+> 
+> body {
+>   background-color: #ddd;
+> }
+> 
+> #box1 {
+>   color:#ff0;
+>   background-color: $bg-color;
+>   width:100px;
+> }
+> 
+> #box2 {
+>   color:#f00;
+>   background-color: $bg-color;
+>   width:100px;
+> }
+> 
+> #box3 {
+>   color:#ff0;
+>   background-color:$bg-color;
+>   width:300px;
+> }
+> 
+> #box4 {
+>   color :#f00;
+>   background-color:$bg-color;
+>   width:300px;
+> }
+> 
+> #box5 {
+>   color:#0f0;
+>   background-color:$bg-color;
+> }
+> ```
+>
+> ![image-20210110201210584](scss.assets/image-20210110201210584.png)
+
+- 변수 이름 규칙
+
+  - `변수 : css에 들어갈 수 있는 모든 값;`
+
+  - `$영문`으로 시작, 영문,숫자,`-`,`_`이렇게만 들어갈 수 있다 
+
+### Nesting
+
+> 포함관계
+
+- `sass-basic.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/sass-basic.css">
+</head>
+<body>
+  <div id="box1">
+    box1<br>
+    <a href="#">button1</a>
+    <div id="box2">
+      box2<br>
+      <a href="#">button2</a>
+    </div>
+  </div>
+</body>
+</html>
+```
+
+- `sass-basic.scss`
+
+```scss
+html {
+  font-size: 18px; 
+}
+
+body {
+  margin: 20px;
+  background-color: #fff4ef;
+}
+
+div {
+  color: #333;
+  padding: 20px;
+}
+
+a {
+  display: inline-block;
+  margin: 10px 0;
+}
+
+#box1 {
+  font-size: 40px;
+  background-color: #ffcccc;
+  // 모서리둥글게함
+  border-radius: 20px;
+  // 모서리,테두리
+  border: 3px solid #f00;
+  // 그림자
+  box-shadow: 0px 3px 11px 0px rgba(0, 0, 0, 0.75);
+}
+
+#box1 > a {
+  color: #a22;
+  text-decoration: none;
+}
+
+#box1 > a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+#box1:hover {
+  background-color: #ccc;
+}
+
+#box1 #box2 {
+  font-size: 20px;
+  background-color: #e9e9e9;
+  
+  border-radius: 20px;
+  border: 3px solid #f00;
+  box-shadow: 0px 3px 11px 0px rgba(0, 0, 0, 0.75);
+}
+
+#box1 #box2 > a {
+  color: #ee6633;
+  text-decoration: none;
+}
+
+#box1 #box2 > a:hover {
+  color: #a22;
+  text-decoration: underline;
+}
+```
+
+![image-20210110202010119](scss.assets/image-20210110202010119.png)
+
+- 여기서 scss는 포함관계를 나타낼 수 있는데 만약 아래처럼 `box1`id 아래에 `a`를 적고 css를 적는다면, 변환된 css파일에는 box1id아래 모든 a태그를 가리키는 css로 변환된다!
+
+- scss파일
+
+```scss
+#box1 {
+  font-size: 40px;
+  background-color: #ffcccc;
+  // 모서리둥글게함
+  border-radius: 20px;
+  // 모서리,테두리
+  border: 3px solid #f00;
+  // 그림자
+  box-shadow: 0px 3px 11px 0px rgba(0, 0, 0, 0.75);
+  a {
+  color: #a22;
+  text-decoration: none;
+  };
+  a:hover {
+  color: #000;
+  text-decoration: underline;
+  };
+}
+```
+
+- css파일
+
+```css
+#box1 a {
+  color: #a22;
+  text-decoration: none;
+}
+
+#box1 a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+```
+
+- 하지만 이렇게 하면 box1id아래 모든  `a`가 해당되기 때문에 바로 아래의 a만 적용하고 싶다면 `&`를 이용!
+
+#### `&`(자기자신)
+
+> `&`를 이용하면`#box1` 아래에 
+>
+> `&:hover`는 `#box1:hover`
+>
+> `& > a` 는 `#box1 > a`, 그 아래 또 `&:hover`를 한다면 `#box1 > a:hover`
+
+- scss
+
+```scss
+#box1 {
+  &:hover {
+    background-color: #ccc;
+  }
+  & > a {
+  color: #a22;
+  text-decoration: none;
+  &:hover {
+      color: #000;
+      text-decoration: underline;
+    }
+  };
+}
+```
+
+- css
+
+```css
+#box1:hover {
+  background-color: #ccc;
+}
+
+#box1 > a {
+  color: #a22;
+  text-decoration: none;
+}
+
+#box1 > a:hover {
+  color: #000;
+  text-decoration: underline;
+}
+```
+

@@ -1,0 +1,35 @@
+$bg-color:rgb(73, 83, 221);
+$color-yello:#ff0;
+
+body {
+  background-color: #ddd;
+}
+
+#box1 {
+  color:#ff0;
+  background-color: $bg-color;
+  width:100px;
+}
+
+#box2 {
+  color:#f00;
+  background-color: $bg-color;
+  width:100px;
+}
+
+#box3 {
+  color:#ff0;
+  background-color:$bg-color;
+  width:300px;
+}
+
+#box4 {
+  color :#f00;
+  background-color:$bg-color;
+  width:300px;
+}
+
+#box5 {
+  color:#0f0;
+  background-color:$bg-color;
+}
