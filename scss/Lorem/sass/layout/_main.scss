@@ -1,0 +1,172 @@
+
+main {
+
+    @include clearfix();
+
+    //
+    #section-about {
+        background-color: #ededed;
+        padding: 7rem 0 6.5rem 6rem;
+        width: 66.66666%;
+        min-height: 42rem;
+        float: left;
+
+        @include clearfix();
+        @include mq('small-screen-1') {
+            width: 100%;
+        }
+        @include mq('small-screen-2') {
+            width: 100%;
+            height: 54rem;
+            padding: 7rem 6rem 6.5rem 6rem;
+        }
+        @include mq('small-screen-3') {
+            width: 100%;
+            height: 60rem;
+            padding: 7rem 6rem 6.5rem 6rem;
+        }
+
+        &-words {
+            width: 65%;
+            padding: 2rem 2rem 0 0;
+            float: left;
+
+            @include mq('small-screen-2') {
+                width: 100%;
+            }
+            @include mq('small-screen-3') {
+                width: 100%;
+            }
+
+            p {
+                padding: 1.5rem 0;
+                font-size: 1.4rem;
+                font-weight: 700;
+                text-align: justify;
+            }
+        }
+
+        &-photo {
+            position: relative;
+            width: 35%;
+            float: left;
+
+            @include mq('small-screen-2') {
+                width: 100%;
+            }
+            @include mq('small-screen-3') {
+                width: 100%;
+            }
+
+            .photo {
+                position: absolute;
+                width: 18rem;
+                height: 12rem;
+                transition: all .5s;
+
+                @include mq('small-screen-2') {
+                    top: 3rem !important;
+                    left: 50% !important;
+                }
+                @include mq('small-screen-3') {
+                    top: 3rem !important;
+                    left: 50% !important;
+                }
+
+                &:hover {
+                    transform: scale(1.1);
+                    padding: 1rem;
+                    border: 3px solid $color-primary;
+                    z-index: 10;
+                }
+
+                &:nth-child(1) {
+                    left: 1rem;
+                    top: 3rem;
+                    @include mq('small-screen-2') {
+                        transform: translateX(-120%);
+                    }
+                    @include mq('small-screen-3') {
+                        transform: translateX(-120%);
+                    }
+                }
+                &:nth-child(2) {
+                    left: 6rem;
+                    top: 10rem;
+                }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    box-shadow: 3px 3px 9px 0px rgba(0, 0, 0, 0.5);
+                }
+            }
+        }
+    }
+
+    //
+    #section-etc {
+        width: 33.33334%;
+        float: left;
+
+        @include mq('small-screen-1') {
+            width: 100%;
+        }
+        @include mq('small-screen-2') {
+            width: 100%;
+        }
+        @include mq('small-screen-3') {
+            width: 100%;
+        }
+
+        [id^="etc-"] {
+            height: 14rem;
+        }
+
+        .etc {
+
+            @include mq('small-screen-1') {
+                width: 33.33333%;
+                float: left;
+            }
+            @include mq('small-screen-2') {
+                width: 33.33333%;
+                height: 22rem;
+                float: left;
+            }
+
+            &:nth-child(1) {
+                background-color: $color-blue-1;
+            }
+            &:nth-child(2) {
+                background-color: $color-blue-2;
+            }
+            &:nth-child(3) {
+                background-color: $color-blue-3;
+            }
+
+            .etc-icon {
+                padding-top: 3.5rem;
+                width: 30%;
+                text-align: center;
+                float: left;
+                i {
+                    font-size: 6rem;
+                }
+            }
+
+            .etc-text {
+                padding-top: 1rem;
+                width: 70%;
+                float: left;
+
+                p {
+                    margin: 0.5rem 0;
+                    padding-right: 3.5rem;
+                    text-align: justify;
+                    font-size: 1.4rem;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+
+.btn {
+    font-size: 30px;
+    text-decoration: none;
+    opacity: 1;
+    transition: all .5s;
+
+    &:hover {
+        font-size: 50px;
+        text-decoration: underline;
+        opacity: .2;
+    }
+}
+
+// animation
+// blueweber@gmail.com
+// kakao: - blueweber
+@keyframes anim1 {
+    0% {
+        opacity: .2;
+        transform: translate(100px, -30px);
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: .1;
+    }
+}
+
+#box1 {
+    animation-name: anim1;
+    animation-duration: 5s;
+    animation-fill-mode: both;
+    animation-iteration-count: 1;
+    animation-delay: 3s;
+}
