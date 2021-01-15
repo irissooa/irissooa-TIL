@@ -2,6 +2,516 @@
 
 [toc]
 
+## 기능 추가
+
+### CodeSplit
+
+- `routes.js`
+
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+
+Vue.use(VueRouter)
+
+export default new VueRouter ({
+    mode:'history',
+    routes: [
+    {
+        path : '/',
+        name : 'Login',
+        component : () => import('./views/user/Login.vue'),
+    },
+    {
+        path : '/user/join',
+        name : 'Join',
+        component: () => import('./views/user/Join.vue'),
+    },
+    {
+        path : '/feed/main',
+        name : 'FeedMain',
+        component: () => import('./views/feed/IndexFeed.vue'),
+    },
+    {
+        path : '/components',
+        name : 'Components',
+        component : () => import('./views/Components.vue'),
+    },
+    // pageNotFound로 가기
+    {
+        path : '/user/joinComplete',
+        name : 'JoinComplete',
+        component: () => import('./views/user/JoinComplete.vue'),
+    },
+    {
+        path : '/user/ChangePw',
+        name : 'ChangePw',
+        component: () => import('./views/user/ChangePw.vue'),
+    },
+    {
+        path : '/Error',
+        name : 'Error',
+        component: () => import('./views/Error.vue'),
+    },
+    {
+        path: '*',
+        component: () => import('./views/NotFoundPage.vue'),
+    },
+    ]
+})
+```
+
+
+
+## Join
+
+1. 가입 필수 항목 모두 입력 시에만 '가입 완료' 버튼 활성화
+
+> 회원 가입 회원 관리에 필요한 최소 정보는 필수로 포함 필수항목 : 이메일, 비밀번호, 비밀번호 확인, 이름, 약관선택유무
+>
+> 모두 충족시켜야 가입 완료 버튼 활성화
+>
+> `:disabled`로 `isButtonDisabled`가 false여야 버튼이 활성화되고
+>
+> `class`를 통해 `btn-bottom의 scss`에 `&.disabled` 코드를 통해  `isButtonDisabled`가 true면 disabled class를 붙여 비활성화된 상태로 보이게 함
+>
+> ```scss
+> .btn-bottom {
+>  width: calc(100% - 40px);
+>  background: #000;
+>  color: #fff;
+>  height: 50px;
+>  text-align: center;
+>  line-height: 50px;
+>  font-weight: $f600;
+>  position: fixed;
+>  left: 20px;
+>  bottom: 17px;
+>  cursor: pointer;
+>  transform: rotate(.1deg);
+>  &.disabled {
+>      background: $grey;
+>      cursor: default;
+>  }
+> ```
+
+```vue
+<template>
+	<!-- 수정 -->
+    <button 
+        class="btn-bottom"
+        :class="{disabled:isButtonDisabled}"
+        :disabled="isButtonDisabled"
+        @click= "joinComplete"
+        >가입하기
+    </button>
+</template>
+<script>
+export default {
+    //추가
+    computed : {
+    isButtonDisabled (){
+      if (!this.nickName || !this.email || !this.password || !this.passwordConfirm || !this.isTerm) {
+       return true
+      }
+      return false
+    }
+  },
+    methods: {
+    joinComplete() {
+      console.log("회원가입완료!")
+      this.$router.push("/user/JoinComplete");
+    }
+  }
+};
+</script>
+```
+
+2. 회원 가입 완료 회원가입을 완료 했을 때 보이는 페이지 "인증 메일이 발송되었습니다. 이메일을 확인해주세요" 문구를 화면에 노출
+
+> 이메일 인증: 회원가입 완료 시 인증 이메일 발송 메일 발송은 웹메일의 SMTP 서비스 이용 ( ex. Gmail ) 메일 발송 성공 및 실패 시 메시지 출력
+
+- `JoinComplete.vue`
+
+```vue
+<template>
+  <div class="user join wrapC">
+    <h1>가입완료</h1>
+    <p class="mail-text">회원가입 인증 메일이 발송되었습니다. <br/>이메일을 확인해 주세요.</p>
+    <button class="btn-bottom">메일 재발송</button>
+    <img src="@/assets/images/happy.jpg" alt="happy" width=100% height=100%>
+    <button class="btn-bottom" @click="goHome">Home</button>
+  </div>
+</template>
+
+<script>
+export default {
+  methods:{
+    goHome() {
+      this.$router.push("/");
+    }
+  }
+};
+</script>
+```
+
+3. 비밀번호 변경 페이지 제작
+
+>  비밀번호 입력 기준이 충족되었을 때 '저장'버튼 활성화
+>
+>  - `Login.vue`에서 `비밀번호 찾기`클릭 
+>
+>  ```vue
+>  <div class="wrap">
+>           <p>비밀번호를 잊으셨나요?</p>
+>           <router-link to="/user/ChangePw" class="btn--text">비밀번호 찾기</router-link>
+>  </div>
+>  ```
+
+```vue
+<template>
+  <div class="user join wrapC">
+    <h1>비밀번호 변경</h1>
+    <div class="form-wrap">
+      <div class="input-with-label">
+        <input v-model="nickName" id="nickname" placeholder="닉네임" type="text" />
+        <label for="nickname">닉네임</label>
+      </div>
+
+      <div class="input-with-label">
+        <input v-model="email" id="email" placeholder="이메일" type="text" />
+        <label for="email">이메일</label>
+      </div>
+      <h4 class = "auth">인증하기</h4>
+
+      <div class="input-with-label">
+        <input v-model="password" id="password" :type="passwordType" placeholder="새 비밀번호" />
+        <label for="password">비밀번호</label>
+      </div>
+
+      <div class="input-with-label">
+        <input
+          v-model="passwordConfirm"
+          :type="passwordConfirmType"
+          id="password-confirm"
+          placeholder="새 비밀번호 확인"
+        />
+        <label for="password-confirm">비밀번호 확인</label>
+      </div>
+    </div>
+
+
+    <button 
+    class="btn-bottom"
+    :class="{disabled:isButtonDisabled}"
+    :disabled="isButtonDisabled"
+    @click= "joinComplete">SAVE</button>
+  </div>
+</template>
+
+<script>
+export default {
+  data: () => {
+    return {
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      nickName: "",
+      passwordType: "password",
+      passwordConfirmType: "password",
+      termPopup: false
+    };
+  },
+  methods: {
+    joinComplete() {
+      console.log("비밀번호변경!")
+      this.$router.push("/user/joinComplete");
+    }
+  },
+  computed : {
+    isButtonDisabled (){
+      if (!this.nickName || !this.email || !this.password || !this.passwordConfirm) {
+       return true
+      }
+      return false
+    }
+  }
+};
+</script>
+```
+
+### 가입페이지
+
+![image-20210115105748652](skeleton.assets/image-20210115105748652.png)
+
+![image-20210115105808603](skeleton.assets/image-20210115105808603.png)
+
+### 가입완료페이지
+
+![image-20210115105727466](skeleton.assets/image-20210115105727466.png)
+
+### 비밀번호 변경페이지
+
+![image-20210115105704327](skeleton.assets/image-20210115105704327.png)
+
+
+
+## login
+
+1. 모바일에서 입력 시 이메일 Input의 첫 글자가 대문자가 되는 현상으로 인해 로그인 실패가 발생하지 않도록 구현
+
+> `autocapitalize` 전역 특성은 사용자가 입력하거나 수정하는 텍스트를 자동으로 대문자로 바꾸는 방식을 제거하는 열거형 특성
+>
+> - `off` 또는 `none`: 대문자로 변환하지 않음 (모든 문자의 기본값 소문자)
+> - `on` 또는 `sentences`: 각 문장의 첫 번째 문자는 기본값 대문자, 다른 모든 문자는 기본값 소문자
+> - `words`: 각 단어의 첫 번째 문자는 기본값 대문자, 다른 모든 문자는 기본값 소문자.
+> - `characters`: 모든 문자의 기본값 대문자
+
+```html
+<input type="text|email|속성값" autocapitalize="off">
+```
+
+
+
+2. 이메일 형식 입력 및 비밀번호 입력 기준 충족 시에만 `로그인`버튼 활성화
+
+> `:disabled`로 `isButtonDisabled`가 false여야 버튼이 활성화되고
+>
+> `class`를 통해 `btn-bottom의 scss`에 `&.disabled` 코드를 통해  `isButtonDisabled`가 true면 disabled class를 붙여 비활성화된 상태로 보이게 함
+>
+> ```scss
+> // &.disabled추가 grey로 보이게 만듦
+> .btn--back {
+>  width: $c100;
+>  background-color: #000;
+>  border-radius: 3px;
+>  font-weight: $f600;
+>  box-shadow: none;
+>  height: 50px;
+>  line-height: 50px;
+>  &.disabled {
+>      background: $grey;
+>      cursor: default;
+>  }
+> ```
+
+```vue
+<template>
+	<!-- 수정 -->
+    <!-- isSubmit이 false이면 disabled 클래스 적용, isSubmit이 false이면 버튼 비활성화 -->
+      <button
+        class="btn btn--back btn--login"
+        @click="onLogin"
+        :disabled="isButtonDisabled"
+        :class="{disabled : isButtonDisabled }"
+      >로그인
+    </button>
+</template>
+<script>
+import "../../components/css/user.scss";
+// password유효성검사
+import PV from "password-validator";
+// email유효성검사
+import * as EmailValidator from "email-validator";
+// sns로그인기능
+import KakaoLogin from "../../components/user/snsLogin/Kakao.vue";
+import GoogleLogin from "../../components/user/snsLogin/Google.vue";
+import UserApi from "../../api/UserApi";
+
+export default {
+  components: {
+    KakaoLogin,
+    GoogleLogin
+  },
+  created() {
+    this.component = this;
+    // 비밀번호 8자~100자사이 숫자, 문자 포함(비밀번호형식)
+    this.passwordSchema
+      .is()
+      .min(8)
+      .is()
+      .max(100)
+      .has()
+      .digits()
+      .has()
+      .letters();
+  },
+  watch: {
+    // password에 변화가 있으면 checkForm함수 실행
+    password: function(v) {
+      this.checkForm();
+    },
+    // email에 변화가 있으면 checkForm함수 실행
+    email: function(v) {
+      this.checkForm();
+    }
+  },
+  methods: {
+    goError() {
+      console.log('에러!');
+      this.$router.push("/Error");
+    },
+    checkForm() {
+      // email.length가 0이상이고 email이 이메일형식이 false라면(맞다면 true,아니면 false)
+      if (this.email.length >= 0 && !EmailValidator.validate(this.email))
+        this.error.email = "이메일 형식이 아닙니다.";
+      else this.error.email = false;
+      // password.length가 0이상이고, password형식이 false라면(틀리다면)
+      if (
+        this.password.length >= 0 &&
+        !this.passwordSchema.validate(this.password)
+      )
+        this.error.password = "영문,숫자 포함 8 자리이상이어야 합니다.";
+      else this.error.password = false;
+      // isSubmit 변수 true로 할당
+      let isSubmit = true;
+      // error객체 하나하나(email, password가 v에 들어감)
+      Object.values(this.error).map(v => {
+        // email이나 password가 true(에러!, 에러가아니라면 false임)라면 isSubmit은 false
+        if (v) isSubmit = false;
+      });
+      // isSubmit이 true면 이메일,비밀번호 valid!, false라면 하나라도 valid하지 않음
+      this.isSubmit = isSubmit;
+    },
+    onLogin() {
+      // isSubmit이 true라면(valid하다면)
+      if (this.isSubmit) {
+        // email, password를 data 변수에 넣음
+        let { email, password } = this;
+        let data = {
+          email,
+          password
+        };
+
+        //요청 후에는 버튼 비활성화
+        this.isSubmit = false;
+        // UserApi에 requestLogin으로 data를 보냄
+        UserApi.requestLogin(
+          data,
+          res => {
+            //통신을 통해 전달받은 값 콘솔에 출력
+            //console.log(res);
+
+            //요청이 끝나면 버튼 활성화
+            this.isSubmit = true;
+            // 요청성공했으니 main으로 이동
+            this.$router.push("/feed/main");
+          },
+          // login실패
+          error => {
+            //요청이 끝나면 버튼 활성화
+            this.isSubmit = true;
+            // 요청실패했으니 Error으로 이동
+            this.$router.push("/Error");
+          }
+        );
+      }
+    }
+  },
+  data: () => {
+    return {
+      email: "",
+      password: "",
+      passwordSchema: new PV(),
+      error: {
+        email: false,
+        passowrd: false
+      },
+      isSubmit: false,
+      component: this,
+    };
+  },
+  //추가
+  computed : {
+    isButtonDisabled (){
+      if (!this.email || !this.password || !this.isSubmit) {
+       return true
+      } 
+      return false
+    }
+  }
+};
+</script>
+```
+
+### Login 결과페이지
+
+![image-20210115105414343](skeleton.assets/image-20210115105414343.png)
+
+![image-20210115105441147](skeleton.assets/image-20210115105441147.png)
+
+![image-20210115105537696](skeleton.assets/image-20210115105537696.png)
+
+### 로그인완료 후 메인페이지로 이동
+
+![image-20210115111402984](skeleton.assets/image-20210115111402984.png)
+
+## Page Not Found
+
+1. 존재하지 않는 URL요청 시 Page Not Found페이지로 이동
+
+- `routes.js`에 아래구문 추가
+
+> 모든 페이지들을 경로와 매칭시킨 이후, route 포함되지 않은 모든 경로(default 값)에 대해서 `NotFoundPage`로 보냄. `'*'` 의 의미는 위에서 어떤 경로와도 매칭이 되지 않은 경우 해당 경로로 이동하라는 의미로 이해하면 된다
+
+```js
+ {
+        path: '*',
+        component: () => import('@/views/NotFoundPage.vue'),
+    },
+```
+
+- `views` > `NotFoundPage.vue`
+
+```vue
+<template>
+  <div>
+    Page is not found
+  </div>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style></style>
+```
+
+![image-20210115105600003](skeleton.assets/image-20210115105600003.png)
+
+2. Error 페이지
+
+> 웹 페이지에 오류가 발생하는 경우 Error 페이지로 이동
+
+![image-20210115105633269](skeleton.assets/image-20210115105633269.png)
+
+## 주소지정
+
+- 프로젝트폴더 위치에 `jsconfig.json`파일 추가
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "./*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+```
+
+
+
 ## 참고
 
 ### 1. v-bind:disabled
