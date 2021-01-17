@@ -1,0 +1,25 @@
+{
+  "editor.semanticTokenColorCustomizations": null,
+  "liveSassCompile.settings.formats": [
+    // This is Default.
+    {
+      "format": "expanded",
+      "extensionName": ".css",
+      // ~은 해당 sass파일이 있는 폴더(~)의 상위폴더(../)에 css파일
+      "savePath": "~/../css"
+    },
+    // You can add more
+    // min.css 공백없이 용량줄이기 위한 파일 -> 필요없으면 지워도됨
+    // {
+    //   "format": "compressed",
+    //   "extensionName": ".min.css",
+    //   "savePath": "/dist/css"
+    // },
+    // // More Complex
+    // {
+    //   "format": "compressed",
+    //   "extensionName": ".min.css",
+    //   "savePath": "~/../css/"
+    // }
+  ]
+}

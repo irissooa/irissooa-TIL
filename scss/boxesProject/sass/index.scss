@@ -1,0 +1,96 @@
+@import "abstracts/variables";
+@import "abstracts/mixins";
+
+@import "base/base";
+
+// Nesting
+.box {
+  @include width-height-padding(300px, 300px, 20px);
+  @include pos-abs-center();
+  
+  &, &-inner {
+    border:3px solid $border-color;
+  }
+  // Media query Nesting -> 기본구간 아래에 정의돼야한다 아래로 읽기때문에 위 코드가 나중에 읽히게 되면 그게 적용됨!
+  // desktop-big
+  @include mq('desktop-big') {
+    border:10px solid $border-color;
+  }
+  // @media screen and (min-width:1201px){
+  //   border:10px solid $border-color;
+  // }
+  // tablet-land(tablet옆으로)
+  @include mq('tablet-land') {
+    border:10px solid $border-color;
+  }
+  // @media screen and (min-width:601px) and (max-width:899px) {
+  //   border:2px solid $border-color;
+  // }
+  // phone
+  @include mq('phone') {
+    border:10px solid $border-color;
+    width: 100%;
+  }
+  // @media screen and (max-width:600px) {
+  //   border:none;
+  // }
+
+  // .bix-inner
+  &-inner {
+    // width:initial; -> 따로 설정안하면 default값
+    @include width-height-padding(initial,40px , 10px);
+    // desktop-big
+    @include mq('desktop-big') {
+      height:50px;
+    }
+    // @media screen and (min-width:1201px){
+    //   height:50px;
+    // }
+    // tablet-land(tablet옆으로)
+    @include mq('tablet-land') {
+      height:30px;
+    }
+    // @media screen and (min-width:601px) and (max-width:899px) {
+    //   height:30px;
+    // }
+    // phone
+    @include mq('phone') {
+      height:55px;
+    }
+    // @media screen and (max-width:600px) {
+    //   height:10px;
+    // }
+
+    background-color:$color-grey;
+    // .box-inner-title
+    &-title {
+      font-size: 20px;
+      color:$color-white;
+      background-color: rgba($color-black,5);
+      @include mq('tablet-land') {
+        font-size: 30px;
+      }
+      @include mq('phone') {
+        font-size: 40px;
+      }
+      }
+  }
+}
+// desktop-big
+// @media screen and (min-width:1201px){
+//   .box-inner {
+//     height:50px;
+//   }
+// }
+// // tablet-land(tablet옆으로)
+// @media screen and (min-width:601px) and (max-width:899px) {
+//   .box-inner {
+//     height:30px;
+//   }
+// }
+// // phone
+// @media screen and (max-width:600px) {
+//   .box-inner {
+//     height:10px;
+//   }
+// }

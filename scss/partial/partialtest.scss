@@ -1,0 +1,7 @@
+@import "mixins";
+@import "partial/styles";
+
+#test {
+  @include fontSizeBgColor(100px,rgb(224, 0, 0));
+  @extend %boxShape;
+}

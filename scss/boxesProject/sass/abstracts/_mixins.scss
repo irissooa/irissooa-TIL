@@ -1,0 +1,53 @@
+// mixin
+@mixin width-height-padding($w,$h,$p) {
+  width: $w;
+  height: $h;
+  padding: $p;
+}
+// 상하좌우 가운데 정렬
+@mixin pos-abs-center() {
+  position:absolute;
+  // absolute는 부모를 기준으로 기준점이 가운데로 오게됨 -> 정가운데가 아님
+  left:50%;
+  top:50%;
+  // translate(x,y)는 자기자신의 위치를 조절
+  // 자기자신 너비의 반만큼 좌우(x), 자기자신 높이의 반만큼 상하(y)
+  transform: translate(-50%,-50%);
+}
+// 좌우 가운데 정렬
+@mixin pos-abs-center-horizontal() {
+  position:absolute;
+  left:50%;
+  transform: translateX(-50%);
+}
+// 상하 가운데 정렬
+@mixin pos-abs-center-vertical() {
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+}
+
+// @content를 하게되면 @include mq() {css코드 작성가능} 가져가서 css코드 작성 가능하게 됨
+@mixin mq($screen-width) {
+  @if $screen-width == 'phone' {
+  // phone
+    @media screen and (max-width:600px) {
+      @content;
+    }
+  }
+  @else if $screen-width == 'tablet-land' {
+    // tablet-land(tablet옆으로)
+    @media screen and (min-width:601px) and (max-width:899px) {
+      @content;
+    }
+  }
+  @else if $screen-width == 'desktop-big' {
+    // desktop-big
+    @media screen and (min-width:1201px){
+      @content;
+    }
+  }
+  @else { //일반 기본 desktop
+
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,KAAK,CAAC;EACJ,SAAS,EAAC,IAAI;CACf",
+    "sources": [
+        "../partial/partialtest.scss"
+    ],
+    "names": [],
+    "file": "partialtest.css"
+}

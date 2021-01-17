@@ -1,0 +1,36 @@
+body {
+  margin:50px;
+}
+
+//mixin
+@mixin textAndBgcolor($textColor,$bgColor) {
+  color : $textColor;
+  background-color: $bgColor;
+}
+
+@mixin theme($mood) {
+  // if 조건 인자 mood가 `light`라는 글자와 같다면
+  @if $mood == 'light' {
+    @include textAndBgcolor(#333,#ff0 )
+  }
+  // mood가 'dark'와 같다면
+  @else if $mood == 'dark' {
+    @include textAndBgcolor(#fff,#000 )
+
+  }
+  // mood가 그외일때
+  @else {
+    @include textAndBgcolor(#f00,#aaa )
+
+  }
+}
+
+#box1 {
+  @include theme('light');
+}
+#box2 {
+  @include theme('dark');
+}
+#box3 {
+  @include theme('아무거나');
+}
