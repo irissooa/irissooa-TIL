@@ -1,39 +1,43 @@
-
+// transition
 .btn {
     font-size: 30px;
-    text-decoration: none;
-    opacity: 1;
-    transition: all .5s;
-
+    text-decoration: none; // 및줄없앰
+    opacity: 1; //기본은 1(안적어도됨)
+    // all은 바뀌는 속성(hover안의 3가지 속성) 5초동안
+    transition: all .5s; 
+    // transition: font-size 5s, opacity 10s; // 이렇게 나눠서 적용도 가능
+    // 버튼에 마우스가 올라왔을때
     &:hover {
         font-size: 50px;
-        text-decoration: underline;
-        opacity: .2;
+        text-decoration: underline; //마우스올리면 밑줄
+        opacity: .2; //투명도
     }
 }
 
 // animation
-// blueweber@gmail.com
-// kakao: - blueweber
+// @keyframes로 시작(css3에서 제공하는 애니메이션 기능) anim1(애니메이션이름)
 @keyframes anim1 {
-    0% {
-        opacity: .2;
-        transform: translate(100px, -30px);
+    // 주어진 시간에 대한 %로 기술
+    0% { // 처음
+        opacity: .2; //투명도(20%)
+        // transform : 그 요소의 위치(translate)나 크기(scale)를 바꾸는 속성
+        transform: translate(100px, -30px); // 요소 위치 (x : 왼쪽이 '-'&오른쪽이 '+',y: 위쪽이 '-' &아래쪽이 '+')
     }
 
-    50% {
-        opacity: 1;
+    50% { // 중간
+        opacity: 1; //투명도(100%)
     }
 
-    100% {
-        opacity: .1;
+    100% { // 끝나는 위치
+        opacity: .1; // 투명도(10%)
     }
 }
 
 #box1 {
-    animation-name: anim1;
-    animation-duration: 5s;
-    animation-fill-mode: both;
-    animation-iteration-count: 1;
-    animation-delay: 3s;
+    // 애니메이션 지정
+    animation-name: anim1; // 애니메이션이름
+    animation-duration: 5s; // 애니메이션 지속시간
+    animation-fill-mode: both; // forwards: 딜레이가 없고 애니메이션 끝나고 마지막상태 지속하고 싶을 때 , backwords : 딜레이가 있을 때 딜레이시간동안 처음 0%로 이동 후 시작, both : forwards + backwords(딜레이 후 처음 0%로 시작하고, 끝나도 마지막 100%상태 유지) 
+    animation-iteration-count: 1; // 애니메이션 실현 횟수
+    animation-delay: 3s; // 애니메이션 바로 시작이 아니라 몇s뒤에 시작
 }

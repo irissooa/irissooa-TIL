@@ -1,24 +1,27 @@
-
+// float로 띄웠을 때 부모가 자식의 영역을 인지하게 하기위함
 @mixin clearfix() {
     &::after {
         content: '';
         display: block;
-        clear: both;
+        clear: both; // float : right&left둘다 적용
     }
 }
-
+// 반응형 페이지
 @mixin mq($screen-width) {
     @if $screen-width == 'small-screen-1' {
+        // 900~1200px 사이
         @media screen and (min-width: 900px) and (max-width: 1200px) {
             @content;
         }
     }
     @else if $screen-width == 'small-screen-2' {
+        // 701~899px사이
         @media screen and (min-width: 701px) and (max-width: 899px) {
             @content;
         }
     }
     @else if $screen-width == 'small-screen-3' {
+        // 700px이하
         @media screen and (max-width: 700px) {
             @content;
         }

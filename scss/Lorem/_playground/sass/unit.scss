@@ -1,6 +1,6 @@
 
-// px
-// em, rem
+// px (절대적크기)
+// em(해당요소에 지정된 폰트사이즈 = 1em), rem
 // vw(viewport width), vh(viewport height)
 
 html {
@@ -10,7 +10,9 @@ html {
 }
 
 #box1 {
+    // viewport넓이의 80%
     width: 80vw;
+    // viewport넓이의 50%
     height: 50vh;
     font-size: 3rem;
     background-color: #aaa;

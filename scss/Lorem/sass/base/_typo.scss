@@ -1,22 +1,25 @@
-
+// typo 글자 text 스타일 지정
 h2 {
-    padding: 1rem 0;
+    padding: 1rem 0; // 위아래, 좌우
     font-size: 2.4rem;
     font-weight: 800;
-    text-transform: uppercase;
-    background: linear-gradient(left, $color-primary, $color-secondary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    text-transform: uppercase; // 대문자
+    // 그라데이션효과
+    background: linear-gradient(left, $color-primary, $color-secondary); // 왼쪽에서 시작, 시작, 끝 색
+    -webkit-background-clip: text; // 글자 부분에만 그라데이션을 입힘
+    -webkit-text-fill-color: transparent; // 기본적인 text color를 transparent(투명)하게 함
 
-    transition: all .5s;
-
+    // hover(애니메이션) 움직일때 매끄럽게 움직임
+    transition: all .5s; // padding-left가 5초동안 움직임
+    // 마우스 올라감
     &:hover {
+        // 살짝 왼쪽으로 움직임
         padding-left: 1.5rem;
     }
 }
 
 h3 {
-    padding: .5rem 0;
+    padding: .5rem 0; // 상하,좌우
     color: $color-grey-dark;
     font-size: 1.6rem;
     font-weight: 700;

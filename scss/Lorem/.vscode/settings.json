@@ -3,6 +3,7 @@
        {
            "format": "expanded",
            "extensionName": ".css",
+            // 해당 sass파일의 한폴더 위의 css폴더   
            "savePath": "~/../css"
        }
    ],
@@ -14,5 +15,12 @@
    "liveSassCompile.settings.autoprefix": [
        "> 1%",
        "last 2 versions"
-   ]
+],
+"[json]": {
+
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    "editor.suggest.insertMode": "replace"
+}
 }

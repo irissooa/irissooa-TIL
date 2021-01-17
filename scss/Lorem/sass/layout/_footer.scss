@@ -1,22 +1,23 @@
-
+// footer
 footer {
 
     color: $color-grey-light;
     background-color: $color-blue-dark;
-    padding: 9rem 7rem 3rem 7rem;
+    padding: 9rem 7rem 3rem 7rem; // 상 우 하 좌
 
     @include mq('small-screen-3') {
         padding: 9rem 2rem 3rem 7rem;
     }
 
-    @include clearfix();
+    @include clearfix(); // float된 자식을 부모가 인지할 수 있게 함
 
     #logo-text-footer {
-        width: 25%;
-        font-size: 4rem;
+        width: 25%; // 넓이의 25%
+        font-size: 4rem; // 40px
         font-family: 'Lato', sans-serif;
-        font-weight: 100;
-        text-transform: uppercase;
+        font-weight: 100; // 굵기
+        text-transform: uppercase; // 전부 대문자로 표시
+        // 옆으로 띄우기 위해
         float: left;
 
         @include mq('small-screen-3') {
@@ -26,25 +27,27 @@ footer {
     }
 
     #copyright {
-        width: 75%;
-        font-size: 1.2rem;
+        width: 75%; // 넓이의 75%
+        font-size: 1.2rem; // 12px
         float: left;
 
         @include mq('small-screen-3') {
             width: 60%;
         }
-
+        // :ntn-child(n) -> n번째 자식
+        // :first-child라고 해도 됨
         p:nth-child(1) {
             margin-bottom: 2rem;
-            word-break: break-all;
-            text-align: justify;
+            word-break: break-all; // break-all 단어가 길더라도 줄이 바뀌면 그대로 잘려서 줄이 바뀜
+            text-align: justify; // 양쪽 가장자리가 딱 맞게
 
-            column-count: 3;
-            column-gap: 3rem;
-            column-rule-style: dashed;
-            column-rule-width: 1px;
-            column-rule-color: #888;
-            column-width: 1rem;
+            // 단 표시
+            column-count: 3; // 단 개수
+            column-gap: 3rem; // 30px
+            column-rule-style: dashed; // gap 사이에 나누는 선 (dashed : 점선)
+            column-rule-width: 1px; // 선 두께
+            column-rule-color: #888; // 선 색
+            column-width: 1rem; // 크게 의미 없는데 1rem이 기본으로 들어간다고 생각하면 됨
         }
     }
 }

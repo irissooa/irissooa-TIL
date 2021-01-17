@@ -1,4 +1,4 @@
-
+// nav bar 스타일
 .nav {
 
     &-checkbox {
@@ -9,17 +9,18 @@
         background-color: #c4e3ff;
         width: 7rem;
         height: 6rem;
-        position: fixed;
+        position: fixed; // 계속 특정위치에 고정시키기 위해
         top: 7rem;
         right: 8rem;
-        z-index: 2000;
-        cursor: pointer;
-        border-radius: 2px;
-        box-shadow: 0 1rem 1rem rgba(#000, 0.1);
-        text-align: center;
+        z-index: 2000; // 제일 위로 올림
+        cursor: pointer; // 마우스 올리면 손모양으로 바뀜
+        border-radius: 2px; // 테두리 살짝 둥글게
+        box-shadow: 0 1rem 1rem rgba(#000, 0.1); // 그림자
+        text-align: center; // icon(3선 메뉴-span)을 중간으로 오게 함
     }
-
+    // nav버튼 누르면 나오는 배경 버튼과 포개져있기 때문에 위치 같게 함
     &-bg {
+        // 그라데이션 radial-gradient(가운데서 원형으로 퍼져나가는 그라데이션)
         background-image: radial-gradient($color-primary, $color-secondary);
         width: 7rem;
         height: 6rem;
@@ -29,81 +30,90 @@
         z-index: 1000;
         border-radius: 2px;
 
-        transition: all .8s;
+        transition: all .8s; // 체크박스 선택됐을 떄 커졌다가 작아졌다가 하는 것을 부드럽게 표현
     }
 
-    //
+    //체크박스가 체크가 됐나 안됐나 판별 가능
+    // :checked(체크된상태) ~(같은 위치의 형제 요소를 선택 할 수 있음) and &-bg
+    // 체크박스가 체크됐을 때 같은 위치의 &-bg도  같이 아래의 스타일 적용됨
     &-checkbox:checked ~ &-bg {
+        // 크기가 엄청 커지게 만듦(체크해제되면 사라짐)
         transform: scale(80);
     }
 
-    // ICON
+    // ICON(3선 메뉴)
     &-icon {
-        position: relative;
+        position: relative; // 자식 선(absolute)이 icon을 기준(relative)으로 위치하기 위해
+        // 중간 선 위치
         margin-top: 3rem;
-
+        // 위에선
         &::before {
-            top: -0.8rem;
+            top: -0.8rem; // 부모를 기준으로 -0.8rem올라감
         }
-
+        // 아래선
         &::after {
             top: 0.8rem;
         }
-
+        // 위, 아래 둘다 공통으로 스타일 주기 위해
         &::before, &::after {
             content: '';
-            position: absolute;
+            position: absolute; // absolute, 부모(-icon)를 기준으로 위치하기 위해
             left: 0;
-            transition: all .2s;
+            transition: all .2s; // hover일때 자연스럽게 하기 위해
         }
-
+        // 3선 전부 적용할 스타일
         &, &::before, &::after {
             width: 3rem;
             height: 2px;
             background-color: #333;
-            display: inline-block;
+            display: inline-block; // span태그는 inline요소기 때문에 inline-block으로 바꿔줌
         }
     }
-
+    // button에 마우스가 올라갔을 때, icon(3선메뉴)의 첫줄은 위로 조금 올림
     &-button:hover &-icon::before {
         top: -1rem;
     }
+    // button에 마우스가 올라갔을 때, icon(3선메뉴)의 아랫줄은 아래로 조금 내림
     &-button:hover &-icon::after {
         top: 1rem;
     }
-
+    // 체크박스가 체크되고(메뉴가 활성화됨) 같은 위치의 &-button &-icon에 적용
     &-checkbox:checked ~ &-button &-icon {
-        background-color: transparent;
+        background-color: transparent; // 가운데 선이 투명하게 됨
     }
+    // 메뉴가 눌려지면 3선이 X표시가 됨
+    // 체크박스가 체크되고(메뉴가 활성화됨) 같은 위치의 &-button &-icon의 첫줄에 적용
     &-checkbox:checked ~ &-button &-icon::before {
-        top: 0;
-        transform: rotate(135deg);
+        top: 0; // top이 벌어져있으니까 0으로 돌림
+        transform: rotate(135deg); // deg(도), 135도 돌림 -> 45도 돌려도 되지만 더 크게 회전시키기 위해 (180-45)
     }
+    // 체크박스가 체크되고(메뉴가 활성화됨) 같은 위치의 &-button &-icon의 마지막 줄에 적용
     &-checkbox:checked ~ &-button &-icon::after {
-        top: 0;
+        top: 0; // top이 벌어져있으니까 0으로 돌림
         transform: rotate(-135deg);
     }
 
     // .nav-body
     &-body {
-        position: fixed;
+        position: fixed; // 메뉴도 고정된 위치로 따라 내려가야되기 때문
         top: 0;
-        left: -120%;
-        width: 100vw;
-        height: 100vh;
+        left: -120%; // 자기 넓이 이상으로 왼쪽으로 보냄 -> 체크됐을 때 메뉴 위로 올릴거야
+        width: 100vw; // body의 영역을 꽉차게함
+        height: 100vh; // body의 영역을 꽉차게함
         z-index: 1500;
-        opacity: 0;
-        transition: all .8s;
+        opacity: 0; // 기본투명도를 0 -> 체크되면 1로 하면 점점 진해짐
+        transition: all .8s; // left가 변하는 것을 자연스럽게 함
     }
-
+    // .nav-body아래에 적어도 되고 이렇게 독립적으로 적어도 됨
     &-list {
         position: absolute;
-        left: 50%;
+        // 가운데 정렬
+        left: 50%; // 기준점이 중간에 위치
         top: 50%;
-        transform: translate(-50%, -50%);
-        list-style: none;
-        width: 100%;
-        text-align: center;
+        transform: translate(-50%, -50%); // 자기자신의 반(width,height)만큼 이동시켜서 가운데 정렬
+        list-style: none; // 목록(ul)의 점 사라짐
+        width: 100%; // 넓이 꽉참
+        text-align: center; // 글자 가운데 정렬
     }
 
     &-item {
@@ -114,36 +124,38 @@
         display: inline-block;
         font-size: 3rem;
         font-weight: 300;
-        padding: 1rem 2rem;
+        padding: 1rem 2rem; // 상하, 좌우
         color: $color-white;
-        text-decoration: none;
-        text-transform: uppercase;
+        text-decoration: none; // 밑줄없음
+        text-transform: uppercase; // 대문자
 
-        transition: all .4s;
-
+        transition: all .4s; // hover 매끄럽게
+        // 그라데이션 응용
+        // 꺾인 사각형 배경 표시
+        // 첫요소 120도, 투명도, 색
         background-image: linear-gradient(
             120deg,
             transparent 0%,
             transparent 50%,
             $color-white 50%
         );
-        background-size: 220%;
-
+        background-size: 220%; // background-size를 키움 -> 마우스 올라가면 이동시키게 함
+        // 마우스가 올라갔을 때
         &:hover {
-            color: $color-primary;
-            background-position: 100%;
-            transform: translateX(1rem);
+            color: $color-primary; // 글자색 변경
+            background-position: 100%; // 위치를 내 위치로
+            transform: translateX(1rem); // 글자 살짝 오른쪽으로 이동
         }
-
+        // 숫자 span으로 감싸서 margin을 줌
         span {
-            display: inline-block;
+            display: inline-block; // block요소여야 margin을 줄 수 있음
             margin-right: 1.5rem;
         }
     }
-
+    // 체크됐고 해당 위치의 &-body
     &-checkbox:checked ~ &-body {
         opacity: 1;
-        left: 0;
+        left: 0; // left : 0으로 바꿔서 나타나게 함
     }
 
 }
