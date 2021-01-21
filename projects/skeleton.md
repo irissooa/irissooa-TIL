@@ -514,6 +514,8 @@ export default {};
 
 ## 참고
 
+> `npm`과 `yarn`의 차이는...?
+
 ### 1. v-bind:disabled
 
 - disabled="쌍따옴표안의 특정 조건을 만족하는 경우 비활성화됨"
