@@ -45,7 +45,7 @@
 
 ```
 VUE_APP_CLIENT_ID_KAKAO=
-VUE_APP_CALLBACK_URL_KAKAO=http://localhost:3030/loginKakao/callback
+VUE_APP_CALLBACK_URL_KAKAO=http://localhost:8080/
 ```
 
 #### server/.env
@@ -53,7 +53,7 @@ VUE_APP_CALLBACK_URL_KAKAO=http://localhost:3030/loginKakao/callback
 ```
 CLIENT_ID_KAKAO=
 CLIENT_SECRET_KAKAO=
-CALLBACK_URL_KAKAO=http://localhost:3030/loginKakao/callback
+CALLBACK_URL_KAKAO=http://localhost:8080/
 ```
 
 
@@ -92,7 +92,7 @@ CALLBACK_URL_KAKAO=http://localhost:3030/loginKakao/callback
 
 ```
 VUE_APP_CLIENT_ID_GOOGLE=
-VUE_APP_CALLBACK_URL_GOOGLE=http://localhost:3030/loginGoogle/callback
+VUE_APP_CALLBACK_URL_GOOGLE=http://localhost:8080/
 ```
 
 #### server/.env
@@ -100,7 +100,7 @@ VUE_APP_CALLBACK_URL_GOOGLE=http://localhost:3030/loginGoogle/callback
 ```
 CLIENT_ID_GOOGLE=
 CLIENT_SECRET_GOOGLE=
-CALLBACK_URL_GOOGLE=http://localhost:3030/loginGoogle/callback
+CALLBACK_URL_GOOGLE=http://localhost:8080/
 ```
 
 
