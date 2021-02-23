@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "프로세서에 연결",
+      "processId": "${command:PickProcess}",
+      "request": "attach",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Launch Program",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\We love kriii.js"
+    },
+    {
+      "type": "pwa-node",
+      "name": "Run Current File",
+      "request": "launch",
+      "program": "${workspaceFolder}\\개.js"
+    }
+  ]
+}
