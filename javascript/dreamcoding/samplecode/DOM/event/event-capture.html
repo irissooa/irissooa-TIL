@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .outer {
+        width: 500px;
+        height: 500px;
+        background-color: yellow;
+      }
+
+      .middle {
+        width: 50%;
+        height: 50%;
+        margin: auto;
+        background-color: thistle;
+        transform: translateY(50%);
+      }
+
+      button {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="middle">
+        <button>Click Me</button>
+      </div>
+    </div>
+    <script>
+      const outer = document.querySelector('.outer');
+      const middle = document.querySelector('.middle');
+      const button = document.querySelector('button');
+
+      outer.addEventListener('click', event => {
+        if (event.target !== event.currentTarget) {
+          return;
+        }
+        console.log(`outer: ${event.currentTarget}, ${event.target}`);
+      });
+      middle.addEventListener('click', event => {
+        if (event.target !== event.currentTarget) {
+          return;
+        }
+        console.log(`middle ${event.currentTarget}, ${event.target}`);
+      });
+      button.addEventListener('click', event => {
+        console.log(`button1 ${event.currentTarget}, ${event.target}`);
+        // button1,2만 클릭되고 버블링은 일어나지 않음
+        // event.stopPropagation();
+        // button1만 일어남(내가 최고야 다른애들은 다 취소해) 
+        // event.stopImmediatePropagation();
+      });
+      button.addEventListener('click', event => {
+        console.log(`button2 ${event.currentTarget}, ${event.target}`);
+        // button2에는 등록해도 1은 계속 console에 찍힘 why? 1이 먼저 등록됐기 때문! 그래서 캡쳐링될때 버튼1->버튼2되고 이제그만해라고 해봤자 1은 이미 일어났음
+        // event.stopImmediatePropagation();
+      });
+    </script>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 # Javascript
 
+[toc]
+
 > [Javascript 공식문서](https://www.ecma-international.org/)
 >
 > [Javascript MDN](https://developer.mozilla.org/ko/docs/Web/JavaScript)
@@ -389,6 +391,38 @@ console.log(triangle instanceof Shape); // true
 console.log(triangle instanceof Object); // true
 // Object의 공통적인 method를 쓸 수있음
 console.log(triangle.toString()); // [object Object] -> Triangle: color: red(오버라이딩되면 이렇게 바뀜)
+```
+
+- callback함수 -> class의 재사용가능성을 높임
+
+> 가능하면 class를 하나의 완전히 다 만들어진 완전체로 만들기보다는 우리가 원하는 기능을 끼워맞춰서 재조립이 가능하도록 만드는 것이 좋다!
+>
+> 그래서 이렇게 콜백함수를 등록받음
+
+```js
+class Counter {
+    constructor(runEveryFiveTimes) {
+        this.counter = 0;
+        this.callback = runEveryFiveTimes;
+    }
+    
+    increase() {
+        this.counter++;
+        console.log(this.counter);
+        if (this.counter % 5 === 0) {
+            //callback이 있다면 실행하라
+            this.callback && this.callback(this.counter);
+        }
+    }
+}
+function printSomething(num) {
+    console.log(`Wow! ${num}`);
+}
+function alertNum(num) {
+    alert(`alert! ${num}`);
+}
+const printCounter = new Counter(printSomething);
+const alertCounter = new Counter(alertNum);
 ```
 
 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      div {
+        width: 250px;
+        height: 250px;
+        background-color: yellow;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input type="checkbox" />
+    </div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <script>
+      document.addEventListener('wheel', event => {
+        console.log('scrolling');
+        // wheel은 passive event 이기 때문에 preventDefault를 이용할 수 없다
+        // wheel은 사용자가 행동을 다할때까지 기다릴수 없는 이벤트이기 때문에 스크롤에 관련된것, 빠르게 뭔가가 동작을 해야되는 이벤트는 브라우저가 '야 나는 내 할일 먼저 할게 너는 나중에 뭘 하든 말든 상관없어 그리고 내가 먼저 할때는 니가 preventDefault를 해도 난 무시할거야' -> 그래서 scroll되는 기본값은 취소할 수 없다
+        // 하지만 취소할 수 있는 방법이 있다!
+        // addEventListener 의 passive옵션이 true이면 preventDefault()가 무시됨
+        event.preventDefault();
+        // {passive:false}를 추가하면 이제 active가 돼서 preventDefault를 쓸 수 있음 하지만 웬만해서는 이렇게 안하는게 좋음
+      },{passive:false});
+      const checkbox = document.querySelector('input');
+      checkbox.addEventListener('click', event => {
+        // long
+        console.log('checked');
+        // 브라우저에서 기본적으로 발생하는 행동을 취소함 -> 체크박스가 체크가안됨
+        event.preventDefault();
+      });
+    </script>
+  </body>
+</html>
