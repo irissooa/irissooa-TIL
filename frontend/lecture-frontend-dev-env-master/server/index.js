@@ -6,6 +6,7 @@ const app = express();
 
 app.use(morgan("dev"));
 
+// dist폴더를 정적파일로 제공하는 코드
 app.use(express.static(path.join(__dirname, "../dist")));
 
 const port = process.env.PORT || 8081;
